@@ -11,8 +11,8 @@ import { downloadScheduleCSV } from "./engine/csv";
 const STORAGE_KEY = "prepayment-ledger-v1";
 
 const DEFAULT_LOANS: Record<"A" | "B", Loan> = {
-  A: { id: "A", name: "Loan A", outstanding: 3_000_000, ratePct: 7.5, tenureMonths: 180, startYYYYMM: "2025-01" },
-  B: { id: "B", name: "Loan B", outstanding: 5_000_000, ratePct: 7.5, tenureMonths: 180, startYYYYMM: "2025-01" },
+  A: { id: "A", name: "Loan A", outstanding: 3_000_000, ratePct: 7.5, tenureMonths: 180, startYYYYMM: "2026-06" },
+  B: { id: "B", name: "Loan B", outstanding: 5_000_000, ratePct: 7.5, tenureMonths: 180, startYYYYMM: "2026-06" },
 };
 
 interface State {

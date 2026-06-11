@@ -49,7 +49,7 @@ def build_inputs(ws):
         ("Outstanding principal (Rs)", 3_000_000, 5_000_000, RUPEE, True),
         ("Annual interest rate (%)", 7.5, 7.5, "0.00", True),
         ("Tenure (months)", 180, 180, "0", True),
-        ("EMI start date", dt.date(2025, 1, 1), dt.date(2025, 1, 1), "dd-mmm-yyyy", True),
+        ("EMI start date", dt.date(2026, 6, 1), dt.date(2026, 6, 1), "dd-mmm-yyyy", True),
     ]
     r = 3
     for label, a, b, fmt, editable in rows:
