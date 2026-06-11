@@ -56,13 +56,13 @@ def main():
     emi_a = get(sol, "INPUTS", "B7")
     emi_b = get(sol, "INPUTS", "C7")
     from amortization import monthly_emi
-    if not approx(emi_a, monthly_emi(3_000_000, 7.5, 180), 0):
+    if not approx(emi_a, monthly_emi(3_500_000, 7.25, 180), 0):
         fails.append(f"EMI A {emi_a} != {monthly_emi(3_000_000,7.5,180)}")
     if not approx(emi_b, monthly_emi(5_000_000, 7.5, 180), 0):
         fails.append(f"EMI B {emi_b} != {monthly_emi(5_000_000,7.5,180)}")
 
     # 2. Baseline total interest (Summary B7 / C7) match core (no prepay)
-    core_a = build_schedule(3_000_000, 7.5, 180)
+    core_a = build_schedule(3_500_000, 7.25, 180)
     core_b = build_schedule(5_000_000, 7.5, 180)
     sum_base_a = get(sol, "SUMMARY", "B6")
     sum_base_b = get(sol, "SUMMARY", "C6")
@@ -85,7 +85,7 @@ def main():
         fails.append(f"Interest saved A should be 0 with no prepay, got {get(sol,'SUMMARY','B8')}")
 
     # 5. Windfall block: default 5,00,000 @ month 12 on each loan, vs core
-    wf_a_core = compare(core_a, build_schedule(3_000_000, 7.5, 180, prepayments={12: 500_000}))
+    wf_a_core = compare(core_a, build_schedule(3_500_000, 7.25, 180, prepayments={12: 500_000}))
     wf_b_core = compare(core_b, build_schedule(5_000_000, 7.5, 180, prepayments={12: 500_000}))
     wf_a_saved = get(sol, "WINDFALL WHAT-IF", "B6")
     wf_b_saved = get(sol, "WINDFALL WHAT-IF", "B8")
@@ -108,7 +108,7 @@ def main():
     sol2 = calc(tmp)
     plan_saved_a = get(sol2, "SUMMARY", "B8")
     plan_months_a = get(sol2, "SUMMARY", "B11")
-    plan_core = compare(core_a, build_schedule(3_000_000, 7.5, 180, prepayments={12: 500_000}))
+    plan_core = compare(core_a, build_schedule(3_500_000, 7.25, 180, prepayments={12: 500_000}))
     if not approx(plan_saved_a, plan_core["interest_saved"], 50):
         fails.append(f"PLAN-column interest saved {plan_saved_a} != core {plan_core['interest_saved']}")
     if int(plan_months_a) != plan_core["months_saved"]:
