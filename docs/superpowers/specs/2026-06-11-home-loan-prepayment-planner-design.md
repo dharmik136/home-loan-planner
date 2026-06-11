@@ -17,7 +17,7 @@ The tool must respect HDFC's real prepayment rules and recommend which loan to p
 | Loan A | ₹30,00,000 | 7.5% (was 7.25%) | 15 yr (180 mo) | Floating |
 | Loan B | ₹50,00,000 | 7.5% (was 7.25%) | 15 yr (180 mo) | Floating |
 
-Illustrative EMIs at full principal over 15 yr @ 7.5%: Loan A ≈ ₹27,815/mo, Loan B ≈ ₹46,358/mo. Actual EMI / outstanding / start date are user-entered inputs and may differ.
+Illustrative EMIs at full principal over 15 yr @ 7.5% (EMI rounded up to whole rupee, as banks do): Loan A = ₹27,811/mo, Loan B = ₹46,351/mo. Actual EMI / outstanding / start date are user-entered inputs and may differ. Verified baseline total interest: Loan A ₹20,05,772; Loan B ₹33,43,053.
 
 ## Verified HDFC + RBI rules (June 2026) — encoded into the model
 
