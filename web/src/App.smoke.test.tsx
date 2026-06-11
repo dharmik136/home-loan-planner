@@ -29,9 +29,9 @@ describe("App smoke", () => {
   it("mounts and shows the masthead + verified default EMI", () => {
     render(<App />);
     expect(screen.getAllByText(/Prepayment/i).length).toBeGreaterThan(0);
-    // Loan A default EMI (30L @ 7.5% / 180) = ₹27,811 — must appear.
-    expect(screen.getAllByText(/27,811/).length).toBeGreaterThan(0);
-    // Loan B default EMI = ₹46,351.
+    // Loan A default EMI (35L @ 7.25% / 180) = ₹31,951 — must appear.
+    expect(screen.getAllByText(/31,951/).length).toBeGreaterThan(0);
+    // Loan B default EMI (50L @ 7.5% / 180) = ₹46,351.
     expect(screen.getAllByText(/46,351/).length).toBeGreaterThan(0);
   });
 

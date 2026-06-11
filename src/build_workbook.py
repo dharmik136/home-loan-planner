@@ -46,10 +46,10 @@ def build_inputs(ws):
     ws.cell(row=2, column=2, value="Loan A").font = LABEL
     ws.cell(row=2, column=3, value="Loan B").font = LABEL
     rows = [
-        ("Outstanding principal (Rs)", 3_000_000, 5_000_000, RUPEE, True),
-        ("Annual interest rate (%)", 7.5, 7.5, "0.00", True),
+        ("Outstanding principal (Rs)", 3_500_000, 5_000_000, RUPEE, True),
+        ("Annual interest rate (%)", 7.25, 7.5, "0.00", True),
         ("Tenure (months)", 180, 180, "0", True),
-        ("EMI start date", dt.date(2026, 6, 1), dt.date(2026, 6, 1), "dd-mmm-yyyy", True),
+        ("Full-EMI start date", dt.date(2026, 7, 1), dt.date(2026, 7, 1), "dd-mmm-yyyy", True),
     ]
     r = 3
     for label, a, b, fmt, editable in rows:
@@ -70,6 +70,14 @@ def build_inputs(ws):
                       f"/(POWER(1+{L}4/100/12,{L}5)-1),0)").number_format = RUPEE
         ws.cell(row=8, column=1, value="Monthly rate (auto)").font = LABEL
         ws.cell(row=8, column=col, value=f"={L}4/100/12").number_format = "0.000000"
+    # Pre-EMI: one-time prorated interest paid before regular EMIs begin
+    # (interest-only — does NOT reduce principal or change the schedule below).
+    ws.cell(row=9, column=1, value="Pre-EMI interest (one-time)").font = LABEL
+    for col, val in ((2, 17877), (3, 0)):
+        c = ws.cell(row=9, column=col, value=val)
+        c.number_format = RUPEE
+        c.fill = INPUT_FILL
+        c.border = BORDER
     ws.column_dimensions["A"].width = 26
     ws.column_dimensions["B"].width = 16
     ws.column_dimensions["C"].width = 16
@@ -200,6 +208,23 @@ def build_summary(ws):
                   '"Loan A (larger balance saves more)")))')
     ws.cell(row=16, column=2).fill = SAVE_FILL
     ws.merge_cells("B16:D16")
+
+    # Pre-EMI one-time interest: a sunk cost that adds to TOTAL interest but does
+    # not change the schedule, payoff, or any prepayment saving above.
+    extra = [
+        (18, "Pre-EMI interest (one-time)", "=Inputs!B9", "=Inputs!C9", "=B18+C18"),
+        (19, "Total interest incl. pre-EMI (plan)", "=B7+B18", "=C7+C18", "=B19+C19"),
+    ]
+    for row, lab, av, bv, cv in extra:
+        ws.cell(row=row, column=1, value=lab).font = LABEL
+        for col, val in ((2, av), (3, bv), (4, cv)):
+            cell = ws.cell(row=row, column=col, value=val)
+            cell.border = BORDER
+            cell.number_format = RUPEE
+    ws.cell(row=17, column=1,
+            value="Note: pre-EMI is interest-only and does not change months/interest saved above.").font = \
+        Font(italic=True, size=9, color="808080")
+
     ws.column_dimensions["A"].width = 30
     for c in "BCD":
         ws.column_dimensions[c].width = 16
