@@ -32,5 +32,20 @@ python src/verify_workbook.py       # recalc the .xlsx and verify vs core
 - Once per calendar month; min ₹5,000 or 1 EMI (higher); max ₹50L/month or 75% of
   year-opening principal (lower); not in month 1.
 
-## Next phase
-A web UI (sliders + live charts) on top of this same logic — scoped in its own spec.
+## Web UI (Phase 2 — built)
+An interactive single-page dashboard ("The Prepayment Ledger") on the same engine:
+sliders, live balance charts, windfall A-vs-B simulator, HDFC rule badges, CSV export.
+
+**To use it:** double-click **`web/dist/index.html`** — it opens in your browser, works
+offline, and saves your numbers in the browser. (Internet only makes the fonts prettier.)
+
+**To develop it:**
+```
+cd web
+npm install
+npm run dev      # live dev server
+npm test         # 14 tests: engine (matches Excel to the rupee) + UI smoke tests
+npm run build    # regenerates the single-file web/dist/index.html
+```
+The web amortization engine (`web/src/engine/amortization.ts`) is a port of the Python
+core and is tested against the same verified numbers.
