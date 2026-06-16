@@ -227,6 +227,23 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 .tooltip .tt-b { color: var(--emerald-bright); }
 .tooltip .tt-c { color: #e8a07e; }
 
+/* ---------- Schedule table ---------- */
+.sched-scroll { max-height: 380px; overflow: auto; border: 1px solid var(--line); border-radius: 3px; }
+.sched-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.sched-table th {
+  position: sticky; top: 0; z-index: 1; background: var(--ink); color: var(--paper);
+  font-family: var(--body); font-weight: 600; font-size: 0.66rem; letter-spacing: 0.05em;
+  text-transform: uppercase; padding: 9px 10px; text-align: right; white-space: nowrap;
+}
+.sched-table th:nth-child(1), .sched-table th:nth-child(2) { text-align: left; }
+.sched-table td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); color: var(--ink-soft); white-space: nowrap; }
+.sched-table td:nth-child(1) { color: var(--ink-faint); }
+.sched-table td:nth-child(2) { text-align: left; color: var(--ink); font-weight: 500; }
+.sched-table tbody tr:nth-child(12n) td { border-bottom: 1px solid var(--line-strong); }
+.sched-table tbody tr:hover td { background: var(--panel); }
+.sched-table tr.has-prepay td { background: var(--emerald-wash); color: var(--ink); font-weight: 600; }
+.sched-note { font-size: 0.74rem; color: var(--ink-faint); margin-top: 8px; }
+
 /* ---------- Windfall ---------- */
 .wf-versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; margin-top: 14px; }
 @media (max-width: 560px) { .wf-versus { grid-template-columns: 1fr; } .wf-versus .vs { display: none; } }

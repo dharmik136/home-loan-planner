@@ -3,6 +3,7 @@ import { LoanCard } from "./components/LoanCard";
 import { PrepaymentControls } from "./components/PrepaymentControls";
 import { SummaryCards } from "./components/SummaryCards";
 import { BalanceChart } from "./components/BalanceChart";
+import { ScheduleTable } from "./components/ScheduleTable";
 import { WindfallSimulator } from "./components/WindfallSimulator";
 import { RulesPanel } from "./components/RulesPanel";
 import { computeLoan, type Loan, type PrepayEntry } from "./engine/planning";
@@ -105,7 +106,9 @@ export function App() {
           </div>
 
           <BalanceChart result={resA} />
+          <ScheduleTable result={resA} />
           <BalanceChart result={resB} />
+          <ScheduleTable result={resB} />
 
           <WindfallSimulator loanA={loans.A} loanB={loans.B} />
 
