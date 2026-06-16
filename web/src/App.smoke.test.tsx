@@ -56,6 +56,14 @@ describe("App smoke", () => {
     expect(screen.getAllByText(/Best choice/i).length).toBeGreaterThan(0);
   });
 
+  it("shows a month-by-month schedule with opening balances", () => {
+    render(<App />);
+    expect(screen.getAllByText(/every month/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Opening/).length).toBeGreaterThan(0);
+    // 180-month schedule -> the final month row (#180) is present.
+    expect(screen.getAllByText("180").length).toBeGreaterThan(0);
+  });
+
   it("renders the HDFC rules panel", () => {
     render(<App />);
     const panel = screen.getByText(/rules this model enforces/i);
