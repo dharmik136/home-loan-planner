@@ -23,6 +23,8 @@ import { BankEMIComparator } from "./components/BankEMIComparator";
 import { AchievementBadges } from "./components/AchievementBadges";
 import { InflationAdjustedView } from "./components/InflationAdjustedView";
 import { StampDutyCalculator } from "./components/StampDutyCalculator";
+import { BalanceTransferAdvisor } from "./components/BalanceTransferAdvisor";
+import { RentVsBuyCalculator } from "./components/RentVsBuyCalculator";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -427,6 +429,10 @@ export function App() {
           {loans.length >= 1 && <InflationAdjustedView results={results} />}
 
           <StampDutyCalculator />
+
+          {loans.length >= 1 && <BalanceTransferAdvisor results={results} />}
+
+          <RentVsBuyCalculator />
           
           <RulesPanel />
 
