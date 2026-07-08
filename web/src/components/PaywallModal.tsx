@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { formatINR } from "../engine/format";
+import { useState } from "react";
 
 interface Props {
   isOpen: boolean;
@@ -8,13 +7,8 @@ interface Props {
 
 export function PaywallModal({ isOpen, onClose }: Props) {
   const [email, setEmail] = useState("");
+  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-
-  // Randomly assign a test price (₹299, ₹499, or ₹999) for this user session to test price sensitivity
-  const testPrice = useMemo(() => {
-    const prices = [299, 499, 999];
-    return prices[Math.floor(Math.random() * prices.length)];
-  }, []);
 
   if (!isOpen) return null;
 
@@ -24,8 +18,8 @@ export function PaywallModal({ isOpen, onClose }: Props) {
       alert("Please enter a valid email address.");
       return;
     }
-    // In a live server-side app, this would send the email and testPrice to a database (e.g. Supabase)
-    console.log(`[PAYWALL CONVERSION] Email: ${email}, Price Point: ₹${testPrice}`);
+    // In a live system, this sends the email and opt-in flag to Supabase to build the customer database
+    console.log(`[LEAD CAPTURE] Email: ${email}, Newsletter Opt-In: ${newsletterOptIn}`);
     setSubmitted(true);
   };
 
@@ -77,42 +71,30 @@ export function PaywallModal({ isOpen, onClose }: Props) {
 
         {!submitted ? (
           <form onSubmit={handleSubmit}>
-            <h3 style={{ fontFamily: "var(--display)", fontSize: "1.2rem", fontWeight: "bold", marginBottom: "8px", color: "var(--ink)" }}>
-              👑 Upgrade to Premium Ledger
+            <h3 style={{ fontFamily: "var(--display)", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "8px", color: "var(--ink)" }}>
+              📄 Save Plan & Download PDF (100% Free)
             </h3>
             <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "20px", lineHeight: "1.4" }}>
-              Unlock professional debt payoff planning tools to secure your financial freedom.
+              Enter your email to save your debt-free timeline and generate a printable PDF payoff report.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
-              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem" }}>
-                <span>📄</span>
-                <span><b>Download Branded PDF Reports</b> to print, share, or save offline.</span>
+              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
+                <span>📋</span>
+                <span><b>Printable Payoff Schedule</b>: Get a step-by-step month-by-month guide.</span>
               </div>
-              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem" }}>
+              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
                 <span>💾</span>
-                <span><b>Save Unlimited Debt Portfolios</b> to compare different prepayment strategies.</span>
+                <span><b>Cloud Portfolio Save</b>: Re-access your configured loans anytime without re-typing.</span>
               </div>
-              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem" }}>
-                <span>🚀</span>
-                <span><b>Advanced Rollover Optimizer</b> with customizable tax-deduction adjustments.</span>
+              <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
+                <span>🎓</span>
+                <span><b>Prepayment Hacks</b>: Receive occasional, verified interest-saving tips and calculator updates.</span>
               </div>
             </div>
 
-            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", padding: "12px 14px", borderRadius: "3px", textAlign: "center", marginBottom: "20px" }}>
-              <span style={{ fontSize: "0.72rem", color: "var(--ink-faint)", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>
-                Special Launch Pricing
-              </span>
-              <span style={{ fontSize: "1.4rem", fontWeight: "bold", color: "var(--emerald)", fontFamily: "var(--display)" }}>
-                {formatINR(testPrice)}
-              </span>
-              <span style={{ fontSize: "0.68rem", color: "var(--ink-soft)", display: "block" }}>
-                One-time payment · Lifetime access
-              </span>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "0.74rem", color: "var(--ink-soft)", fontWeight: "600" }}>Email address</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+              <label style={{ fontSize: "0.74rem", color: "var(--ink-soft)", fontWeight: "600" }}>Your Email Address</label>
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -133,29 +115,49 @@ export function PaywallModal({ isOpen, onClose }: Props) {
               />
             </div>
 
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
+              <input
+                type="checkbox"
+                id="newsletter"
+                checked={newsletterOptIn}
+                onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                style={{ cursor: "pointer" }}
+              />
+              <label htmlFor="newsletter" style={{ fontSize: "0.76rem", color: "var(--ink-soft)", cursor: "pointer", userSelect: "none" }}>
+                Sign me up for the Free Debt-Free newsletter (monthly tips).
+              </label>
+            </div>
+
             <button
               type="submit"
               className="add-btn"
-              style={{ width: "100%", marginTop: "16px", padding: "10px", fontSize: "0.88rem", height: "auto" }}
+              style={{ width: "100%", padding: "10px", fontSize: "0.88rem", height: "auto" }}
             >
-              Get Premium Access
+              Generate My Free PDF Blueprint
             </button>
+
+            <span style={{ display: "block", fontSize: "0.68rem", color: "var(--ink-faint)", textAlign: "center", marginTop: "12px" }}>
+              We respect your privacy. No spam. No selling your email.
+            </span>
           </form>
         ) : (
           <div style={{ textAlign: "center", padding: "10px 0" }}>
-            <span style={{ fontSize: "2.4rem" }}>🎉</span>
+            <span style={{ fontSize: "2.4rem" }}>✉️</span>
             <h3 style={{ fontFamily: "var(--display)", fontSize: "1.2rem", fontWeight: "bold", marginTop: "12px", marginBottom: "8px", color: "var(--ink)" }}>
-              Thank You!
+              Check Your Inbox!
             </h3>
             <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "20px", lineHeight: "1.4" }}>
-              We have registered your interest for the <b>Premium Plan</b> at the <b>{formatINR(testPrice)}</b> pricing model. We are onboarding beta users in weekly batches and will email your activation link shortly!
+              We have saved your plan portfolio and sent your customized PDF payoff schedule to <b>{email}</b>. 
+            </p>
+            <p style={{ fontSize: "0.76rem", color: "var(--ink-faint)", marginBottom: "20px", lineHeight: "1.4" }}>
+              (Note: In this client-only offline MVP demo, check console logs to verify that the lead data was logged successfully).
             </p>
             <button
               onClick={onClose}
               className="add-btn secondary"
               style={{ width: "100%", padding: "8px", fontSize: "0.82rem", height: "auto" }}
             >
-              Close
+              Return to Planner
             </button>
           </div>
         )}
