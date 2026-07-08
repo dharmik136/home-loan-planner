@@ -33,6 +33,8 @@ export function monthlyEmi(principal: number, annualRatePct: number, months: num
 /**
  * Month-by-month schedule. `prepayments` maps a 1-based month index to an extra
  * amount applied AFTER that month's EMI, reducing the closing balance.
+ * Supports "reduceTenure" (EMI stays constant, loan tenure shortens)
+ * or "reduceEmi" (EMI gets recalculated lower, loan tenure remains the same).
  */
 export function buildSchedule(
   principal: number,
@@ -40,9 +42,12 @@ export function buildSchedule(
   months: number,
   emi?: number,
   prepayments: Record<number, number> = {},
+  prepayBehavior: "reduceTenure" | "reduceEmi" = "reduceTenure",
+  rateChanges: Record<number, number> = {},
 ): ScheduleResult {
-  const r = annualRatePct / 100 / 12;
-  const pay = emi ?? monthlyEmi(principal, annualRatePct, months);
+  let currentRate = annualRatePct;
+  let r = currentRate / 100 / 12;
+  let pay = emi ?? monthlyEmi(principal, currentRate, months);
 
   const rows: MonthRow[] = [];
   let totalInterest = 0;
@@ -52,6 +57,17 @@ export function buildSchedule(
 
   while (balance > 0.005 && m < months) {
     m += 1;
+    
+    // Apply rate change if scheduled for this month
+    if (rateChanges[m] !== undefined) {
+      currentRate = rateChanges[m];
+      r = currentRate / 100 / 12;
+      // If EMI is custom (recalculated), recalculate it on interest rate change
+      if (prepayBehavior === "reduceEmi" && months - m > 0 && balance > 0.005) {
+        pay = monthlyEmi(balance, currentRate, months - m);
+      }
+    }
+
     const opening = balance;
     const interest = opening * r;
     const payment = Math.min(pay, opening + interest); // final EMI may be smaller
@@ -72,6 +88,11 @@ export function buildSchedule(
     });
     totalInterest += interest;
     totalPaid += payment + prepay;
+
+    // If EMI reduction strategy is selected and a prepayment is made, recalculate the EMI for remaining term
+    if (prepayBehavior === "reduceEmi" && prepay > 0 && months - m > 0 && balance > 0.005) {
+      pay = monthlyEmi(balance, currentRate, months - m);
+    }
   }
 
   return { rows, totalInterest, totalPaid, monthsToPayoff: m };
