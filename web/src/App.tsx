@@ -238,7 +238,7 @@ export function App() {
       </div>
 
       <div className="grid">
-        <aside className="aside">
+        <aside className="col-left">
           {loans.map((loan, idx) => {
             const res = results[idx];
             if (!res) return null;
@@ -258,7 +258,7 @@ export function App() {
           </button>
         </aside>
 
-        <div className="col-main">
+        <main className="col-mid">
           <SummaryCards results={results} />
 
           {loans.length > 0 && (
@@ -286,20 +286,77 @@ export function App() {
             </div>
           ))}
 
-          {loans.length >= 1 && <WindfallSimulator loans={loans} />}
-
           {loans.length >= 1 && <RolloverPlanner loans={loans} />}
 
           <DebtMilestones results={results} />
 
-          <RulesPanel />
-
-          <div className="actions">
+          <div className="actions" style={{ marginTop: "12px" }}>
             <button className="btn" onClick={() => setIsPaywallOpen(true)}>📄 Save Plan & Get PDF (Free)</button>
             <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
-        </div>
+        </main>
+
+        <aside className="col-right">
+          {loans.length >= 1 && <WindfallSimulator loans={loans} />}
+          
+          <RulesPanel />
+
+          {leads.length > 0 && (
+            <div className="panel s6" style={{ borderLeft: "4px solid var(--emerald)", width: "100%" }}>
+              <div className="panel-title">
+                <span className="num">Database</span> 📋 Captured Leads ({leads.length})
+              </div>
+              <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "14px", lineHeight: "1.4" }}>
+                Simulates Supabase lead database, collecting user emails and portfolio savings.
+              </p>
+              <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
+                  <thead>
+                    <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                      <th style={{ padding: "8px", textAlign: "right" }}>Savings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map((l, index) => (
+                      <tr key={index} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "8px", fontWeight: "bold", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "160px" }} title={l.email}>{l.email}</td>
+                        <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 700 }}>
+                          {formatINR(l.calculatedSavings)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Captured At"];
+                    const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, `"${l.capturedAt}"`]);
+                    downloadCSV(headers, rows, "captured-customer-leads.csv");
+                  }}
+                  style={{ fontSize: "0.76rem", padding: "8px 14px", width: "100%" }}
+                >
+                  📥 Export Leads to CSV
+                </button>
+                <button
+                  className="btn ghost"
+                  onClick={() => {
+                    if (confirm("Are you sure you want to clear the captured leads database?")) {
+                      setLeads([]);
+                    }
+                  }}
+                  style={{ fontSize: "0.76rem", padding: "8px 14px", width: "100%" }}
+                >
+                  Clear Database
+                </button>
+              </div>
+            </div>
+          )}
+        </aside>
       </div>
 
       <footer className="foot">
@@ -309,65 +366,6 @@ export function App() {
         Set your real outstanding balances, rates and start months in the loan cards.
         Not financial advice; confirm current terms with your lender.
       </footer>
-      
-      {leads.length > 0 && (
-        <div className="panel s6" style={{ marginTop: "30px", borderLeft: "4px solid var(--emerald)" }}>
-          <h3 className="panel-title">
-            <span className="num">Database</span> 📋 Captured Customer Leads ({leads.length})
-          </h3>
-          <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "16px" }}>
-            This section simulates the Supabase backend lead database, collecting user emails and portfolio interest savings.
-          </p>
-          <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
-              <thead>
-                <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
-                  <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
-                  <th style={{ padding: "8px", textAlign: "center" }}>Newsletter</th>
-                  <th style={{ padding: "8px", textAlign: "right" }}>Portfolio Savings</th>
-                  <th style={{ padding: "8px", textAlign: "right" }}>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.map((l, index) => (
-                  <tr key={index} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "8px", fontWeight: "bold" }}>{l.email}</td>
-                    <td style={{ padding: "8px", textAlign: "center" }}>{l.newsletter ? "Yes" : "No"}</td>
-                    <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 700 }}>
-                      {formatINR(l.calculatedSavings)}
-                    </td>
-                    <td style={{ padding: "8px", textAlign: "right", color: "var(--ink-faint)" }}>{l.capturedAt}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              className="btn"
-              onClick={() => {
-                const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Captured At"];
-                const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, `"${l.capturedAt}"`]);
-                downloadCSV(headers, rows, "captured-customer-leads.csv");
-              }}
-              style={{ fontSize: "0.76rem", padding: "8px 14px" }}
-            >
-              📥 Export Leads to CSV
-            </button>
-            <button
-              className="btn ghost"
-              onClick={() => {
-                if (confirm("Are you sure you want to clear the captured leads database?")) {
-                  setLeads([]);
-                }
-              }}
-              style={{ fontSize: "0.76rem", padding: "8px 14px" }}
-            >
-              Clear Database
-            </button>
-          </div>
-        </div>
-      )}
 
       <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
     </div>
