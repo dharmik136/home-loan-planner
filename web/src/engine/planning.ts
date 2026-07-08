@@ -87,17 +87,28 @@ function getRateChangesMap(loan: Loan): Record<number, number> {
 }
 
 export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
-  const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
-  const prepayments = buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi);
+  const emi = loan.outstanding <= 0 ? 0 : monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
+  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
-  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
-  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
+  
+  const emptySchedule: ScheduleResult = { rows: [], totalInterest: 0, totalPaid: 0, monthsToPayoff: 0 };
+  const baseline = loan.outstanding <= 0 
+    ? emptySchedule 
+    : buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
+  
+  const plan = loan.outstanding <= 0 
+    ? emptySchedule 
+    : buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
+
   return { loan, emi, baseline, plan, comparison: compare(baseline, plan) };
 }
 
 /** Effect of a single lump sum on a loan, vs its own baseline. */
 export function windfallEffect(loan: Loan, amount: number, monthIndex: number): Comparison {
+  const emptyComparison = { interestSaved: 0, monthsSaved: 0, baselineInterest: 0, planInterest: 0, baselineMonths: 0, planMonths: 0 };
+  if (loan.outstanding <= 0) return emptyComparison;
+
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
