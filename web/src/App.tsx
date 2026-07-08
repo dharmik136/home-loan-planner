@@ -27,6 +27,8 @@ import { BalanceTransferAdvisor } from "./components/BalanceTransferAdvisor";
 import { RentVsBuyCalculator } from "./components/RentVsBuyCalculator";
 import { MonthlyBudgetPlanner } from "./components/MonthlyBudgetPlanner";
 import { SmartTipsPanel } from "./components/SmartTipsPanel";
+import { NetWorthProjector } from "./components/NetWorthProjector";
+import { BonusWindfallPlanner } from "./components/BonusWindfallPlanner";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -439,6 +441,10 @@ export function App() {
           <RentVsBuyCalculator />
 
           {loans.length >= 1 && <MonthlyBudgetPlanner results={results} />}
+
+          {loans.length >= 1 && <BonusWindfallPlanner results={results} />}
+
+          {loans.length >= 1 && <NetWorthProjector results={results} />}
           
           <RulesPanel />
 
