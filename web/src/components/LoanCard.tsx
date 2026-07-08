@@ -11,6 +11,8 @@ interface Props {
 }
 
 export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const sanitizeName = (val: string) => {
     const stripped = val.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
     return stripped.substring(0, 50);
@@ -47,37 +49,56 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
             fontSize: '1rem',
             fontFamily: 'var(--display)',
             padding: '2px 0',
-            width: '80%',
+            width: '70%',
             outline: 'none'
           }}
           placeholder="Loan Name"
         />
-        {onDelete && (
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
-            onClick={onDelete}
+            onClick={() => setIsCollapsed(!isCollapsed)}
             style={{
               background: 'none',
               border: 'none',
               color: 'var(--ink-faint)',
               cursor: 'pointer',
-              fontSize: '0.9rem',
+              fontSize: '0.8rem',
               padding: '2px 4px',
               transition: 'color 0.15s'
             }}
-            title="Delete loan"
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--clay)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-faint)')}
+            title={isCollapsed ? "Expand card" : "Collapse card"}
           >
-            ✕
+            {isCollapsed ? "▼" : "▲"}
           </button>
-        )}
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--ink-faint)',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                padding: '2px 4px',
+                transition: 'color 0.15s'
+              }}
+              title="Delete loan"
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--clay)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-faint)')}
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
-      <NumericInput
-        label="Outstanding principal"
-        value={loan.outstanding}
-        onChange={(val) => onChange({ outstanding: val })}
-      />
+      {!isCollapsed && (
+        <>
+          <NumericInput
+            label="Outstanding principal"
+            value={loan.outstanding}
+            onChange={(val) => onChange({ outstanding: val })}
+          />
 
       <div className="field row2">
         <NumericInput
@@ -253,6 +274,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
           }}
         />
       </div>
+      </>)}
 
       {hasErrors && (
         <div style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>

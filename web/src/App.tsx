@@ -11,6 +11,8 @@ import { RolloverPlanner } from "./components/RolloverPlanner";
 import { PortfolioBalanceChart } from "./components/PortfolioBalanceChart";
 import { PaywallModal } from "./components/PaywallModal";
 import { MarketingLandingPage } from "./components/MarketingLandingPage";
+import { TaxSavingsDeductor } from "./components/TaxSavingsDeductor";
+import { InvestmentVsPrepay } from "./components/InvestmentVsPrepay";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -339,6 +341,10 @@ export function App() {
 
         <aside className="col-right">
           {loans.length >= 1 && <WindfallSimulator loans={loans} />}
+
+          {loans.length >= 1 && <TaxSavingsDeductor results={results} />}
+
+          {loans.length >= 1 && <InvestmentVsPrepay results={results} />}
           
           <RulesPanel />
 
