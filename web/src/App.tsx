@@ -17,6 +17,8 @@ import { DebtStressMeter } from "./components/DebtStressMeter";
 import { ForeclosureCalculator } from "./components/ForeclosureCalculator";
 import { YearlyScheduleTable } from "./components/YearlyScheduleTable";
 import { SharePlanButton } from "./components/SharePlanButton";
+import { LoanEligibilityChecker } from "./components/LoanEligibilityChecker";
+import { PrepayGoalPlanner } from "./components/PrepayGoalPlanner";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -409,6 +411,10 @@ export function App() {
           {loans.length >= 1 && <DebtStressMeter results={results} />}
 
           {loans.length >= 1 && <ForeclosureCalculator results={results} />}
+
+          {loans.length >= 1 && <PrepayGoalPlanner results={results} />}
+
+          <LoanEligibilityChecker />
           
           <RulesPanel />
 
