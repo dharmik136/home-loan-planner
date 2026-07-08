@@ -56,6 +56,22 @@ export function App() {
   const [state, setState] = useState<State>(load);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.body.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
@@ -117,10 +133,32 @@ export function App() {
           <div className="kicker">A planning ledger · est. 2026</div>
           <h1>The Prepayment <em>Ledger</em></h1>
         </div>
-        <div className="edition">
-          Interactive home loan planner<br />
-          Pay early · cut years · keep interest<br />
-          <b>No prepayment penalty (RBI 2026)</b>
+        <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+          <button
+            onClick={toggleDarkMode}
+            style={{
+              background: "none",
+              border: "1px solid var(--line-strong)",
+              borderRadius: "50%",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "var(--ink)",
+              fontSize: "1.1rem",
+              transition: "all 0.2s"
+            }}
+            title="Toggle Light/Dark Theme"
+          >
+            {darkMode ? "☀️" : "🌙"}
+          </button>
+          <div className="edition">
+            Interactive home loan planner<br />
+            Pay early · cut years · keep interest<br />
+            <b>No prepayment penalty (RBI 2026)</b>
+          </div>
         </div>
       </header>
       <div className="rule-row">
