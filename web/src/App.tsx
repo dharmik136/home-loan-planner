@@ -21,6 +21,8 @@ import { LoanEligibilityChecker } from "./components/LoanEligibilityChecker";
 import { PrepayGoalPlanner } from "./components/PrepayGoalPlanner";
 import { BankEMIComparator } from "./components/BankEMIComparator";
 import { AchievementBadges } from "./components/AchievementBadges";
+import { InflationAdjustedView } from "./components/InflationAdjustedView";
+import { StampDutyCalculator } from "./components/StampDutyCalculator";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -421,6 +423,10 @@ export function App() {
           <BankEMIComparator />
 
           {loans.length >= 1 && <AchievementBadges results={results} />}
+
+          {loans.length >= 1 && <InflationAdjustedView results={results} />}
+
+          <StampDutyCalculator />
           
           <RulesPanel />
 
