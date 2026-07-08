@@ -19,6 +19,8 @@ import { YearlyScheduleTable } from "./components/YearlyScheduleTable";
 import { SharePlanButton } from "./components/SharePlanButton";
 import { LoanEligibilityChecker } from "./components/LoanEligibilityChecker";
 import { PrepayGoalPlanner } from "./components/PrepayGoalPlanner";
+import { BankEMIComparator } from "./components/BankEMIComparator";
+import { AchievementBadges } from "./components/AchievementBadges";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -415,6 +417,10 @@ export function App() {
           {loans.length >= 1 && <PrepayGoalPlanner results={results} />}
 
           <LoanEligibilityChecker />
+
+          <BankEMIComparator />
+
+          {loans.length >= 1 && <AchievementBadges results={results} />}
           
           <RulesPanel />
 
