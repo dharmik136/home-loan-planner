@@ -39,6 +39,7 @@ Three artifacts, one shared amortization engine (tenure-reduction, reducing-bala
   - Full Portfolio Rollover Planner (Avalanche vs. Snowball debt repayment budgets).
   - Combined amortization payoff CSV downloader.
   - SVG Stacked Area Portfolio Balance Chart.
+  - Premium A/B Testing Paywall Modal (₹299/₹499/₹999 price sensitivity testing).
   - Custom `NumericInput` resolving backspace zero-state usability issues.
   - Playwright browser E2E test suite.
 
