@@ -13,6 +13,7 @@ import { PaywallModal } from "./components/PaywallModal";
 import { MarketingLandingPage } from "./components/MarketingLandingPage";
 import { TaxSavingsDeductor } from "./components/TaxSavingsDeductor";
 import { InvestmentVsPrepay } from "./components/InvestmentVsPrepay";
+import { DebtStressMeter } from "./components/DebtStressMeter";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -173,6 +174,38 @@ export function App() {
 
   const reset = () => setState({ loans: structuredClone(DEFAULT_LOANS), entries: [] });
 
+  const exportWorkspaceJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `prepayment-ledger-workspace-${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    trackEvent("workspace_exported", { loanCount: state.loans.length });
+  };
+
+  const importWorkspaceJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    fileReader.readAsText(files[0], "UTF-8");
+    fileReader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (parsed && Array.isArray(parsed.loans) && Array.isArray(parsed.entries)) {
+          setState(parsed);
+          trackEvent("workspace_imported", { loanCount: parsed.loans.length });
+        } else {
+          alert("Invalid workspace backup file format.");
+        }
+      } catch (err) {
+        alert("Failed to parse workspace backup file.");
+      }
+    };
+  };
+
   const results: LoanResult[] = useMemo(() => {
     return loans.map((loan) => {
       const loanEntries = entries.filter((e) => e.loanId === loan.id);
@@ -328,13 +361,16 @@ export function App() {
 
           <DebtMilestones results={results} />
 
-          <div className="actions" style={{ marginTop: "12px" }}>
+          <div className="actions" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
             <button className="btn" onClick={() => {
               const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
               trackEvent("save_plan_cta_clicked", { savings: totalSavings });
               setIsPaywallOpen(true);
             }}>📄 Save Plan & Get PDF (Free)</button>
             <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
+            <button className="btn ghost" onClick={exportWorkspaceJSON}>💾 Export JSON</button>
+            <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>📤 Import JSON</button>
+            <input type="file" id="import-json-file" accept=".json" onChange={importWorkspaceJSON} style={{ display: "none" }} />
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
         </main>
@@ -345,6 +381,8 @@ export function App() {
           {loans.length >= 1 && <TaxSavingsDeductor results={results} />}
 
           {loans.length >= 1 && <InvestmentVsPrepay results={results} />}
+
+          {loans.length >= 1 && <DebtStressMeter results={results} />}
           
           <RulesPanel />
 
