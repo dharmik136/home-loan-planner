@@ -9,6 +9,7 @@ import { RulesPanel } from "./components/RulesPanel";
 import { DebtMilestones } from "./components/DebtMilestones";
 import { RolloverPlanner } from "./components/RolloverPlanner";
 import { PortfolioBalanceChart } from "./components/PortfolioBalanceChart";
+import { PaywallModal } from "./components/PaywallModal";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV } from "./engine/csv";
 
@@ -53,6 +54,7 @@ const newId = () => `pp-${Date.now()}-${idSeq++}`;
 
 export function App() {
   const [state, setState] = useState<State>(load);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -186,7 +188,8 @@ export function App() {
           <RulesPanel />
 
           <div className="actions">
-            <button className="btn" onClick={() => downloadScheduleCSV(results)}>↓ Download schedule (CSV)</button>
+            <button className="btn" onClick={() => setIsPaywallOpen(true)}>👑 Export PDF Payoff Report</button>
+            <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
         </div>
@@ -199,6 +202,7 @@ export function App() {
         Set your real outstanding balances, rates and start months in the loan cards.
         Not financial advice; confirm current terms with your lender.
       </footer>
+      <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} />
     </div>
   );
 }
