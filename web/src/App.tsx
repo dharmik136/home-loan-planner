@@ -263,7 +263,7 @@ export function App() {
           <RulesPanel />
 
           <div className="actions">
-            <button className="btn" onClick={() => setIsPaywallOpen(true)}>👑 Export PDF Payoff Report</button>
+            <button className="btn" onClick={() => setIsPaywallOpen(true)}>📄 Save Plan & Get PDF (Free)</button>
             <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
