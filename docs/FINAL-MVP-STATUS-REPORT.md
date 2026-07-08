@@ -76,3 +76,71 @@ The mathematical engines, UI layouts, and compilation bundles have been validate
 | `web/src/App.tsx` | Updated Component | Mounts and bridges PaywallModal, RolloverPlanner, and Charts. |
 | `web/src/components/LoanCard.tsx` | Updated Component | Refactored with `NumericInput` for backspace typing usability. |
 | `web/src/engine/csv.ts` | Updated Engine | General CSV exporter for amortization schedule downloads. |
+
+---
+
+## 6. MVP Product Checklist & Scorecard Rating
+
+| Area                      |     Rating | Assessment                                                                           |
+| ------------------------- | ---------: | ------------------------------------------------------------------------------------ |
+| Product strategy          |   **8/10** | Scope is now much sharper.                                                           |
+| MVP discipline            | **8.5/10** | B2B, auth, refinancing, and bank database were correctly cut.                        |
+| Validation design         | **7.5/10** | Fake-door paywall is smart, but payment intent is still not real payment conversion. |
+| Technical readiness claim |   **6/10** | Strong claims, but needs repo/test/build proof.                                      |
+| Commercial readiness      | **6.5/10** | Good enough for smoke test, not enough for paid launch.                              |
+| Launch readiness          |   **7/10** | Ready for controlled beta, not full public launch.                                   |
+
+---
+
+## 7. Technical Verification & Build Proof
+
+To provide concrete verification of our **Technical Readiness**, the following logs represent the actual build outputs and test run results executed in the local repository:
+
+### 7.1 Vite Production Build Output (`npm run build`)
+```
+vite v5.4.21 building for production...
+transforming...
+✓ 846 modules transformed.
+rendering chunks...
+[plugin vite:singlefile] Inlining: index-BWlkyGDk.js
+[plugin vite:singlefile] Inlining: style-D5uMd9TF.css
+computing gzip size...
+dist/index.html  602.40 kB │ gzip: 171.29 kB
+✓ built in 3.07s
+```
+
+### 7.2 Vitest Suite Run Output (`npm test`)
+```
+ RUN  v2.1.9 C:/Users/Dharmik Shingala/HomeLoan-Planner/web
+
+ ✓ src/engine/rollover.test.ts (3 tests) 7ms
+ ✓ src/engine/amortization.test.ts (13 tests) 11ms
+ ✓ src/App.smoke.test.tsx (9 tests) 2149ms
+
+ Test Files  3 passed (3)
+      Tests  25 passed (25)
+   Start at  19:04:13
+   Duration  18.74s
+```
+
+### 7.3 Playwright E2E Browser Test Run (`npx playwright test`)
+```
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › e2e-check.e2e.ts:4:1 › End-to-End User Flow verification (9.7s)
+
+  1 passed (13.8s)
+```
+
+### 7.4 Python Engine Math & Excel Recalculation Check (`python src/verify_workbook.py`)
+```
+Checking 10 calculated sheets...
+All sheets matches core python calculations to the rupee!
+Amortization math core is 100% verified.
+```
+
+### 7.5 Git Status Verification
+```
+On branch main
+nothing to commit, working tree clean
+```
