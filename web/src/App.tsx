@@ -14,6 +14,9 @@ import { MarketingLandingPage } from "./components/MarketingLandingPage";
 import { TaxSavingsDeductor } from "./components/TaxSavingsDeductor";
 import { InvestmentVsPrepay } from "./components/InvestmentVsPrepay";
 import { DebtStressMeter } from "./components/DebtStressMeter";
+import { ForeclosureCalculator } from "./components/ForeclosureCalculator";
+import { YearlyScheduleTable } from "./components/YearlyScheduleTable";
+import { SharePlanButton } from "./components/SharePlanButton";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -122,6 +125,7 @@ export function App() {
   const { loans, entries } = state;
 
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
+  const [yearlyView, setYearlyView] = useState(false);
 
   useEffect(() => {
     if (loans.length > 0 && !loans.some((l) => l.id === activeLoanId)) {
@@ -350,7 +354,21 @@ export function App() {
                 return (
                   <div key={res.loan.id}>
                     <BalanceChart result={res} index={loanIndex >= 0 ? loanIndex : idx} />
-                    <ScheduleTable result={res} />
+                    <div style={{ display: "flex", gap: "6px", marginBottom: "8px", marginTop: "8px" }}>
+                      <button
+                        className={`btn ghost${!yearlyView ? " active" : ""}`}
+                        style={{ fontSize: "0.75rem", padding: "4px 10px" }}
+                        onClick={() => setYearlyView(false)}
+                      >Monthly</button>
+                      <button
+                        className={`btn ghost${yearlyView ? " active" : ""}`}
+                        style={{ fontSize: "0.75rem", padding: "4px 10px" }}
+                        onClick={() => setYearlyView(true)}
+                      >Yearly Summary</button>
+                    </div>
+                    {yearlyView
+                      ? <YearlyScheduleTable result={res} />
+                      : <ScheduleTable result={res} />}
                   </div>
                 );
               })}
@@ -373,6 +391,12 @@ export function App() {
             <input type="file" id="import-json-file" accept=".json" onChange={importWorkspaceJSON} style={{ display: "none" }} />
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
+
+          {loans.length >= 1 && (
+            <div style={{ marginTop: "8px" }}>
+              <SharePlanButton results={results} />
+            </div>
+          )}
         </main>
 
         <aside className="col-right">
@@ -383,6 +407,8 @@ export function App() {
           {loans.length >= 1 && <InvestmentVsPrepay results={results} />}
 
           {loans.length >= 1 && <DebtStressMeter results={results} />}
+
+          {loans.length >= 1 && <ForeclosureCalculator results={results} />}
           
           <RulesPanel />
 
