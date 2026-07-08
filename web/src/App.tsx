@@ -25,6 +25,8 @@ import { InflationAdjustedView } from "./components/InflationAdjustedView";
 import { StampDutyCalculator } from "./components/StampDutyCalculator";
 import { BalanceTransferAdvisor } from "./components/BalanceTransferAdvisor";
 import { RentVsBuyCalculator } from "./components/RentVsBuyCalculator";
+import { MonthlyBudgetPlanner } from "./components/MonthlyBudgetPlanner";
+import { SmartTipsPanel } from "./components/SmartTipsPanel";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -387,6 +389,8 @@ export function App() {
 
           <DebtMilestones results={results} />
 
+          {loans.length >= 1 && <SmartTipsPanel results={results} />}
+
           <div className="actions" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
             <button className="btn" onClick={() => {
               const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
@@ -433,6 +437,8 @@ export function App() {
           {loans.length >= 1 && <BalanceTransferAdvisor results={results} />}
 
           <RentVsBuyCalculator />
+
+          {loans.length >= 1 && <MonthlyBudgetPlanner results={results} />}
           
           <RulesPanel />
 
