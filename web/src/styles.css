@@ -23,6 +23,21 @@
   --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
 }
 
+body.dark {
+  --paper: #11141c;
+  --paper-raised: #181d27;
+  --panel: #202634;
+  --ink: #f4f0e6;
+  --ink-soft: #9c9586;
+  --ink-faint: #6c6657;
+  --line: #292f3d;
+  --line-strong: #3f475a;
+  
+  --emerald-wash: #0e241c;
+  --clay-wash: #281912;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.8);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; }
@@ -107,6 +122,11 @@ body {
   box-shadow: var(--shadow);
   padding: 22px;
   animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.panel:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
 }
 .panel-title {
   font-family: var(--display);
