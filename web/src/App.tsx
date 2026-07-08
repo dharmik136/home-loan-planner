@@ -29,6 +29,8 @@ import { MonthlyBudgetPlanner } from "./components/MonthlyBudgetPlanner";
 import { SmartTipsPanel } from "./components/SmartTipsPanel";
 import { NetWorthProjector } from "./components/NetWorthProjector";
 import { BonusWindfallPlanner } from "./components/BonusWindfallPlanner";
+import { SIPCorpusSimulator } from "./components/SIPCorpusSimulator";
+import { PrepaymentScenarios } from "./components/PrepaymentScenarios";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -393,6 +395,8 @@ export function App() {
 
           {loans.length >= 1 && <SmartTipsPanel results={results} />}
 
+          {loans.length >= 1 && <PrepaymentScenarios results={results} />}
+
           <div className="actions" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
             <button className="btn" onClick={() => {
               const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
@@ -445,6 +449,8 @@ export function App() {
           {loans.length >= 1 && <BonusWindfallPlanner results={results} />}
 
           {loans.length >= 1 && <NetWorthProjector results={results} />}
+
+          <SIPCorpusSimulator results={results} />
           
           <RulesPanel />
 
