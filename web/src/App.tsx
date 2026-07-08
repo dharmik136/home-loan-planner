@@ -12,7 +12,15 @@ import { PortfolioBalanceChart } from "./components/PortfolioBalanceChart";
 import { PaywallModal } from "./components/PaywallModal";
 import { MarketingLandingPage } from "./components/MarketingLandingPage";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
-import { downloadScheduleCSV } from "./engine/csv";
+import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
+import { formatINR } from "./engine/format";
+
+export interface Lead {
+  email: string;
+  newsletter: boolean;
+  calculatedSavings: number;
+  capturedAt: string;
+}
 
 const STORAGE_KEY = "prepayment-ledger-v1";
 
@@ -62,6 +70,30 @@ export function App() {
     }
     return "landing";
   });
+
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    try {
+      const raw = localStorage.getItem("prepayment-ledger-leads");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("prepayment-ledger-leads", JSON.stringify(leads));
+  }, [leads]);
+
+  const handleCaptureLead = (email: string, newsletter: boolean) => {
+    const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
+    const newLead: Lead = {
+      email,
+      newsletter,
+      calculatedSavings: totalSavings,
+      capturedAt: new Date().toLocaleString()
+    };
+    setLeads(prev => [newLead, ...prev]);
+  };
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
@@ -140,7 +172,7 @@ export function App() {
           onGoToPlanner={() => setView("app")}
           onOpenPaywall={() => setIsPaywallOpen(true)}
         />
-        <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} />
+        <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
       </>
     );
   }
@@ -277,7 +309,67 @@ export function App() {
         Set your real outstanding balances, rates and start months in the loan cards.
         Not financial advice; confirm current terms with your lender.
       </footer>
-      <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} />
+      
+      {leads.length > 0 && (
+        <div className="panel s6" style={{ marginTop: "30px", borderLeft: "4px solid var(--emerald)" }}>
+          <h3 className="panel-title">
+            <span className="num">Database</span> 📋 Captured Customer Leads ({leads.length})
+          </h3>
+          <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "16px" }}>
+            This section simulates the Supabase backend lead database, collecting user emails and portfolio interest savings.
+          </p>
+          <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
+              <thead>
+                <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
+                  <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                  <th style={{ padding: "8px", textAlign: "center" }}>Newsletter</th>
+                  <th style={{ padding: "8px", textAlign: "right" }}>Portfolio Savings</th>
+                  <th style={{ padding: "8px", textAlign: "right" }}>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map((l, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid var(--line)" }}>
+                    <td style={{ padding: "8px", fontWeight: "bold" }}>{l.email}</td>
+                    <td style={{ padding: "8px", textAlign: "center" }}>{l.newsletter ? "Yes" : "No"}</td>
+                    <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 700 }}>
+                      {formatINR(l.calculatedSavings)}
+                    </td>
+                    <td style={{ padding: "8px", textAlign: "right", color: "var(--ink-faint)" }}>{l.capturedAt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              className="btn"
+              onClick={() => {
+                const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Captured At"];
+                const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, `"${l.capturedAt}"`]);
+                downloadCSV(headers, rows, "captured-customer-leads.csv");
+              }}
+              style={{ fontSize: "0.76rem", padding: "8px 14px" }}
+            >
+              📥 Export Leads to CSV
+            </button>
+            <button
+              className="btn ghost"
+              onClick={() => {
+                if (confirm("Are you sure you want to clear the captured leads database?")) {
+                  setLeads([]);
+                }
+              }}
+              style={{ fontSize: "0.76rem", padding: "8px 14px" }}
+            >
+              Clear Database
+            </button>
+          </div>
+        </div>
+      )}
+
+      <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
     </div>
   );
 }

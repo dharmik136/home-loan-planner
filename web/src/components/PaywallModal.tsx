@@ -3,9 +3,10 @@ import { useState } from "react";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onCapture: (email: string, newsletter: boolean) => void;
 }
 
-export function PaywallModal({ isOpen, onClose }: Props) {
+export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
   const [email, setEmail] = useState("");
   const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const [submitted, setSubmitted] = useState(false);
@@ -18,8 +19,7 @@ export function PaywallModal({ isOpen, onClose }: Props) {
       alert("Please enter a valid email address.");
       return;
     }
-    // In a live system, this sends the email and opt-in flag to Supabase to build the customer database
-    console.log(`[LEAD CAPTURE] Email: ${email}, Newsletter Opt-In: ${newsletterOptIn}`);
+    onCapture(email, newsletterOptIn);
     setSubmitted(true);
   };
 
