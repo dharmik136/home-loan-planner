@@ -9,9 +9,10 @@ CREATE TABLE public.profiles (
     email VARCHAR(255) UNIQUE NOT NULL,
     full_name VARCHAR(255),
     role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('user', 'advisor', 'admin')),
-    subscription_tier VARCHAR(50) DEFAULT 'free' CHECK (subscription_tier IN ('free', 'premium', 'advisor_pro')),
-    stripe_customer_id VARCHAR(255),
-    stripe_subscription_id VARCHAR(255),
+    subscription_tier VARCHAR(50) DEFAULT 'free' CHECK (subscription_tier IN ('free', 'subscriber', 'advisor_pro')),
+    newsletter_subscriber BOOLEAN DEFAULT TRUE NOT NULL,
+    lead_source VARCHAR(100),
+    calculated_savings NUMERIC(12, 2) DEFAULT 0.00 NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
