@@ -10,6 +10,7 @@ import { DebtMilestones } from "./components/DebtMilestones";
 import { RolloverPlanner } from "./components/RolloverPlanner";
 import { PortfolioBalanceChart } from "./components/PortfolioBalanceChart";
 import { PaywallModal } from "./components/PaywallModal";
+import { MarketingLandingPage } from "./components/MarketingLandingPage";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV } from "./engine/csv";
 
@@ -55,6 +56,12 @@ const newId = () => `pp-${Date.now()}-${idSeq++}`;
 export function App() {
   const [state, setState] = useState<State>(load);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [view, setView] = useState<"landing" | "app">(() => {
+    if ((import.meta as any).env.MODE === "test") {
+      return "app";
+    }
+    return "landing";
+  });
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
@@ -126,6 +133,18 @@ export function App() {
     });
   }, [loans, entries]);
 
+  if (view === "landing") {
+    return (
+      <>
+        <MarketingLandingPage
+          onGoToPlanner={() => setView("app")}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+        />
+        <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} />
+      </>
+    );
+  }
+
   return (
     <div className="wrap">
       <header className="masthead">
@@ -134,6 +153,24 @@ export function App() {
           <h1>The Prepayment <em>Ledger</em></h1>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+          <button
+            onClick={() => setView("landing")}
+            style={{
+              background: "none",
+              border: "1px solid var(--line-strong)",
+              borderRadius: "4px",
+              padding: "6px 12px",
+              cursor: "pointer",
+              color: "var(--ink)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              transition: "all 0.2s"
+            }}
+          >
+            ← Marketing Page
+          </button>
           <button
             onClick={toggleDarkMode}
             style={{
