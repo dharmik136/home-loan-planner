@@ -3,6 +3,7 @@ import type { Loan } from "../engine/planning";
 import { windfallEffect } from "../engine/planning";
 import { formatCompactINR, formatDuration, formatINR } from "../engine/format";
 import { buildSchedule, monthlyEmi } from "../engine/amortization";
+import { trackEvent } from "../engine/analytics";
 
 interface Props { loans: Loan[]; }
 
@@ -165,12 +166,34 @@ export function WindfallSimulator({ loans }: Props) {
       <div className="slider-meta" style={{ marginBottom: 2 }}>
         <span>Lump sum</span><span><b>{formatINR(amount)}</b></span>
       </div>
-      <input type="range" min={0} max={sliderMax} step={5000} value={Math.min(amount, sliderMax)} onChange={(e) => setAmount(Number(e.target.value))} />
+      <input
+        type="range"
+        min={0}
+        max={sliderMax}
+        step={5000}
+        value={Math.min(amount, sliderMax)}
+        onChange={(e) => {
+          const val = Number(e.target.value);
+          setAmount(val);
+          trackEvent("windfall_simulation_run", { amount: val, month });
+        }}
+      />
 
       <div className="slider-meta" style={{ marginTop: 10, marginBottom: 2 }}>
         <span>Paid in</span><span><b>month {month}</b> (year {Math.floor((month - 1) / 12) + 1})</span>
       </div>
-      <input type="range" min={2} max={maxTenure} step={1} value={Math.min(month, maxTenure)} onChange={(e) => setMonth(Number(e.target.value))} />
+      <input
+        type="range"
+        min={2}
+        max={maxTenure}
+        step={1}
+        value={Math.min(month, maxTenure)}
+        onChange={(e) => {
+          const val = Number(e.target.value);
+          setMonth(val);
+          trackEvent("windfall_simulation_run", { amount, month: val });
+        }}
+      />
 
       {comparisonElement}
 

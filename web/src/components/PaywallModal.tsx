@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackEvent } from "../engine/analytics";
 
 interface Props {
   isOpen: boolean;
@@ -15,10 +16,12 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes("@")) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
       alert("Please enter a valid email address.");
       return;
     }
+    trackEvent("email_lead_captured", { email, newsletter: newsletterOptIn });
     onCapture(email, newsletterOptIn);
     setSubmitted(true);
   };

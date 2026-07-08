@@ -1,14 +1,20 @@
+import { useEffect } from "react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, type TooltipProps,
 } from "recharts";
 import type { LoanResult } from "../engine/planning";
 import { formatCompactINR } from "../engine/format";
+import { trackEvent } from "../engine/analytics";
 
 interface Props {
   results: LoanResult[];
 }
 
 export function PortfolioBalanceChart({ results }: Props) {
+  useEffect(() => {
+    trackEvent("chart_viewed", { type: "combined" });
+  }, []);
+
   if (results.length === 0) return null;
 
   // Find max tenure across all baselines

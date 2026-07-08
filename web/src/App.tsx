@@ -14,6 +14,7 @@ import { MarketingLandingPage } from "./components/MarketingLandingPage";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
+import { trackEvent } from "./engine/analytics";
 
 export interface Lead {
   email: string;
@@ -142,6 +143,10 @@ export function App() {
         { id, name, outstanding: 3_000_000, ratePct: 8.5, tenureMonths: 180, startYYYYMM: "2026-07", preEmiInterest: 0, ruleset: "none", rateChanges: [] },
       ],
     }));
+    trackEvent("loan_created", { loanId: id, name });
+    if (loans.length + 1 > 1) {
+      trackEvent("multiple_loans_configured", { count: loans.length + 1 });
+    }
   };
 
   const removeLoan = (id: string) => {
@@ -322,7 +327,11 @@ export function App() {
           <DebtMilestones results={results} />
 
           <div className="actions" style={{ marginTop: "12px" }}>
-            <button className="btn" onClick={() => setIsPaywallOpen(true)}>📄 Save Plan & Get PDF (Free)</button>
+            <button className="btn" onClick={() => {
+              const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
+              trackEvent("save_plan_cta_clicked", { savings: totalSavings });
+              setIsPaywallOpen(true);
+            }}>📄 Save Plan & Get PDF (Free)</button>
             <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
