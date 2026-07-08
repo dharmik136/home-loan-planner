@@ -31,3 +31,19 @@ export function downloadScheduleCSV(results: LoanResult[]) {
   link.click();
   URL.revokeObjectURL(url);
 }
+
+/** General CSV downloader helper. */
+export function downloadCSV(headers: string[], rows: (string | number)[][], filename: string) {
+  const lines: string[] = [];
+  lines.push(headers.join(","));
+  for (const r of rows) {
+    lines.push(r.join(","));
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}

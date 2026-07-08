@@ -7,6 +7,8 @@ import { ScheduleTable } from "./components/ScheduleTable";
 import { WindfallSimulator } from "./components/WindfallSimulator";
 import { RulesPanel } from "./components/RulesPanel";
 import { DebtMilestones } from "./components/DebtMilestones";
+import { RolloverPlanner } from "./components/RolloverPlanner";
+import { PortfolioBalanceChart } from "./components/PortfolioBalanceChart";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV } from "./engine/csv";
 
@@ -166,6 +168,8 @@ export function App() {
             </div>
           )}
 
+          {loans.length >= 1 && <PortfolioBalanceChart results={results} />}
+
           {results.map((res, idx) => (
             <div key={res.loan.id} style={{ display: "contents" }}>
               <BalanceChart result={res} index={idx} />
@@ -174,6 +178,8 @@ export function App() {
           ))}
 
           {loans.length >= 1 && <WindfallSimulator loans={loans} />}
+
+          {loans.length >= 1 && <RolloverPlanner loans={loans} />}
 
           <DebtMilestones results={results} />
 
