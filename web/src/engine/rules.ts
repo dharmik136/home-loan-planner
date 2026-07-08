@@ -20,6 +20,9 @@ export const HDFC_MAX_ABS = 5_000_000; // ₹50 lakh / month
 /** Validate one prepayment against floating-rate part-payment rules. */
 export function validatePrepayment(ctx: RuleContext): RuleVerdict {
   if (ctx.amount <= 0) return { ok: true, message: "" };
+  if (ctx.amount > ctx.openingBalance) {
+    return { ok: false, message: `Above remaining balance (₹${Math.round(ctx.openingBalance).toLocaleString("en-IN")})` };
+  }
   
   const ruleset = ctx.ruleset || "hdfc";
 
