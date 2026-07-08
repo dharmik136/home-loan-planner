@@ -44,10 +44,12 @@ export function buildSchedule(
   prepayments: Record<number, number> = {},
   prepayBehavior: "reduceTenure" | "reduceEmi" = "reduceTenure",
   rateChanges: Record<number, number> = {},
+  stepUpPct: number = 0,
 ): ScheduleResult {
   let currentRate = annualRatePct;
   let r = currentRate / 100 / 12;
   let pay = emi ?? monthlyEmi(principal, currentRate, months);
+  let baseEmi = pay;
 
   const rows: MonthRow[] = [];
   let totalInterest = 0;
@@ -58,6 +60,14 @@ export function buildSchedule(
   while (balance > 0.005 && m < months) {
     m += 1;
     
+    // Apply yearly step-up to base EMI (month 13, 25, 37...)
+    if (stepUpPct > 0 && m > 1 && (m - 1) % 12 === 0) {
+      baseEmi = baseEmi * (1 + stepUpPct / 100);
+      if (prepayBehavior !== "reduceEmi") {
+        pay = baseEmi;
+      }
+    }
+
     // Apply rate change if scheduled for this month
     if (rateChanges[m] !== undefined) {
       currentRate = rateChanges[m];
