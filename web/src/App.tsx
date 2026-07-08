@@ -117,6 +117,14 @@ export function App() {
 
   const { loans, entries } = state;
 
+  const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
+
+  useEffect(() => {
+    if (loans.length > 0 && !loans.some((l) => l.id === activeLoanId)) {
+      setActiveLoanId(loans[0].id);
+    }
+  }, [loans, activeLoanId]);
+
   const setLoan = (id: string, patch: Partial<Loan>) =>
     setState((s) => ({
       ...s,
@@ -279,12 +287,35 @@ export function App() {
 
           {loans.length >= 1 && <PortfolioBalanceChart results={results} />}
 
-          {results.map((res, idx) => (
-            <div key={res.loan.id} style={{ display: "contents" }}>
-              <BalanceChart result={res} index={idx} />
-              <ScheduleTable result={res} />
+          {loans.length > 0 && (
+            <div className="panel s4">
+              <div className="panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                <span>
+                  <span className="num">04 / Detailed Analysis</span> Schedules & Charts
+                </span>
+                <div className="seg">
+                  {loans.map((loan) => (
+                    <button
+                      key={loan.id}
+                      className={activeLoanId === loan.id ? "active" : ""}
+                      onClick={() => setActiveLoanId(loan.id)}
+                    >
+                      {loan.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {results.filter((r) => r.loan.id === activeLoanId).map((res, idx) => {
+                const loanIndex = loans.findIndex((l) => l.id === res.loan.id);
+                return (
+                  <div key={res.loan.id}>
+                    <BalanceChart result={res} index={loanIndex >= 0 ? loanIndex : idx} />
+                    <ScheduleTable result={res} />
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
 
           {loans.length >= 1 && <RolloverPlanner loans={loans} />}
 
