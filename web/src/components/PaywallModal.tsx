@@ -57,6 +57,7 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <button
+          className="modal-close"
           onClick={onClose}
           style={{
             position: "absolute",

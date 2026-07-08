@@ -12,21 +12,25 @@ interface Props {
 
 export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
   const sanitizeName = (val: string) => {
-    return val.replace(/[^a-zA-Z0-9\s-]/g, "").substring(0, 30);
+    const stripped = val.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+    return stripped.substring(0, 50);
   };
 
   const outstandingError = loan.outstanding <= 0 ? "Principal must be greater than 0" : null;
-  const rateError = (loan.ratePct < 0 || loan.ratePct > 30) ? "Interest rate must be between 0% and 30%" : null;
+  const rateError = (loan.ratePct < 0 || loan.ratePct > 100) ? "Interest rate must be between 0% and 100%" : null;
+  const rateWarning = (loan.ratePct > 30 && loan.ratePct <= 100) ? "Interest rate above 30% looks unusually high. Please verify." : null;
   const tenureError = (loan.tenureMonths <= 0 || loan.tenureMonths > 600) ? "Tenure must be between 1 and 600 months" : null;
 
   const monthlyInterestRate = loan.ratePct / 100 / 12;
   const firstMonthInterest = Math.round(loan.outstanding * monthlyInterestRate);
   const isEmiTooLow = emi <= firstMonthInterest && loan.ratePct > 0;
-  const emiError = isEmiTooLow
-    ? `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) must exceed first month interest (₹${firstMonthInterest.toLocaleString("en-IN")})`
-    : null;
+  const emiError = emi <= 0
+    ? "EMI must be greater than 0"
+    : (isEmiTooLow
+        ? `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) must exceed first month interest (₹${firstMonthInterest.toLocaleString("en-IN")})`
+        : null);
 
-  const hasErrors = outstandingError || rateError || tenureError || emiError;
+  const hasErrors = outstandingError || rateError || rateWarning || tenureError || emiError;
 
   return (
     <div className={`panel loan-card ${delay}`} style={{ paddingTop: '28px' }}>
@@ -72,20 +76,20 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
       <NumericInput
         label="Outstanding principal"
         value={loan.outstanding}
-        onChange={(val) => onChange({ outstanding: Math.max(0, val) })}
+        onChange={(val) => onChange({ outstanding: val })}
       />
 
       <div className="field row2">
         <NumericInput
           label="Interest rate (%)"
           value={loan.ratePct}
-          onChange={(val) => onChange({ ratePct: Math.min(100, Math.max(0, val)) })}
+          onChange={(val) => onChange({ ratePct: val })}
           isDecimal={true}
         />
         <NumericInput
           label="Tenure (months)"
           value={loan.tenureMonths}
-          onChange={(val) => onChange({ tenureMonths: Math.min(600, Math.max(0, Math.round(val))) })}
+          onChange={(val) => onChange({ tenureMonths: val })}
         />
       </div>
 
@@ -254,6 +258,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
         <div style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
           {outstandingError && <span className="error-principal">• {outstandingError}</span>}
           {rateError && <span className="error-rate">• {rateError}</span>}
+          {rateWarning && <span className="warning-rate" style={{ color: "#b45309" }}>• ⚠️ {rateWarning}</span>}
           {tenureError && <span className="error-tenure">• {tenureError}</span>}
           {emiError && <span className="error-emi">• {emiError}</span>}
         </div>

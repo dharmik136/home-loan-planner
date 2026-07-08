@@ -89,14 +89,22 @@ test.describe("Playwright MVP Integrity Flows", () => {
     await page.goto(fileUrl);
     await page.click('button:has-text("Model Your Loans (Free)")');
     
-    // Select interest rate field in first card and set it to 45% (which exceeds 30% cap)
+    // Test Warning: Set interest rate in first card to 45% (should trigger above 30% warning)
     const rateInput = page.locator('.loan-card').first().locator('input').nth(2);
     await rateInput.fill('45');
     await rateInput.blur();
     
-    // Expect warning alert box to render and display error message
+    // Expect warning alert box to render and display warning message
+    await expect(page.locator('.warning-rate')).toBeVisible();
+    await expect(page.locator('.warning-rate')).toContainText('looks unusually high');
+
+    // Test Hard Error: Set interest rate to 150% (exceeds 100% cap)
+    await rateInput.fill('150');
+    await rateInput.blur();
+
+    // Expect hard error alert box to render and display error message
     await expect(page.locator('.error-rate')).toBeVisible();
-    await expect(page.locator('.error-rate')).toContainText('Interest rate must be between');
+    await expect(page.locator('.error-rate')).toContainText('Interest rate must be between 0% and 100%');
   });
 
   // Flow 6: User refreshes page and local data persists
