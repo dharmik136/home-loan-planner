@@ -55,7 +55,7 @@ body {
   letter-spacing: 0.01em;
 }
 
-.wrap { max-width: 1240px; margin: 0 auto; padding: clamp(20px, 4vw, 56px); }
+.wrap { max-width: 1680px; margin: 0 auto; padding: 20px clamp(15px, 2vw, 30px); }
 
 /* ---------- Masthead ---------- */
 .masthead {
@@ -109,10 +109,37 @@ body {
 .rule-row b { color: var(--emerald); font-weight: 700; }
 
 /* ---------- Layout ---------- */
-.grid { display: grid; grid-template-columns: 360px 1fr; gap: 30px; align-items: start; }
-@media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
-.col-main { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
-.aside { display: flex; flex-direction: column; gap: 22px; }
+.grid {
+  display: grid;
+  grid-template-columns: 370px 1fr 400px;
+  gap: 24px;
+  align-items: start;
+}
+.col-left { display: flex; flex-direction: column; gap: 22px; }
+.col-mid { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.col-right { display: flex; flex-direction: column; gap: 24px; }
+
+@media (max-width: 1380px) {
+  .grid {
+    grid-template-columns: 360px 1fr;
+  }
+  .col-right {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 940px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .col-right {
+    grid-column: span 1;
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ---------- Panels ---------- */
 .panel {
