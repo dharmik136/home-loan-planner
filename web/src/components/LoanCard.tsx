@@ -151,6 +151,52 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
         </span>
       </div>
 
+      {/* Prepayment Presets */}
+      <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px dashed var(--line-strong)", marginBottom: "16px" }}>
+        <label style={{ display: "block", fontSize: "0.68rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "600", marginBottom: "8px" }}>
+          Prepayment Presets
+        </label>
+        
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--ink)", cursor: "pointer", marginBottom: "12px" }}>
+          <input
+            type="checkbox"
+            checked={!!loan.extraEmiPerYear}
+            onChange={(e) => onChange({ extraEmiPerYear: e.target.checked })}
+            style={{ cursor: "pointer", width: "15px", height: "15px", accentColor: "var(--emerald)" }}
+          />
+          <span>Pay 1 extra EMI every year (13th EMI)</span>
+        </label>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <label style={{ fontSize: "0.62rem", letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ink-faint)", fontWeight: "600" }}>
+            Step-up EMI (increase payment yearly)
+          </label>
+          <select
+            value={loan.stepUpPct || 0}
+            onChange={(e) => onChange({ stepUpPct: Number(e.target.value) })}
+            style={{
+              width: "100%",
+              fontFamily: "var(--body)",
+              fontSize: "0.82rem",
+              fontWeight: "600",
+              color: "var(--ink)",
+              background: "var(--paper)",
+              border: "1px solid var(--line-strong)",
+              borderRadius: "2px",
+              padding: "6px 8px",
+              outline: "none",
+              cursor: "pointer"
+            }}
+          >
+            <option value={0}>None (Flat EMI)</option>
+            <option value={3}>3% increase / year</option>
+            <option value={5}>5% increase / year</option>
+            <option value={8}>8% increase / year</option>
+            <option value={10}>10% increase / year</option>
+          </select>
+        </div>
+      </div>
+
       {/* Floating Rate Simulator */}
       <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px dashed var(--line-strong)", marginBottom: "12px" }}>
         <label style={{ display: "block", fontSize: "0.68rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "600", marginBottom: "8px" }}>

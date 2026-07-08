@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { monthlyEmi, buildSchedule, compare } from "./amortization";
+import { buildPrepayments } from "./planning";
 
 // These pin the SAME verified numbers as the Python core and the Excel workbook.
 describe("monthlyEmi", () => {
@@ -66,5 +67,20 @@ describe("prepayment effects", () => {
     expect(planEmi.monthsToPayoff).toBe(180);
     expect(planEmi.totalInterest).toBeLessThan(base.totalInterest);
     expect(planEmi.rows[12].emi).toBeLessThan(27811);
+  });
+  it("stepUpPct increases EMI yearly and shortens tenure", () => {
+    const base = buildSchedule(3_000_000, 7.5, 180);
+    const planStepUp = buildSchedule(3_000_000, 7.5, 180, undefined, {}, "reduceTenure", {}, 5);
+    expect(planStepUp.rows[0].emi).toBe(27811);
+    expect(planStepUp.rows[12].emi).toBeGreaterThan(27811);
+    expect(planStepUp.monthsToPayoff).toBeLessThan(180);
+    expect(planStepUp.totalInterest).toBeLessThan(base.totalInterest);
+  });
+  it("buildPrepayments aggregates extra emi per year correctly", () => {
+    const map = buildPrepayments([], 180, true, 20_000);
+    expect(map[12]).toBe(20_000);
+    expect(map[24]).toBe(20_000);
+    expect(map[180]).toBe(20_000);
+    expect(map[6]).toBeUndefined();
   });
 });

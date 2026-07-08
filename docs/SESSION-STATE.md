@@ -35,6 +35,7 @@ Three artifacts, one shared amortization engine (tenure-reduction, reducing-bala
   - Smart Windfall Allocator (suggests mathematically optimal split of a lump sum windfall).
   - Debt Milestones Timeline (Principal-vs-Interest crossover, 50% paid, early payoff boost).
   - Pre-EMI construction phase interest support.
+  - Prepayment Presets (13th EMI and Step-up EMI % yearly increase).
   - Custom `NumericInput` resolving backspace zero-state usability issues.
   - Playwright browser E2E test suite.
 

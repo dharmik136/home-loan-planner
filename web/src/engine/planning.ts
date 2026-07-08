@@ -26,6 +26,8 @@ export interface Loan {
   ruleset?: LenderRuleset;
   customMinPrepay?: number;
   rateChanges?: RateChangeEntry[];
+  extraEmiPerYear?: boolean;
+  stepUpPct?: number;
 }
 
 export interface PrepayEntry {
@@ -37,8 +39,20 @@ export interface PrepayEntry {
 }
 
 /** Aggregate a loan's entries into a {month: total} prepayment map. */
-export function buildPrepayments(entries: PrepayEntry[], tenure: number): Record<number, number> {
+export function buildPrepayments(
+  entries: PrepayEntry[],
+  tenure: number,
+  extraEmiPerYear = false,
+  baseEmi = 0
+): Record<number, number> {
   const map: Record<number, number> = {};
+
+  if (extraEmiPerYear && baseEmi > 0) {
+    for (let m = 12; m <= tenure; m += 12) {
+      map[m] = (map[m] ?? 0) + baseEmi;
+    }
+  }
+
   for (const e of entries) {
     if (e.amount <= 0) continue;
     if (e.type === "oneTime") {
@@ -74,11 +88,11 @@ function getRateChangesMap(loan: Loan): Record<number, number> {
 
 export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
-  const prepayments = buildPrepayments(entries, loan.tenureMonths);
+  const prepayments = buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
-  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap);
-  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap);
+  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
+  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
   return { loan, emi, baseline, plan, comparison: compare(baseline, plan) };
 }
 
@@ -87,7 +101,10 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
-  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap);
-  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, { [monthIndex]: amount }, behavior, rateChangesMap);
+  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi);
+  prepayments[monthIndex] = (prepayments[monthIndex] ?? 0) + amount;
+  
+  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
+  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
   return compare(baseline, plan);
 }
