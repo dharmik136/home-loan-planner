@@ -22,8 +22,10 @@ test('End-to-End User Flow verification', async ({ page }) => {
   await thirdCardNameInput.fill('My Car Loan');
   await expect(thirdCardNameInput).toHaveValue('My Car Loan');
   
-  // 5. Check optimal split in windfall simulator
+  // 5. Check optimal split in windfall simulator, Rollover Planner & Portfolio Chart
   await expect(page.locator('text=Smart Windfall Allocator')).toBeVisible();
+  await expect(page.locator('text=Portfolio Rollover Planner')).toBeVisible();
+  await expect(page.locator('text=Total Outstanding Debt Over Time')).toBeVisible();
   
   // 6. Delete the new loan
   await page.locator('.loan-card').nth(2).locator('button[title="Delete loan"]').click();

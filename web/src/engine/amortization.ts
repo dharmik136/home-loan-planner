@@ -20,7 +20,7 @@ export interface ScheduleResult {
   monthsToPayoff: number;
 }
 
-const round2 = (x: number) => Math.round(x * 100) / 100;
+export const round2 = (x: number) => Math.round(x * 100) / 100;
 
 /** Standard EMI, rounded UP to whole rupees (as Indian banks do). */
 export function monthlyEmi(principal: number, annualRatePct: number, months: number): number {

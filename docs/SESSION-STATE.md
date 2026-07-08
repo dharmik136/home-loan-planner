@@ -36,6 +36,9 @@ Three artifacts, one shared amortization engine (tenure-reduction, reducing-bala
   - Debt Milestones Timeline (Principal-vs-Interest crossover, 50% paid, early payoff boost).
   - Pre-EMI construction phase interest support.
   - Prepayment Presets (13th EMI and Step-up EMI % yearly increase).
+  - Full Portfolio Rollover Planner (Avalanche vs. Snowball debt repayment budgets).
+  - Combined amortization payoff CSV downloader.
+  - SVG Stacked Area Portfolio Balance Chart.
   - Custom `NumericInput` resolving backspace zero-state usability issues.
   - Playwright browser E2E test suite.
 
