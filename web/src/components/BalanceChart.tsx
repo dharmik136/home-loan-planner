@@ -4,9 +4,9 @@ import {
 import type { LoanResult } from "../engine/planning";
 import { formatCompactINR } from "../engine/format";
 
-interface Props { result: LoanResult; }
+interface Props { result: LoanResult; index: number; }
 
-export function BalanceChart({ result }: Props) {
+export function BalanceChart({ result, index }: Props) {
   const { baseline, plan, loan } = result;
   const maxLen = baseline.rows.length;
   const data = [];
@@ -22,7 +22,7 @@ export function BalanceChart({ result }: Props) {
   return (
     <div className="panel s4">
       <div className="panel-title">
-        <span className="num">{loan.id === "A" ? "03" : "04"} / Balance</span>
+        <span className="num">{String(index + 3).padStart(2, "0")} / Balance</span>
         {loan.name}: how fast the debt falls
       </div>
       <div className="legend">

@@ -69,4 +69,28 @@ describe("App smoke", () => {
     const panel = screen.getByText(/rules this model enforces/i);
     expect(within(panel.closest(".panel") as HTMLElement).getByText(/Prepayment penalty/i)).toBeTruthy();
   });
+
+  it("renders the milestones panel and displays crossover/payoff marks", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Debt-Free Milestones/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/50% Debt Cleared/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Principal > Interest/i).length).toBeGreaterThan(0);
+  });
+
+  it("renders the windfall optimizer split allocation recommendation", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Smart Windfall Allocator/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Total Optimized Savings/i).length).toBeGreaterThan(0);
+  });
+
+  it("renders ruleset selectors and prepayment strategy select dropdowns", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Lender Rules/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Prepayment strategy/i).length).toBeGreaterThan(0);
+  });
+
+  it("renders floating rate simulator rate changes list", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Floating Rate Simulator/i).length).toBeGreaterThan(0);
+  });
 });

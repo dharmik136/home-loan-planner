@@ -1,9 +1,8 @@
 import type { Loan, PrepayEntry, PrepayType } from "../engine/planning";
 import { buildSchedule, monthlyEmi } from "../engine/amortization";
 import { validatePrepayment } from "../engine/rules";
-import { formatINR, monthLabel, yearOfMonth } from "../engine/format";
+import { formatCompactINR, formatINR, monthLabel, yearOfMonth } from "../engine/format";
 
-const SLIDER_MAX = 1_500_000; // ₹15 lakh
 const STEP = 5_000;
 
 interface Props {
@@ -17,7 +16,15 @@ interface Props {
 /** Opening balance at a given month, for the HDFC max rule. */
 function openingAt(loan: Loan, monthIndex: number): number {
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
-  const s = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi);
+  const rateMap: Record<number, number> = {};
+  if (loan.rateChanges) {
+    for (const rc of loan.rateChanges) {
+      if (rc.newRatePct > 0 && rc.monthIndex > 0) {
+        rateMap[rc.monthIndex] = rc.newRatePct;
+      }
+    }
+  }
+  const s = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateMap);
   const row = s.rows.find((r) => r.month === monthIndex);
   return row ? row.opening : loan.outstanding;
 }
@@ -38,7 +45,10 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
           monthIndex: e.monthIndex,
           emi,
           openingBalance: openingAt(loan, e.monthIndex),
+          ruleset: loan.ruleset,
+          customMinPrepay: loan.customMinPrepay,
         });
+        const sliderMax = Math.max(1_500_000, loan.outstanding);
         return (
           <div className="entry" key={e.id}>
             <div className="entry-top">
@@ -55,9 +65,9 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
             <input
               type="range"
               min={0}
-              max={SLIDER_MAX}
+              max={sliderMax}
               step={STEP}
-              value={Math.min(e.amount, SLIDER_MAX)}
+              value={Math.min(e.amount, sliderMax)}
               onChange={(ev) => onChange(e.id, { amount: Number(ev.target.value) })}
             />
             <div className="slider-meta">
@@ -66,7 +76,7 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
                 {e.type === "yearly" ? "every year from " : "at "}
                 <b>month {e.monthIndex}</b> · {monthLabel(loan.startYYYYMM, e.monthIndex)} (yr {yearOfMonth(e.monthIndex)})
               </span>
-              <span>₹15L</span>
+              <span>{formatCompactINR(sliderMax)}</span>
             </div>
 
             <input

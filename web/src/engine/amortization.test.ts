@@ -60,4 +60,11 @@ describe("prepayment effects", () => {
     expect(plan.rows[plan.rows.length - 1].closing).toBe(0);
     expect(plan.monthsToPayoff).toBe(2);
   });
+  it("reduceEmi strategy lowers EMI and keeps original tenure", () => {
+    const base = buildSchedule(3_000_000, 7.5, 180);
+    const planEmi = buildSchedule(3_000_000, 7.5, 180, undefined, { 12: 500_000 }, "reduceEmi");
+    expect(planEmi.monthsToPayoff).toBe(180);
+    expect(planEmi.totalInterest).toBeLessThan(base.totalInterest);
+    expect(planEmi.rows[12].emi).toBeLessThan(27811);
+  });
 });
