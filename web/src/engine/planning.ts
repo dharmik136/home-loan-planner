@@ -28,6 +28,7 @@ export interface Loan {
   rateChanges?: RateChangeEntry[];
   extraEmiPerYear?: boolean;
   stepUpPct?: number;
+  biWeekly?: boolean;
 }
 
 export interface PrepayEntry {
@@ -43,13 +44,20 @@ export function buildPrepayments(
   entries: PrepayEntry[],
   tenure: number,
   extraEmiPerYear = false,
-  baseEmi = 0
+  baseEmi = 0,
+  biWeekly = false
 ): Record<number, number> {
   const map: Record<number, number> = {};
 
   if (extraEmiPerYear && baseEmi > 0) {
     for (let m = 12; m <= tenure; m += 12) {
       map[m] = (map[m] ?? 0) + baseEmi;
+    }
+  }
+
+  if (biWeekly && baseEmi > 0) {
+    for (let m = 6; m <= tenure; m += 6) {
+      map[m] = (map[m] ?? 0) + baseEmi / 2;
     }
   }
 
@@ -88,7 +96,7 @@ function getRateChangesMap(loan: Loan): Record<number, number> {
 
 export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
   const emi = loan.outstanding <= 0 ? 0 : monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
-  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi);
+  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
   
@@ -112,7 +120,7 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
-  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi);
+  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly);
   prepayments[monthIndex] = (prepayments[monthIndex] ?? 0) + amount;
   
   const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
