@@ -55,7 +55,9 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             fontSize: '1rem',
             fontFamily: 'var(--display)',
             padding: '2px 0',
-            width: '70%',
+            fieldSizing: 'content',
+            minWidth: '50px',
+            maxWidth: '75%',
             outline: 'none'
           }}
           placeholder="Loan Name"
