@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, type TooltipProps,
 } from "recharts";
@@ -11,9 +11,18 @@ interface Props {
 }
 
 export function PortfolioBalanceChart({ results }: Props) {
+  const [hiddenLoans, setHiddenLoans] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     trackEvent("chart_viewed", { type: "combined" });
   }, []);
+
+  const toggleLoanVisibility = (id: string) => {
+    setHiddenLoans((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   if (results.length === 0) return null;
 
@@ -54,12 +63,26 @@ export function PortfolioBalanceChart({ results }: Props) {
       </div>
       <div className="legend">
         <span><i style={{ border: "2px dashed var(--clay)", background: "none", height: 0, width: 14 }} />Baseline Total Balance</span>
-        {results.map((r, idx) => (
-          <span key={r.loan.id}>
-            <i style={{ background: colors[idx % colors.length] }} />
-            {r.loan.name} (Plan)
-          </span>
-        ))}
+        {results.map((r, idx) => {
+          const isHidden = !!hiddenLoans[r.loan.id];
+          return (
+            <span
+              key={r.loan.id}
+              onClick={() => toggleLoanVisibility(r.loan.id)}
+              style={{
+                cursor: "pointer",
+                opacity: isHidden ? 0.35 : 1,
+                textDecoration: isHidden ? "line-through" : "none",
+                userSelect: "none",
+                transition: "opacity 0.2s"
+              }}
+              title="Click to toggle visibility in chart"
+            >
+              <i style={{ background: colors[idx % colors.length] }} />
+              {r.loan.name} (Plan)
+            </span>
+          );
+        })}
       </div>
       <div className="chart-wrap">
         <ResponsiveContainer width="100%" height="100%">
@@ -87,6 +110,7 @@ export function PortfolioBalanceChart({ results }: Props) {
                 fill={colors[idx % colors.length]}
                 fillOpacity={0.4}
                 strokeWidth={1.5}
+                hide={!!hiddenLoans[r.loan.id]}
               />
             ))}
 
