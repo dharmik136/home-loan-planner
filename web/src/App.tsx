@@ -34,6 +34,8 @@ import { PrepaymentScenarios } from "./components/PrepaymentScenarios";
 import { InterestShockVisualizer } from "./components/InterestShockVisualizer";
 import { SavingsValueWidget } from "./components/SavingsValueWidget";
 import { DebtFreeCelebration } from "./components/DebtFreeCelebration";
+import { DebtFreeCountdown } from "./components/DebtFreeCountdown";
+import { PartPaymentPlanner } from "./components/PartPaymentPlanner";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -332,6 +334,8 @@ export function App() {
 
           {loans.length >= 1 && <DebtFreeCelebration results={results} />}
 
+          {loans.length >= 1 && <DebtFreeCountdown results={results} />}
+
           {loans.length >= 1 && <SavingsValueWidget results={results} />}
 
           {loans.length > 0 && (
@@ -448,6 +452,8 @@ export function App() {
           {loans.length >= 1 && <InflationAdjustedView results={results} />}
 
           <StampDutyCalculator />
+
+          <PartPaymentPlanner />
 
           {loans.length >= 1 && <BalanceTransferAdvisor results={results} />}
 
