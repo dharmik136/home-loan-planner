@@ -57,9 +57,9 @@ test.describe("Playwright MVP Integrity Flows", () => {
     await page.click('button:has-text("Model Your Loans (Free)")');
     
     // Verify windfall optimizer is mounted on the right panel
-    await expect(page.locator('text=Smart Windfall Allocator')).toBeVisible();
+    await expect(page.locator('aside.col-right').locator('text=Smart Windfall Allocator')).toBeVisible();
     // Drag/change windfall slider or type values (represented by the widget UI)
-    await expect(page.locator('text=Smart Windfall Allocator')).toBeVisible();
+    await expect(page.locator('aside.col-right').locator('text=Smart Windfall Allocator')).toBeVisible();
     await expect(page.locator('text=interest saved').first()).toBeVisible();
   });
 

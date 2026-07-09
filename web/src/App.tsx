@@ -275,11 +275,22 @@ export function App() {
     });
   }, [loans, entries]);
 
+  const changeView = (newView: "landing" | "app") => {
+    const doc = document as any;
+    if (doc.startViewTransition) {
+      doc.startViewTransition(() => {
+        setView(newView);
+      });
+    } else {
+      setView(newView);
+    }
+  };
+
   if (view === "landing") {
     return (
       <>
         <MarketingLandingPage
-          onGoToPlanner={() => setView("app")}
+          onGoToPlanner={() => changeView("app")}
           onOpenPaywall={() => setIsPaywallOpen(true)}
         />
         <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
@@ -296,7 +307,7 @@ export function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
           <button
-            onClick={() => setView("landing")}
+            onClick={() => changeView("landing")}
             className="nav-btn"
             style={{
               background: "none",
