@@ -20,6 +20,15 @@ Native UI,Design,Workspace Container Queries layout,Completed,Refactored media q
 Aesthetic,Typography,Newspaper Paragraph Indents layout,Completed,Replaced raw monospace email sequence logs with serif typography and traditional first-line indent paragraphs (1.8em) mimicking physical broadsheet columns,web/src/components/MarketingLandingPage.tsx
 Native UI,Design,Discrete top-layer dialog transitions,Completed,Integrated modern allow-discrete CSS transitions and @starting-style to smoothly scale/fade native modal <dialog> and backdrop elements on entry/exit,web/src/styles.css
 Native UI,Design,Visual bar segment overflow handling,Completed,Added CSS text-overflow ellipsis and hidden bounds to shock visualizer segments to prevent labels overlapping at low percentages,web/src/components/MarketingLandingPage.tsx
+Native UI,Performance,Scroll-aware sticky header,Completed,Sticky header that elevates with box-shadow when user scrolls past 80px — adds context depth cue without blocking content,web/src/components/MarketingLandingPage.tsx
+Aesthetic,Design,Scroll progress bar,Completed,Fixed top-of-page emerald gradient progress bar driven by scroll position via passive scroll event listener,web/src/components/MarketingLandingPage.tsx
+Micro-interactions,Design,IntersectionObserver stat counters,Completed,Three stat counter tiles (Average Interest Saved / Tenure Cut / Interest Ratio) fade in with staggered delays on scroll into viewport via IntersectionObserver,web/src/components/MarketingLandingPage.tsx
+Aesthetic,Design,Gradient dark CTA section,Completed,Replaced flat white CTA with a premium dark gradient section with repeating grid texture pattern and inverted button color scheme,web/src/components/MarketingLandingPage.tsx
+Aesthetic,Design,Columnar 3-column footer,Completed,Replaced flat legal disclaimer-only footer with structured brand / tools / legal column layout and condensed legal disclaimer strip,web/src/components/MarketingLandingPage.tsx
+Native UI,UX Design,Animated FAQ accordion,Completed,Replaced inline faq-answer border-left styling with animated @keyframes slideDown entry and CSS plus-to-X toggle on native details summary element,web/src/components/MarketingLandingPage.tsx
+Aesthetic,Typography,Structured email meta tags,Completed,Replaced unstructured subject line labels with a grid-aligned email metadata row with distinct key/subject/preheader type treatments,web/src/components/MarketingLandingPage.tsx
+Native UI,Testing,Stable E2E ID selectors,Completed,Updated all three Playwright E2E test files to use #hero-cta-free ID selector instead of brittle button text matching for the hero CTA button,web/e2e-trust-flows.e2e.ts; web/e2e-mobile-keyboard.e2e.ts; web/e2e-check.e2e.ts
+
 
 
 
