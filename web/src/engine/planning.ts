@@ -33,6 +33,7 @@ export interface Loan {
   moratoriumDuration?: number;
   moratoriumType?: "interestOnly" | "fullHoliday";
   balloonPayments?: BalloonPaymentEntry[];
+  interestMethod?: "monthlyReducing" | "dailyReducing";
 }
 
 export interface BalloonPaymentEntry {
@@ -136,7 +137,9 @@ export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
         loan.stepUpPct,
         loan.moratoriumStart,
         loan.moratoriumDuration,
-        loan.moratoriumType
+        loan.moratoriumType,
+        loan.interestMethod,
+        loan.startYYYYMM
       );
   
   const plan = loan.outstanding <= 0 
@@ -152,7 +155,9 @@ export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
         loan.stepUpPct,
         loan.moratoriumStart,
         loan.moratoriumDuration,
-        loan.moratoriumType
+        loan.moratoriumType,
+        loan.interestMethod,
+        loan.startYYYYMM
       );
 
   return { loan, emi, baseline, plan, comparison: compare(baseline, plan) };
@@ -180,7 +185,9 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
     loan.stepUpPct,
     loan.moratoriumStart,
     loan.moratoriumDuration,
-    loan.moratoriumType
+    loan.moratoriumType,
+    loan.interestMethod,
+    loan.startYYYYMM
   );
   const plan = buildSchedule(
     loan.outstanding,
@@ -193,7 +200,9 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
     loan.stepUpPct,
     loan.moratoriumStart,
     loan.moratoriumDuration,
-    loan.moratoriumType
+    loan.moratoriumType,
+    loan.interestMethod,
+    loan.startYYYYMM
   );
   return compare(baseline, plan);
 }

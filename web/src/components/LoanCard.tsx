@@ -184,6 +184,35 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         />
       )}
 
+      <div className="field" style={{ marginBottom: "13px" }}>
+        <label>Interest calculation method</label>
+        <select
+          value={loan.interestMethod || "monthlyReducing"}
+          onChange={(e) => onChange({ interestMethod: e.target.value as "monthlyReducing" | "dailyReducing" })}
+          style={{
+            width: "100%",
+            fontFamily: "var(--body)",
+            fontSize: "0.86rem",
+            fontWeight: "600",
+            color: "var(--ink)",
+            background: "var(--paper)",
+            border: "1px solid var(--line-strong)",
+            borderRadius: "2px",
+            padding: "9px 11px",
+            outline: "none",
+            cursor: "pointer"
+          }}
+        >
+          <option value="monthlyReducing">Monthly Reducing (Standard)</option>
+          <option value="dailyReducing">Daily Reducing (SBI MaxGain-Style)</option>
+        </select>
+        <span style={{ fontSize: "0.68rem", color: "var(--ink-faint)", display: "block", marginTop: "5px", lineHeight: "1.3" }}>
+          {loan.interestMethod === "dailyReducing"
+            ? "Interest accrues daily based on days in each month (31/30/28). Matches SBI MaxGain."
+            : "Interest calculated flat monthly: rate/12. Standard for Indian retail home loans."}
+        </span>
+      </div>
+
       <div className="field">
         <label>EMI start month</label>
         <input
