@@ -4,3 +4,6 @@ __pycache__/
 ~$*.xlsx
 web/node_modules/
 web/.vite/
+next-app/node_modules/
+next-app/.next/
+next-app/next-env.d.ts
