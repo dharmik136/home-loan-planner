@@ -1,0 +1,17 @@
+ID,Category,Feature,Status,Impact / Polish Details,Files Modified
+Feature 28,Interactive Visuals,Interactive Area Legend,Completed,Clicking legend labels toggles visibility of individual loan area curves inside PortfolioBalanceChart,web/src/components/PortfolioBalanceChart.tsx
+Feature 38,Micro-interactions,Celebratory Floating Emojis,Completed,Confetti particle CSS float animation triggered when prepayment plans reduce debt term,web/src/components/DebtFreeCelebration.tsx
+Features 4 & 19,Calculation Engine,Bi-Weekly Rollover Integration,Completed,Integrated bi-weekly payment acceleration and rollover logic in the baseline and simulated amortization engines,web/src/engine/rollover.ts; web/src/engine/rollover.test.ts
+Feature 91,Performance,Telemetry Slider Throttling,Completed,Debounced slider analytics logging by 800ms while keeping visual sliders instantly responsive,web/src/components/WindfallSimulator.tsx
+Feature 85,Form Validation,Input Clamping on Rate Change,Completed,Clamped input values for rateChanges month to tenure scope and rates to [0%\, 100%],web/src/components/LoanCard.tsx
+Aesthetic,Design,Broadsheet Palette Unification,Completed,Standardized warning/savings highlight colors to theme HSL variables across panels,web/src/styles.css
+Feature 97,Aesthetic,Chronological Sorting,Completed,Enforced chronological sorting on rate changes logs on render to prevent UI out-of-order alignment,web/src/components/LoanCard.tsx
+Feature 12,Form Validation,Simulated Rate Shock EMI Sufficiency,Completed,Detects simulated future rate spikes to verify if standard monthly EMI covers maximum interest due,web/src/components/LoanCard.tsx
+Native UI,Accessibility,Native HTML5 Modal dialog,Completed,Replaced custom overlays with native HTML5 dialog element with native focus trap and Esc handling,web/src/components/PaywallModal.tsx
+Native UI,UX Design,Mutually Exclusive details Accordion,Completed,Refactored FAQs to use HTML5 details element with same name attribute to auto-collapse others natively,web/src/components/MarketingLandingPage.tsx
+Aesthetic,Typography,Balanced Text Wrap styling,Completed,Configured text-wrap balance for headings and text-wrap pretty for body content to prevent orphans,web/src/styles.css
+Native UI,Performance,View Transitions API integration,Completed,Created hardware-accelerated document transitions when swapping landing and dashboard views,web/src/App.tsx
+Aesthetic,Design,Custom Broadsheet Scrollbars,Completed,Mapped browser scrollbars globally to warm broadsheet ink/paper palette,web/src/styles.css
+Aesthetic,Design,Brand-Consistent Form Accents,Completed,Mapped standard form checkboxes to native emerald green accents,web/src/styles.css
+Aesthetic,Design,Global Input Focus Glows,Completed,Added custom emerald focus shadow glow and background hue shift to all text/email/number inputs,web/src/styles.css
+Micro-interactions,Design,Slider Label Micro-interactions,Completed,Scaled up slider label values dynamically on focus/active range drags via pure CSS focus-within rules,web/src/styles.css
