@@ -34,6 +34,8 @@ Moratorium Engine,Math Engine,Feature 8 — Principal Moratorium Option (amortiz
 Moratorium UI,Feature,Feature 8 — Moratorium Option Loan Card integration,Completed,Added checkbox and forms (start month; duration; type selection) in LoanCard to easily configure and preview moratorium schedules on each loan.,web/src/components/LoanCard.tsx
 Moratorium Testing,Testing,Feature 8 — 2 Vitest moratorium tests,Completed,Added math verification tests for Interest-Only and Full Holiday moratorium models; verifies correct interest calculations; zero principal paid; compounding balances; and correct tenure extension behavior.,web/src/engine/math_trust.test.ts
 Marketing,Design,Indian Bank Benchmark Rates Comparison Table,Completed,Added interactive comparison table showing current rates and specific prepayment rules for major Indian banks (SBI; HDFC; ICICI; LIC HFL; Axis Bank) to build customer trust and authority.,web/src/components/MarketingLandingPage.tsx
+Marketing,Design,Interactive Windfall Simulator Showcase,Completed,Replaced static hardcoded mock loan details in windfall allocation visualizer with interactive React input states and dynamic split ratio text calculation.,web/src/components/MarketingLandingPage.tsx
+
 
 
 
