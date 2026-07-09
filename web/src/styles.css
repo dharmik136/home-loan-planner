@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
 
+/* Customized native scrollbars and form controls to match broadsheet theme */
+html, pre, .chart-wrap, table, .table-wrap {
+  scrollbar-color: var(--line-strong) var(--panel);
+  scrollbar-width: thin;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  accent-color: var(--emerald);
+}
+
 /* ============================================================
    THE PREPAYMENT LEDGER — editorial financial-broadsheet system
    ============================================================ */
