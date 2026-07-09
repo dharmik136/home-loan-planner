@@ -33,6 +33,17 @@ export function DebtFreeCelebration({ results }: Props) {
   const remainingMonths = celebration.monthsSaved % 12;
   const timeSavedStr = `${years > 0 ? `${years} Year${years > 1 ? "s" : ""} ` : ""}${remainingMonths > 0 ? `${remainingMonths} Month${remainingMonths > 1 ? "s" : ""}` : ""}`;
 
+  const particles = [
+    { emoji: "🎉", left: "12%", delay: "0.2s", duration: "4.5s", size: "1.1rem" },
+    { emoji: "✨", left: "28%", delay: "1.5s", duration: "5.2s", size: "0.9rem" },
+    { emoji: "💸", left: "45%", delay: "0.8s", duration: "4.8s", size: "1.2rem" },
+    { emoji: "🚀", left: "62%", delay: "2.1s", duration: "5.5s", size: "1.0rem" },
+    { emoji: "💰", left: "78%", delay: "0.5s", duration: "4.2s", size: "1.1rem" },
+    { emoji: "🎉", left: "90%", delay: "1.8s", duration: "5.0s", size: "0.85rem" },
+    { emoji: "✨", left: "5%", delay: "2.5s", duration: "6.0s", size: "1.0rem" },
+    { emoji: "💸", left: "85%", delay: "3.2s", duration: "4.6s", size: "0.95rem" }
+  ];
+
   return (
     <div
       className="panel"
@@ -46,6 +57,29 @@ export function DebtFreeCelebration({ results }: Props) {
         overflow: "hidden"
       }}
     >
+      {/* Celebration floating particles */}
+      {particles.map((p, idx) => (
+        <span
+          key={idx}
+          style={{
+            position: "absolute",
+            bottom: "-20px",
+            left: p.left,
+            fontSize: p.size,
+            animationName: "floatUp",
+            animationDuration: p.duration,
+            animationDelay: p.delay,
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+            pointerEvents: "none",
+            opacity: 0,
+            zIndex: 0
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
+
       {/* Decorative Sparkles */}
       <div style={{ position: "absolute", right: "10px", top: "10px", fontSize: "2rem", opacity: 0.25, pointerEvents: "none" }}>
         ✨
@@ -54,7 +88,7 @@ export function DebtFreeCelebration({ results }: Props) {
         🚀
       </div>
 
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center", position: "relative", zIndex: 1 }}>
         <span style={{ fontSize: "2.2rem" }}>🎉</span>
         <div>
           <h4 style={{ margin: 0, fontSize: "1.05rem", fontWeight: "700", fontFamily: "var(--display)", color: "var(--ink)" }}>
