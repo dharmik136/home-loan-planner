@@ -36,6 +36,7 @@ import { SavingsValueWidget } from "./components/SavingsValueWidget";
 import { DebtFreeCelebration } from "./components/DebtFreeCelebration";
 import { DebtFreeCountdown } from "./components/DebtFreeCountdown";
 import { PartPaymentPlanner } from "./components/PartPaymentPlanner";
+import { OnboardingTour } from "./components/OnboardingTour";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -146,6 +147,7 @@ export function App() {
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
   const [yearlyView, setYearlyView] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -320,6 +322,27 @@ export function App() {
             title="Toggle Light/Dark Theme"
           >
             {darkMode ? "☀️" : "🌙"}
+          </button>
+          <button
+            onClick={() => setIsTourActive(true)}
+            className="theme-btn"
+            style={{
+              background: "none",
+              border: "1px solid var(--line-strong)",
+              borderRadius: "50%",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "var(--ink)",
+              fontSize: "1.1rem",
+              transition: "all 0.2s"
+            }}
+            title="Start Onboarding Tour"
+          >
+            ❓
           </button>
           <div className="edition">
             Interactive home loan planner<br />
@@ -600,6 +623,7 @@ export function App() {
       )}
 
       <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
+      <OnboardingTour forceOpen={isTourActive} onClose={() => setIsTourActive(false)} />
     </div>
   );
 }
