@@ -257,6 +257,26 @@ export function App() {
     trackEvent("onboarding_scenario_applied", { scenario });
   };
 
+  const handleApplyWindfallSplit = (allocations: { loanId: string; amount: number; monthIndex: number }[]) => {
+    setState((s) => {
+      const newEntries = [...s.entries];
+      for (const alloc of allocations) {
+        if (alloc.amount > 0) {
+          newEntries.push({
+            id: `pp-${Date.now()}-${Math.random()}`,
+            loanId: alloc.loanId,
+            type: "oneTime",
+            amount: alloc.amount,
+            monthIndex: alloc.monthIndex
+          });
+        }
+      }
+      return { ...s, entries: newEntries };
+    });
+    trackEvent("windfall_split_applied", { count: allocations.length });
+    alert("Optimized windfall prepayments successfully applied to your plan!");
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
@@ -609,7 +629,7 @@ export function App() {
         </main>
 
         <aside className="col-right">
-          {loans.length >= 1 && <WindfallSimulator loans={loans} />}
+          {loans.length >= 1 && <WindfallSimulator loans={loans} onApplySplit={handleApplyWindfallSplit} />}
 
           {loans.length >= 1 && <TaxSavingsDeductor results={results} />}
 

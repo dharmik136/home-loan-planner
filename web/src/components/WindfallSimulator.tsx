@@ -5,7 +5,10 @@ import { formatCompactINR, formatDuration, formatINR } from "../engine/format";
 import { buildSchedule, monthlyEmi } from "../engine/amortization";
 import { trackEvent } from "../engine/analytics";
 
-interface Props { loans: Loan[]; }
+interface Props {
+  loans: Loan[];
+  onApplySplit?: (allocations: { loanId: string; amount: number; monthIndex: number }[]) => void;
+}
 
 
 
@@ -80,7 +83,7 @@ function findOptimalSplit(loans: Loan[], amount: number, monthIndex: number): Sp
   return { split: bestSplit, interestSaved: Math.round(maxSaved) };
 }
 
-export function WindfallSimulator({ loans }: Props) {
+export function WindfallSimulator({ loans, onApplySplit }: Props) {
   const [amount, setAmount] = useState(500_000);
   const [month, setMonth] = useState(12);
   const [timerId, setTimerId] = useState<number | null>(null);
@@ -233,6 +236,25 @@ export function WindfallSimulator({ loans }: Props) {
               <span>Total Optimized Savings:</span>
               <span>{formatINR(optimalSplit.interestSaved)}</span>
             </div>
+            {onApplySplit && (
+              <button
+                onClick={() => {
+                  const allocations = loans.map((loan, idx) => {
+                    const pct = optimalSplit.split[idx];
+                    return {
+                      loanId: loan.id,
+                      amount: (amount * pct) / 100,
+                      monthIndex: month
+                    };
+                  }).filter(a => a.amount > 0);
+                  onApplySplit(allocations);
+                }}
+                className="add-btn"
+                style={{ marginTop: "12px", width: "100%", padding: "8px 12px", fontSize: "0.82rem", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                Apply Optimized Split Prepayments ✓
+              </button>
+            )}
           </div>
         </div>
       )}

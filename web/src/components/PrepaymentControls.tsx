@@ -62,14 +62,23 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
               </div>
             </div>
 
-            <input
-              type="range"
-              min={0}
-              max={sliderMax}
-              step={STEP}
-              value={Math.min(e.amount, sliderMax)}
-              onChange={(ev) => onChange(e.id, { amount: Number(ev.target.value) })}
-            />
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <input
+                type="range"
+                min={0}
+                max={sliderMax}
+                step={STEP}
+                value={Math.min(e.amount, sliderMax)}
+                onChange={(ev) => onChange(e.id, { amount: Number(ev.target.value) })}
+                style={{ flexGrow: 1 }}
+              />
+              <input
+                type="number"
+                value={e.amount}
+                onChange={(ev) => onChange(e.id, { amount: Math.max(0, Number(ev.target.value)) })}
+                style={{ width: "95px", fontSize: "0.78rem", padding: "4px", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper)", color: "var(--ink)", outline: "none" }}
+              />
+            </div>
             <div className="slider-meta">
               <span>₹0</span>
               <span>
@@ -79,14 +88,25 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
               <span>{formatCompactINR(sliderMax)}</span>
             </div>
 
-            <input
-              type="range"
-              min={2}
-              max={loan.tenureMonths}
-              step={1}
-              value={e.monthIndex}
-              onChange={(ev) => onChange(e.id, { monthIndex: Number(ev.target.value) })}
-            />
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <input
+                type="range"
+                min={2}
+                max={loan.tenureMonths}
+                step={1}
+                value={e.monthIndex}
+                onChange={(ev) => onChange(e.id, { monthIndex: Number(ev.target.value) })}
+                style={{ flexGrow: 1 }}
+              />
+              <input
+                type="number"
+                min={2}
+                max={loan.tenureMonths}
+                value={e.monthIndex}
+                onChange={(ev) => onChange(e.id, { monthIndex: Math.max(2, Math.min(loan.tenureMonths, Number(ev.target.value))) })}
+                style={{ width: "95px", fontSize: "0.78rem", padding: "4px", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper)", color: "var(--ink)", outline: "none" }}
+              />
+            </div>
 
             <div className={`badge ${verdict.ok ? "ok" : "bad"}`}>
               <span className="mk">{verdict.ok ? "✓" : "✕"}</span>
