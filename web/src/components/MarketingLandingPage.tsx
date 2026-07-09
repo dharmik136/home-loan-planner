@@ -32,9 +32,6 @@ export function MarketingLandingPage({ onGoToPlanner, onOpenPaywall }: Marketing
   // Email Sequence state
   const [activeEmailTab, setActiveEmailTab] = useState<number>(1);
 
-  // FAQ Accordion states
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   // --- Calculations for Widget 1: Amortization Shock ---
   const shockEmiVal = useMemo(() => {
     return monthlyEmi(shockAmount, shockRate, shockTenure * 12);
@@ -1011,71 +1008,56 @@ The Prepayment Ledger Team`,
             </h2>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
             {/* FAQ 1 */}
-            <div className="faq-item">
-              <div className="faq-question" onClick={() => setOpenFaq(openFaq === 0 ? null : 0)}>
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
                 <span>How can I trust the math of this tool?</span>
-                <span>{openFaq === 0 ? "−" : "+"}</span>
+              </summary>
+              <div className="faq-answer">
+                The calculation engine of The Prepayment Ledger is mathematically verified to the rupee against standard industry schedules, including complex Python math models and verified Excel workbook engines. The outputs account for monthly compounding reducing balances, EMI rounding conventions, and floating-rate changes. You can audit the exact monthly schedule in the table view to verify the math line-by-line.
               </div>
-              {openFaq === 0 && (
-                <div className="faq-answer">
-                  The calculation engine of The Prepayment Ledger is mathematically verified to the rupee against standard industry schedules, including complex Python math models and verified Excel workbook engines. The outputs account for monthly compounding reducing balances, EMI rounding conventions, and floating-rate changes. You can audit the exact monthly schedule in the table view to verify the math line-by-line.
-                </div>
-              )}
-            </div>
+            </details>
 
             {/* FAQ 2 */}
-            <div className="faq-item">
-              <div className="faq-question" onClick={() => setOpenFaq(openFaq === 1 ? null : 1)}>
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
                 <span>The RBI says there are no prepayment penalties on home loans. Why does this tool have rules?</span>
-                <span>{openFaq === 1 ? "−" : "+"}</span>
+              </summary>
+              <div className="faq-answer">
+                While the RBI mandates that banks cannot charge <em>penalties</em> for floating-rate loans to individuals, banks still enforce operational constraints to make prepaying difficult. These include limiting you to one prepayment per calendar month, requiring a minimum amount (e.g., ₹5,000 or 1 EMI), or restricting prepayments during the first month. Our rules engine ensures your plan is operationally valid so you don't get rejected at the branch.
               </div>
-              {openFaq === 1 && (
-                <div className="faq-answer">
-                  While the RBI mandates that banks cannot charge <em>penalties</em> for floating-rate loans to individuals, banks still enforce operational constraints to make prepaying difficult. These include limiting you to one prepayment per calendar month, requiring a minimum amount (e.g., ₹5,000 or 1 EMI), or restricting prepayments during the first month. Our rules engine ensures your plan is operationally valid so you don't get rejected at the branch.
-                </div>
-              )}
-            </div>
+            </details>
 
             {/* FAQ 3 */}
-            <div className="faq-item">
-              <div className="faq-question" onClick={() => setOpenFaq(openFaq === 2 ? null : 2)}>
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
                 <span>Should I prepay my home loan or invest in mutual funds?</span>
-                <span>{openFaq === 2 ? "−" : "+"}</span>
+              </summary>
+              <div className="faq-answer">
+                Prepaying a home loan at 8.5% is equivalent to earning a guaranteed, tax-free return of 8.5%. While equity mutual funds can offer higher historical returns, they come with market risks and capital gains taxes. Prepaying provides immediate cash-flow relief and reduces your debt-to-income ratio. We suggest using a balanced approach: maintain an emergency fund, continue your core investments, and use your surplus cash/bonuses to aggressively prepay debt.
               </div>
-              {openFaq === 2 && (
-                <div className="faq-answer">
-                  Prepaying a home loan at 8.5% is equivalent to earning a guaranteed, tax-free return of 8.5%. While equity mutual funds can offer higher historical returns, they come with market risks and capital gains taxes. Prepaying provides immediate cash-flow relief and reduces your debt-to-income ratio. We suggest using a balanced approach: maintain an emergency fund, continue your core investments, and use your surplus cash/bonuses to aggressively prepay debt.
-                </div>
-              )}
-            </div>
+            </details>
 
             {/* FAQ 4 */}
-            <div className="faq-item">
-              <div className="faq-question" onClick={() => setOpenFaq(openFaq === 3 ? null : 3)}>
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
                 <span>Why is the PDF report locked behind a one-time fee?</span>
-                <span>{openFaq === 3 ? "−" : "+"}</span>
+              </summary>
+              <div className="faq-answer">
+                We do not sell your data, run ads, or accept affiliate commissions from lenders for refinancing leads. This independence ensures that our split optimization recommendations are 100% mathematically unbiased. The one-time fee supports the development of the tool and gives you a clean, downloadable blueprint to share with your family or financial advisor.
               </div>
-              {openFaq === 3 && (
-                <div className="faq-answer">
-                  We do not sell your data, run ads, or accept affiliate commissions from lenders for refinancing leads. This independence ensures that our split optimization recommendations are 100% mathematically unbiased. The one-time fee supports the development of the tool and gives you a clean, downloadable blueprint to share with your family or financial advisor.
-                </div>
-              )}
-            </div>
+            </details>
 
             {/* FAQ 5 */}
-            <div className="faq-item">
-              <div className="faq-question" onClick={() => setOpenFaq(openFaq === 4 ? null : 4)}>
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
                 <span>Is my financial information secure?</span>
-                <span>{openFaq === 4 ? "−" : "+"}</span>
+              </summary>
+              <div className="faq-answer">
+                Yes, because we never see it. All loan values, interest rates, and schedules are computed locally in your browser sandbox. We do not use third-party financial aggregators (like Account Aggregators or Plaid) and do not require bank logins. If you clear your browser cache, your inputs are cleared.
               </div>
-              {openFaq === 4 && (
-                <div className="faq-answer">
-                  Yes, because we never see it. All loan values, interest rates, and schedules are computed locally in your browser sandbox. We do not use third-party financial aggregators (like Account Aggregators or Plaid) and do not require bank logins. If you clear your browser cache, your inputs are cleared.
-                </div>
-              )}
-            </div>
+            </details>
           </div>
         </div>
       </section>
