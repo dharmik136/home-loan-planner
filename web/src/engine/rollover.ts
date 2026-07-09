@@ -80,6 +80,11 @@ export function computeRollover(
       const payment = Math.min(pay, balance + interest);
       balance = balance + interest - payment;
       interestSum += interest;
+
+      if (loan.biWeekly && m % 6 === 0) {
+        const extraBiWeekly = Math.min(baseEmi / 2, balance);
+        balance -= extraBiWeekly;
+      }
     }
     return { interestSum, months: m };
   });
@@ -187,6 +192,20 @@ export function computeRollover(
       if (s.balance <= 0.005) continue;
       if (s.loan.extraEmiPerYear && m % 12 === 0) {
         const extraPrepay = Math.min(s.baseEmi, s.balance);
+        s.balance -= extraPrepay;
+        monthPrepaymentPaidSum += extraPrepay;
+        totalPaid += extraPrepay;
+
+        if (s.balance <= 0.005) {
+          s.balance = 0;
+          if (payoffMonths[s.loan.id] === undefined) {
+            payoffMonths[s.loan.id] = m;
+          }
+        }
+      }
+
+      if (s.loan.biWeekly && m % 6 === 0) {
+        const extraPrepay = Math.min(s.baseEmi / 2, s.balance);
         s.balance -= extraPrepay;
         monthPrepaymentPaidSum += extraPrepay;
         totalPaid += extraPrepay;

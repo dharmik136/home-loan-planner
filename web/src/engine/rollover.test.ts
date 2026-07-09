@@ -48,4 +48,24 @@ describe("computeRollover math engine", () => {
     // Let's verify that Loan A is paid off.
     expect(res.payoffMonths["loan-1"]).toBeLessThan(res.payoffMonths["loan-2"]);
   });
+
+  it("supports bi-weekly payment acceleration in rollover calculations", () => {
+    const biWeeklyLoans: Loan[] = [
+      {
+        id: "loan-1",
+        name: "Loan A",
+        outstanding: 1_000_000,
+        ratePct: 8.0,
+        tenureMonths: 120,
+        startYYYYMM: "2026-07",
+        biWeekly: true,
+      }
+    ];
+    // Baseline calculations should include the bi-weekly payments, reducing total interest
+    const resNormal = computeRollover(sampleLoans.slice(0, 1), 0, "avalanche");
+    const resBiWeekly = computeRollover(biWeeklyLoans, 0, "avalanche");
+    
+    expect(resBiWeekly.baselineTotalInterest).toBeLessThan(resNormal.baselineTotalInterest);
+    expect(resBiWeekly.baselineMonthsToPayoff).toBeLessThan(resNormal.baselineMonthsToPayoff);
+  });
 });
