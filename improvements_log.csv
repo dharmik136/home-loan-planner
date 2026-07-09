@@ -35,6 +35,10 @@ Moratorium UI,Feature,Feature 8 — Moratorium Option Loan Card integration,Comp
 Moratorium Testing,Testing,Feature 8 — 2 Vitest moratorium tests,Completed,Added math verification tests for Interest-Only and Full Holiday moratorium models; verifies correct interest calculations; zero principal paid; compounding balances; and correct tenure extension behavior.,web/src/engine/math_trust.test.ts
 Marketing,Design,Indian Bank Benchmark Rates Comparison Table,Completed,Added interactive comparison table showing current rates and specific prepayment rules for major Indian banks (SBI; HDFC; ICICI; LIC HFL; Axis Bank) to build customer trust and authority.,web/src/components/MarketingLandingPage.tsx
 Marketing,Design,Interactive Windfall Simulator Showcase,Completed,Replaced static hardcoded mock loan details in windfall allocation visualizer with interactive React input states and dynamic split ratio text calculation.,web/src/components/MarketingLandingPage.tsx
+Balloon Engine,Math Engine,Feature 9 — Balloon Payment Calculator (planning.ts),Completed,Added balloonPayments array to Loan interface and aggregated them in buildPrepayments; schedules lump sums at year milestones (yearIndex * 12 months) and reduces interest/tenure.,web/src/engine/planning.ts
+Balloon UI,Feature,Feature 9 — Balloon Payments Loan Card integration,Completed,Added Balloon Payments list view and year/amount add form in LoanCard to easily schedule lump-sum payments at specific milestones.,web/src/components/LoanCard.tsx
+Balloon Testing,Testing,Feature 9 — Vitest balloon payment test,Completed,Added math verification test checking that balloon prepayments are properly applied at year milestones (Month 60) and reduce total interest/tenure in res.plan vs res.baseline.,web/src/engine/math_trust.test.ts
+
 
 
 
