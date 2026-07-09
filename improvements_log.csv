@@ -55,6 +55,8 @@ Security,Dependencies,NPM Dependency Vulnerability Audits,Completed,Ran npm audi
 Broadsheet UI,Design,Premium Newspaper Masthead Header,Completed,Added an authentic, large broadsheet newspaper masthead banner at the top of the landing page, featuring a dynamic current date and issue metadata, resolved test locator collisions.,web/src/components/MarketingLandingPage.tsx
 Verification,CLI,Workbook verification printing corrections,Completed,Corrected verify_workbook.py printing of core EMI comparison calculations to dynamically query core values and resolved non-ASCII em-dash character replacement.,src/verify_workbook.py
 Formatting,Design,Root EditorConfig & Prettier configurations,Completed,Added root-level .editorconfig and .prettierrc files to establish consistent code formatting rules (indentation style, line endings, print width) for public code contributions.,.editorconfig
+Compliance,Legal,Python GPL-3.0 License headers,Completed,Prepended standard GPL-3.0 license headers to all core Python logic scripts and verify/build workbook generators to secure copyrights.,src/
+
 
 
 
