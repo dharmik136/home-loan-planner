@@ -6,10 +6,10 @@ import { App } from "./App";
 // Recharts' ResponsiveContainer needs real layout; stub it so the tree mounts
 // in jsdom. We're smoke-testing the app shell + live numbers, not pixel charts.
 vi.mock("recharts", async () => {
-  const actual = await vi.importActual<any>("recharts");
+  const actual = await vi.importActual<Record<string, unknown>>("recharts");
   return {
     ...actual,
-    ResponsiveContainer: ({ children }: any) => <div style={{ width: 600, height: 300 }}>{children}</div>,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div style={{ width: 600, height: 300 }}>{children}</div>,
   };
 });
 

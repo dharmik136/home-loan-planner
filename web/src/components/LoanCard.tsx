@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Loan, LoanResult } from "../engine/planning";
+import type { Loan, LoanResult, LenderRuleset } from "../engine/planning";
 import { formatINR } from "../engine/format";
 
 interface Props {
@@ -146,7 +146,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           <label>Lender Rules</label>
           <select
             value={loan.ruleset || "hdfc"}
-            onChange={(e) => onChange({ ruleset: e.target.value as any })}
+            onChange={(e) => onChange({ ruleset: e.target.value as LenderRuleset })}
             style={{
               width: "100%",
               fontFamily: "var(--body)",

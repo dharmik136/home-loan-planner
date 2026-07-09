@@ -72,7 +72,7 @@ function load(): State {
       }
       // Ensure fields exist for rateChanges and ruleset
       if (Array.isArray(parsed.loans)) {
-        parsed.loans = parsed.loans.map((l: any) => ({
+        parsed.loans = parsed.loans.map((l: Partial<Loan>) => ({
           ...l,
           preEmiInterest: l.preEmiInterest ?? 0,
           ruleset: l.ruleset ?? "hdfc",
@@ -92,7 +92,7 @@ export function App() {
   const [state, setState] = useState<State>(load);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [view, setView] = useState<"landing" | "app">(() => {
-    if ((import.meta as any).env.MODE === "test") {
+    if ((import.meta as ImportMeta & { env: { MODE: string } }).env.MODE === "test") {
       return "app";
     }
     return "landing";
