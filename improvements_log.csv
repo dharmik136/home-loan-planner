@@ -60,6 +60,9 @@ Compliance,Legal,Build configs GPL-3.0 headers,Completed,Prepended standard GPL-
 Interactive UI,Design,Premium Golden Hover highlight effects,Completed,Upgraded dashboard panels hover styles to raise cards slightly with a warm golden highlight shadow and golden outline accent colors.,web/src/styles.css
 Interactive UI,Feature,Supademo-style Onboarding Persona Picker,Completed,Overhauled OnboardingTour component to offer guided walks and automated mock scenario applications for Prepayment Optimizers, Balance Transfer Seekers, Rate Shock Planners, and Tax Optimizers.,web/src/components/OnboardingTour.tsx
 Interactive UI,Design,Premium Keyframe Animations & Micro-interactions,Completed,Added keyframe animations for earned badge unlocks (badge-unlocked pulse), prepayment card insertions (entry-animated slide-in), and validation alerts (callout-warning-pulse breathing).,web/src/styles.css
+Interactive UI,Feature,High-Precision Prepayment Slider Inputs,Completed,Added direct editable numeric input boxes alongside amount and month range sliders in prepayment cards to resolve slider-sensitivity issues.,web/src/components/PrepaymentControls.tsx
+Interactive UI,Feature,Windfall Allocator Apply Split,Completed,Integrated an 'Apply Optimized Split Prepayments' CTA inside the Windfall Optimizer card to automatically inject recommended split allocations directly into the active plan.,web/src/components/WindfallSimulator.tsx
+
 
 
 
