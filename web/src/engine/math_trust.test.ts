@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { monthlyEmi, buildSchedule, compare } from "./amortization";
 import { computeRollover } from "./rollover";
-import { type Loan } from "./planning";
+import { type Loan, computeLoan } from "./planning";
 
 describe("Math Trust Fixtures", () => {
   // 1. Single Loan Baseline Schedule
@@ -210,5 +210,36 @@ describe("Math Trust Fixtures", () => {
     // Tenure should be extended even further than interest-only
     expect(sched.monthsToPayoff).toBeGreaterThan(120);
     expect(sched.rows[sched.rows.length - 1].closing).toBe(0);
+  });
+
+  // 13. Balloon Payment Calculator
+  it("Verify Balloon Payment prepayments occur at year milestones and shorten tenure", () => {
+    const loan: Loan = {
+      id: "L1",
+      name: "Test Balloon Loan",
+      outstanding: 2_000_000,
+      ratePct: 9.0,
+      tenureMonths: 240,
+      startYYYYMM: "2026-07",
+      balloonPayments: [
+        { id: "bp1", yearIndex: 5, amount: 200_000 } // ₹2L at Year 5 (Month 60)
+      ]
+    };
+
+    const res = computeLoan(loan, []);
+    
+    // In the plan schedule, month 60 should have a prepayment of ₹2,00,000
+    const m60 = res.plan.rows.find(r => r.month === 60);
+    expect(m60).toBeDefined();
+    expect(m60?.prepayment).toBe(200_000);
+
+    // Baseline should not have this prepayment
+    const baseM60 = res.baseline.rows.find(r => r.month === 60);
+    expect(baseM60?.prepayment).toBe(0);
+
+    // Total interest paid in plan should be less than baseline
+    expect(res.plan.totalInterest).toBeLessThan(res.baseline.totalInterest);
+    // Tenure should be shorter
+    expect(res.plan.monthsToPayoff).toBeLessThan(240);
   });
 });

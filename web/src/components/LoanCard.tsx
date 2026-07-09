@@ -414,6 +414,41 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           </div>
         )}
       </div>
+
+      {/* Balloon Payments Simulator */}
+      <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px dashed var(--line-strong)", marginBottom: "12px" }}>
+        <label style={{ display: "block", fontSize: "0.68rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "600", marginBottom: "8px" }}>
+          Balloon Payments (Sec 9)
+        </label>
+        
+        {/* List of existing balloon payments */}
+        {loan.balloonPayments && loan.balloonPayments.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
+            {[...loan.balloonPayments].sort((a, b) => a.yearIndex - b.yearIndex).map((bp) => (
+              <div key={bp.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel)", padding: "4px 8px", borderRadius: "2px", fontSize: "0.78rem" }}>
+                <span>Year {bp.yearIndex} Milestone ➔ <b>{formatINR(bp.amount)}</b></span>
+                <button
+                  onClick={() => onChange({ balloonPayments: loan.balloonPayments?.filter(x => x.id !== bp.id) })}
+                  style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: "0.8rem" }}
+                  title="Delete balloon payment"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add balloon payment form */}
+        <BalloonPaymentForm
+          maxYears={Math.ceil(loan.tenureMonths / 12)}
+          onAdd={(yearIndex, amount) => {
+            const newList = [...(loan.balloonPayments || [])];
+            newList.push({ id: `bp-${Date.now()}-${Math.random()}`, yearIndex, amount });
+            onChange({ balloonPayments: newList.sort((a, b) => a.yearIndex - b.yearIndex) });
+          }}
+        />
+      </div>
       </>)}
 
       {hasErrors && (
@@ -541,6 +576,69 @@ function RateChangeForm({ tenureMonths, baseRate, onAdd }: { tenureMonths: numbe
           const clampedMonth = Math.max(2, Math.min(tenureMonths, month));
           const clampedRate = Math.max(0, Math.min(100, rate));
           onAdd(clampedMonth, clampedRate);
+        }}
+        className="add-btn"
+        style={{ padding: "6px 10px", fontSize: "0.74rem", height: "29px", width: "auto", display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        + Add
+      </button>
+    </div>
+  );
+}
+
+function BalloonPaymentForm({ maxYears, onAdd }: { maxYears: number; onAdd: (y: number, a: number) => void }) {
+  const [year, setYear] = useState(5);
+  const [amount, setAmount] = useState(100000);
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px", alignItems: "end" }}>
+      <div>
+        <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Year</label>
+        <input
+          type="number"
+          min={1}
+          max={maxYears}
+          value={year}
+          onChange={(e) => setYear(Math.max(1, Number(e.target.value)))}
+          style={{
+            width: "100%",
+            fontFamily: "var(--body)",
+            fontSize: "0.82rem",
+            color: "var(--ink)",
+            background: "var(--paper)",
+            border: "1px solid var(--line-strong)",
+            borderRadius: "2px",
+            padding: "5px 7px",
+            outline: "none"
+          }}
+        />
+      </div>
+      <div>
+        <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Amount (₹)</label>
+        <input
+          type="number"
+          step="10000"
+          min={1000}
+          value={amount}
+          onChange={(e) => setAmount(Math.max(1000, Number(e.target.value)))}
+          style={{
+            width: "100%",
+            fontFamily: "var(--body)",
+            fontSize: "0.82rem",
+            color: "var(--ink)",
+            background: "var(--paper)",
+            border: "1px solid var(--line-strong)",
+            borderRadius: "2px",
+            padding: "5px 7px",
+            outline: "none"
+          }}
+        />
+      </div>
+      <button
+        onClick={() => {
+          const clampedYear = Math.max(1, Math.min(maxYears, year));
+          const clampedAmount = Math.max(1000, amount);
+          onAdd(clampedYear, clampedAmount);
         }}
         className="add-btn"
         style={{ padding: "6px 10px", fontSize: "0.74rem", height: "29px", width: "auto", display: "flex", alignItems: "center", justifyContent: "center" }}

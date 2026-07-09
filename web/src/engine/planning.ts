@@ -32,6 +32,13 @@ export interface Loan {
   moratoriumStart?: number;
   moratoriumDuration?: number;
   moratoriumType?: "interestOnly" | "fullHoliday";
+  balloonPayments?: BalloonPaymentEntry[];
+}
+
+export interface BalloonPaymentEntry {
+  id: string;
+  yearIndex: number;
+  amount: number;
 }
 
 export interface PrepayEntry {
@@ -48,7 +55,8 @@ export function buildPrepayments(
   tenure: number,
   extraEmiPerYear = false,
   baseEmi = 0,
-  biWeekly = false
+  biWeekly = false,
+  balloonPayments?: BalloonPaymentEntry[]
 ): Record<number, number> {
   const map: Record<number, number> = {};
 
@@ -61,6 +69,17 @@ export function buildPrepayments(
   if (biWeekly && baseEmi > 0) {
     for (let m = 6; m <= tenure; m += 6) {
       map[m] = (map[m] ?? 0) + baseEmi / 2;
+    }
+  }
+
+  if (balloonPayments) {
+    for (const bp of balloonPayments) {
+      if (bp.amount > 0 && bp.yearIndex > 0) {
+        const m = bp.yearIndex * 12;
+        if (m <= tenure) {
+          map[m] = (map[m] ?? 0) + bp.amount;
+        }
+      }
     }
   }
 
@@ -99,7 +118,7 @@ function getRateChangesMap(loan: Loan): Record<number, number> {
 
 export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
   const emi = loan.outstanding <= 0 ? 0 : monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
-  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly);
+  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly, loan.balloonPayments);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
   
@@ -147,7 +166,7 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
   const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
   const behavior = loan.prepayBehavior ?? "reduceTenure";
   const rateChangesMap = getRateChangesMap(loan);
-  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly);
+  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly, loan.balloonPayments);
   prepayments[monthIndex] = (prepayments[monthIndex] ?? 0) + amount;
   
   const baseline = buildSchedule(
