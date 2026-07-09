@@ -54,6 +54,8 @@ CD Pipeline,Deployment,GitHub Actions Pages Deployment (deploy.yml),Completed,Cr
 Security,Dependencies,NPM Dependency Vulnerability Audits,Completed,Ran npm audit and applied updates to resolve high-severity undici and dependent package vulnerability loopholes.,web/package-lock.json
 Broadsheet UI,Design,Premium Newspaper Masthead Header,Completed,Added an authentic, large broadsheet newspaper masthead banner at the top of the landing page, featuring a dynamic current date and issue metadata, resolved test locator collisions.,web/src/components/MarketingLandingPage.tsx
 Verification,CLI,Workbook verification printing corrections,Completed,Corrected verify_workbook.py printing of core EMI comparison calculations to dynamically query core values and resolved non-ASCII em-dash character replacement.,src/verify_workbook.py
+Formatting,Design,Root EditorConfig & Prettier configurations,Completed,Added root-level .editorconfig and .prettierrc files to establish consistent code formatting rules (indentation style, line endings, print width) for public code contributions.,.editorconfig
+
 
 
 
