@@ -114,6 +114,7 @@ export function AchievementBadges({ results }: Props) {
             <div
               key={b.id}
               title={b.detail}
+              className="badge-unlocked"
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                 background: "var(--emerald-wash)", border: "1px solid #c4dac9",
