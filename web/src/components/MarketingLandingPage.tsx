@@ -1338,6 +1338,76 @@ The Prepayment Ledger Team`,
         </div>
       </section>
 
+      {/* INDIAN BANK BENCHMARK COMPARSION */}
+      <section style={{ borderBottom: "1px solid var(--line-strong)", paddingBottom: "48px" }}>
+        <div className="m-wrap">
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <div className="kicker-sub">🇮🇳 Market Intelligence</div>
+            <h2 className="serif-title" style={{ fontSize: "2.2rem" }}>
+              Indian Lenders Benchmark Rates &amp; Prepayment Rules
+            </h2>
+            <p style={{ maxWidth: "720px", margin: "10px auto 0", color: "var(--ink-soft)", fontSize: "0.96rem" }}>
+              How major banks structure their interest rates and restrict part-payments. Use these benchmark ranges to plug into our planner.
+            </p>
+          </div>
+
+          <div style={{ overflowX: "auto", width: "100%", border: "1px solid var(--line-strong)", borderRadius: "3px", boxShadow: "var(--shadow)" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", backgroundColor: "var(--paper-raised)" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid var(--ink)", textAlign: "left", backgroundColor: "var(--panel)" }}>
+                  <th style={{ padding: "14px 16px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.08em", color: "var(--ink)" }}>Lender</th>
+                  <th style={{ padding: "14px 16px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.08em", color: "var(--ink)" }}>Current Rates</th>
+                  <th style={{ padding: "14px 16px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.08em", color: "var(--ink)" }}>Minimum Prepayment</th>
+                  <th style={{ padding: "14px 16px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.08em", color: "var(--ink)" }}>Prepayment Restrictions</th>
+                  <th style={{ padding: "14px 16px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.08em", color: "var(--ink)" }}>Online Prepay Support</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "var(--ink)" }}>State Bank of India (SBI)</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 700 }}>8.40% – 9.05%</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>1 EMI or ₹10,000</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>No annual cap. Zero penalty on floating. Lockout period: Month 1.</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 600 }}>Yes (YONO / NetBanking, Max 3/yr online)</td>
+                </tr>
+                <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "var(--ink)" }}>HDFC Bank</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 700 }}>8.45% – 9.55%</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>₹5,000 or 1 EMI</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>Capped at 1 part-payment per calendar month. Max 25% of o/s per year.</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 600 }}>Yes (HDFC Portal / Mobile App)</td>
+                </tr>
+                <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "var(--ink)" }}>ICICI Bank</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 700 }}>8.40% – 9.90%</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>₹10,000</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>Zero penalty on floating. No transaction limits for online payments.</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 600 }}>Yes (iMobile Pay / Internet Banking)</td>
+                </tr>
+                <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "var(--ink)" }}>LIC Housing Finance</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 700 }}>8.50% – 10.30%</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>₹10,000</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>Zero penalty on floating. Recalculation request must be submitted.</td>
+                  <td style={{ padding: "14px 16px", color: "var(--clay)", fontWeight: 600 }}>Offline preferred (Branch visit required)</td>
+                </tr>
+                <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "var(--ink)" }}>Axis Bank</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 700 }}>8.60% – 9.60%</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>₹10,000</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink-soft)" }}>Zero penalty on floating. Daily online transaction limits apply.</td>
+                  <td style={{ padding: "14px 16px", color: "var(--emerald)", fontWeight: 600 }}>Yes (Axis Mobile / Internet Banking)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ marginTop: "24px", padding: "16px", backgroundColor: "var(--emerald-wash)", borderLeft: "4px solid var(--emerald)", borderRadius: "3px", fontSize: "0.85rem", lineHeight: 1.5, color: "var(--ink)" }}>
+            💡 <strong>CA Note:</strong> Under the latest <strong>Reserve Bank of India (RBI)</strong> directions, no lender is permitted to levy prepayment penalties or foreclosure charges on any floating interest rate home loans borrowed by individual borrowers. Always verify specific transaction limits with your home branch before scheduling lump sums.
+          </div>
+        </div>
+      </section>
+
       {/* EMAIL SEQUENCE PLAYBOOK DRAWER */}
       <section className="m-wrap">
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
