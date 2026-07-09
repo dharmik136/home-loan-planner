@@ -433,13 +433,38 @@ The Prepayment Ledger Team`,
           border: 1px solid var(--line-strong);
           border-radius: 2px;
           padding: 24px;
-          font-family: monospace;
-          white-space: pre-wrap;
-          font-size: 0.82rem;
-          line-height: 1.5;
+          font-family: var(--display);
+          font-size: 0.94rem;
+          line-height: 1.55;
           max-height: 350px;
           overflow-y: auto;
           color: var(--ink);
+        }
+
+        .email-letter p {
+          margin: 0;
+          text-indent: 1.8em;
+          text-wrap: pretty;
+        }
+
+        .email-letter p:first-of-type {
+          text-indent: 0;
+        }
+
+        .email-letter p + p {
+          margin-top: 8px;
+        }
+
+        .email-letter ul {
+          margin: 12px 0 12px 28px;
+          padding: 0;
+          list-style-type: square;
+        }
+
+        .email-letter li {
+          margin-bottom: 6px;
+          font-size: 0.88rem;
+          color: var(--ink-soft);
         }
 
         /* FAQ styling */
@@ -993,7 +1018,19 @@ The Prepayment Ledger Team`,
           </div>
 
           <div className="email-letter">
-            {emailSequence[activeEmailTab - 1].body}
+            {emailSequence[activeEmailTab - 1].body.split("\n\n").map((para, i) => {
+              if (para.trim().startsWith("*") || para.trim().match(/^\d+\./)) {
+                return (
+                  <ul key={i}>
+                    {para.split("\n").map((line, j) => {
+                      const cleanLine = line.replace(/^\*\s*/, "").replace(/^\d+\.\s*/, "");
+                      return <li key={j}>{cleanLine}</li>;
+                    })}
+                  </ul>
+                );
+              }
+              return <p key={i}>{para}</p>;
+            })}
           </div>
         </div>
       </section>
