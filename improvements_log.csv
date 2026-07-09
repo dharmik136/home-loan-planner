@@ -15,3 +15,6 @@ Aesthetic,Design,Custom Broadsheet Scrollbars,Completed,Mapped browser scrollbar
 Aesthetic,Design,Brand-Consistent Form Accents,Completed,Mapped standard form checkboxes to native emerald green accents,web/src/styles.css
 Aesthetic,Design,Global Input Focus Glows,Completed,Added custom emerald focus shadow glow and background hue shift to all text/email/number inputs,web/src/styles.css
 Micro-interactions,Design,Slider Label Micro-interactions,Completed,Scaled up slider label values dynamically on focus/active range drags via pure CSS focus-within rules,web/src/styles.css
+Native UI,Design,Input field-sizing: content,Completed,Applied Chrome-native field-sizing content styling to LoanCard name inputs to dynamically fit typed content,web/src/components/LoanCard.tsx
+Native UI,Design,Workspace Container Queries layout,Completed,Refactored media queries to container-based workspace layout rules to allow flexible split-pane resizing,web/src/styles.css
+
