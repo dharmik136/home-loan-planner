@@ -481,7 +481,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       </>)}
 
       {hasErrors && (
-        <div style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div className="callout-warning-pulse" style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
           {outstandingError && <span className="error-principal">• {outstandingError}</span>}
           {rateError && <span className="error-rate">• {rateError}</span>}
           {rateWarning && <span className="warning-rate" style={{ color: "#b45309" }}>• ⚠️ {rateWarning}</span>}

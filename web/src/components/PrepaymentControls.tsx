@@ -50,7 +50,7 @@ export function PrepaymentControls({ loan, entries, onAdd, onChange, onRemove }:
         });
         const sliderMax = Math.max(1_500_000, loan.outstanding);
         return (
-          <div className="entry" key={e.id}>
+          <div className="entry entry-animated" key={e.id}>
             <div className="entry-top">
               <span className="entry-amt">{formatINR(e.amount)}</span>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
