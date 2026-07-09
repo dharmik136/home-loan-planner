@@ -16,7 +16,7 @@ test.describe("Mobile & Interactive UX Integrity", () => {
     await page.goto(fileUrl);
     
     // Verify landing CTA is visible on mobile
-    const startCta = page.locator('button:has-text("Model Your Loans (Free)")');
+    const startCta = page.locator('#hero-cta-free');
     await expect(startCta).toBeVisible();
     await startCta.click();
     
@@ -39,7 +39,7 @@ test.describe("Mobile & Interactive UX Integrity", () => {
   // 2. Input Keyboard & Focus Dismiss Behavior
   test("Verify numeric inputs have numeric inputmodes and keyboard focus dismisses on outside clicks", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
 
     // 1. Check inputmode attribute for numeric input fields
     const principalInput = page.locator('input[inputmode="numeric"]').first();
@@ -60,7 +60,7 @@ test.describe("Mobile & Interactive UX Integrity", () => {
   // 3. CTA Visibility & Modal Close Behavior
   test("Verify PDF CTA visibility and modal close/dismiss flows", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
 
     // Verify key save plan CTA button is visible
     const saveCta = page.locator('button:has-text("Save Plan & Get PDF (Free)")');

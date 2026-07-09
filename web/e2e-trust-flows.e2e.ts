@@ -12,7 +12,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 1: User adds one home loan and sees baseline payoff
   test("Flow 1: Add one home loan and view baseline payoff", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Check initial page structure
     await expect(page.locator('h1')).toContainText('The Prepayment');
@@ -29,7 +29,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 2: User adds two loans and compares avalanche vs snowball
   test("Flow 2: Compare avalanche and snowball payoff strategies", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Add second loan (default starts with 2, so if we just reset or load we have 2)
     await expect(page.locator('.loan-card')).toHaveCount(2);
@@ -54,7 +54,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 3: User enters windfall and receives recommended split
   test("Flow 3: Windfall Simulator optimization split rendering", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Verify windfall optimizer is mounted on the right panel
     await expect(page.locator('aside.col-right').locator('text=Smart Windfall Allocator')).toBeVisible();
@@ -66,7 +66,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 4: User clicks PDF/save plan CTA and sees lead capture
   test("Flow 4: Save Plan CTA displays email capture form", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Click PDF download button
     await page.click('button:has-text("Save Plan & Get PDF")');
@@ -87,7 +87,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 5: User tries bad inputs and sees clear validation errors
   test("Flow 5: Validation errors are shown for out-of-bounds inputs", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Test Warning: Set interest rate in first card to 45% (should trigger above 30% warning)
     const rateInput = page.locator('.loan-card').first().locator('input').nth(2);
@@ -110,7 +110,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
   // Flow 6: User refreshes page and local data persists
   test("Flow 6: Local storage data persistence on reload", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Rename first loan
     const nameInput = page.locator('.loan-card').first().locator('input[placeholder="Loan Name"]');
@@ -119,7 +119,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
     
     // Refresh page
     await page.reload();
-    await page.click('button:has-text("Model Your Loans (Free)")');
+    await page.click('#hero-cta-free');
     
     // Verify name persisted
     const nameInputReload = page.locator('.loan-card').first().locator('input[placeholder="Loan Name"]');

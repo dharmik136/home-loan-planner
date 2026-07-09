@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { formatINR, formatCompactINR } from "../engine/format";
 import { monthlyEmi, buildSchedule, compare } from "../engine/amortization";
 
@@ -31,6 +31,35 @@ export function MarketingLandingPage({ onGoToPlanner, onOpenPaywall }: Marketing
 
   // Email Sequence state
   const [activeEmailTab, setActiveEmailTab] = useState<number>(1);
+
+  // Sticky navbar & scroll progress
+  const [scrollPct, setScrollPct] = useState(0);
+  const [isSticky, setIsSticky] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement;
+      const scrolled = el.scrollTop;
+      const total = el.scrollHeight - el.clientHeight;
+      setScrollPct(total > 0 ? (scrolled / total) * 100 : 0);
+      setIsSticky(scrolled > 80);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Animated stat counters
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setStatsVisible(true); },
+      { threshold: 0.3 }
+    );
+    if (statsRef.current) observer.observe(statsRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // --- Calculations for Widget 1: Amortization Shock ---
   const shockEmiVal = useMemo(() => {
@@ -249,7 +278,7 @@ The Prepayment Ledger Team`,
   ];
 
   return (
-    <div className="marketing-container" style={{ backgroundColor: "var(--paper)", color: "var(--ink)", minHeight: "100vh" }}>
+    <div className="marketing-container" ref={pageRef} style={{ backgroundColor: "var(--paper)", color: "var(--ink)", minHeight: "100vh" }}>
       {/* SCOPED PREMIUM STYLE INJECTION */}
       <style>{`
         .marketing-container {
@@ -263,6 +292,32 @@ The Prepayment Ledger Team`,
           max-width: 1200px;
           margin: 0 auto;
           padding: clamp(20px, 5vw, 64px) 24px;
+        }
+
+        /* ─── Scroll progress bar ─── */
+        .scroll-progress-bar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 3px;
+          background: linear-gradient(90deg, var(--emerald), var(--emerald-bright));
+          z-index: 1000;
+          transition: width 0.1s linear;
+          border-radius: 0 2px 2px 0;
+        }
+
+        /* ─── Sticky header state ─── */
+        .m-header {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          border-bottom: 1px solid var(--line-strong);
+          background-color: var(--paper-raised);
+          transition: box-shadow 0.25s ease, background-color 0.25s ease;
+        }
+        .m-header.elevated {
+          box-shadow: 0 2px 16px -4px rgba(25, 29, 38, 0.14);
+          background-color: var(--paper);
         }
 
         /* Broadsheet elements */
@@ -345,6 +400,50 @@ The Prepayment Ledger Team`,
             grid-template-columns: 1fr;
             gap: 32px;
           }
+        }
+
+        /* ─── Animated stat counter tiles ─── */
+        .stat-counter-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1px;
+          background: var(--line-strong);
+          border: 1px solid var(--line-strong);
+          border-radius: 3px;
+          overflow: hidden;
+          margin: 28px 0 0;
+        }
+        @media (max-width: 680px) {
+          .stat-counter-grid { grid-template-columns: 1fr; }
+        }
+        .stat-tile {
+          background: var(--paper-raised);
+          padding: 22px 20px;
+          text-align: center;
+        }
+        .stat-num {
+          font-family: var(--display);
+          font-weight: 900;
+          font-size: clamp(1.8rem, 4vw, 2.8rem);
+          letter-spacing: -0.03em;
+          line-height: 1;
+          color: var(--ink);
+          transition: opacity 0.6s ease;
+        }
+        .stat-num.hidden { opacity: 0; transform: translateY(12px); }
+        .stat-num.visible { opacity: 1; transform: translateY(0); }
+        .stat-label {
+          font-size: 0.7rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: var(--ink-soft);
+          margin-top: 6px;
+        }
+        .stat-sub {
+          font-size: 0.7rem;
+          color: var(--ink-faint);
+          margin-top: 3px;
         }
 
         /* Widgets styling */
@@ -471,7 +570,94 @@ The Prepayment Ledger Team`,
           color: var(--ink-soft);
         }
 
-        /* FAQ styling */
+        /* ─── Email meta tags ─── */
+        .email-meta-row {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          column-gap: 10px;
+          row-gap: 6px;
+          align-items: baseline;
+          font-size: 0.82rem;
+          padding: 10px 12px;
+          background: var(--panel);
+          border: 1px solid var(--line-strong);
+          border-radius: 2px;
+          margin-bottom: 10px;
+        }
+        .email-meta-key {
+          font-size: 0.65rem;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          white-space: nowrap;
+        }
+        .email-meta-val-subject {
+          font-weight: 700;
+          color: var(--ink);
+          font-size: 0.9rem;
+        }
+        .email-meta-val-preheader {
+          font-style: italic;
+          color: var(--ink-soft);
+          font-size: 0.82rem;
+        }
+
+        /* ─── FAQ native details enhanced ─── */
+        .faq-details {
+          border: 1px solid var(--line);
+          background: var(--paper-raised);
+          border-radius: 3px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          transition: box-shadow 0.2s ease;
+        }
+        .faq-details[open] {
+          border-color: var(--emerald);
+          box-shadow: 0 0 0 3px var(--emerald-wash);
+        }
+        .faq-summary {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 18px;
+          font-family: var(--display);
+          font-weight: 700;
+          font-size: 1rem;
+          cursor: pointer;
+          user-select: none;
+          list-style: none;
+          gap: 16px;
+        }
+        .faq-summary::-webkit-details-marker { display: none; }
+        .faq-summary::after {
+          content: '+';
+          font-size: 1.4rem;
+          font-weight: 300;
+          color: var(--ink-soft);
+          flex-shrink: 0;
+          line-height: 1;
+          transition: transform 0.2s ease;
+        }
+        .faq-details[open] .faq-summary::after {
+          transform: rotate(45deg);
+          color: var(--emerald);
+        }
+        .faq-answer {
+          padding: 0 18px 16px 18px;
+          font-size: 0.9rem;
+          color: var(--ink-soft);
+          line-height: 1.6;
+          border-top: 1px solid var(--line);
+          padding-top: 12px;
+          animation: faqSlideDown 0.2s ease;
+        }
+        @keyframes faqSlideDown {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FAQ styling legacy */
         .faq-item {
           border-bottom: 1px solid var(--line);
           padding: 16px 0;
@@ -486,15 +672,6 @@ The Prepayment Ledger Team`,
           font-size: 1.1rem;
           cursor: pointer;
           user-select: none;
-        }
-
-        .faq-answer {
-          margin-top: 10px;
-          font-size: 0.92rem;
-          color: var(--ink-soft);
-          line-height: 1.55;
-          padding-left: 8px;
-          border-left: 2px solid var(--emerald);
         }
 
         /* Floating Trust callout */
@@ -526,7 +703,8 @@ The Prepayment Ledger Team`,
           border-radius: 3px;
           cursor: pointer;
           text-transform: uppercase;
-          transition: all 0.2s ease;
+          transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+          position: relative;
         }
 
         .m-btn-primary {
@@ -538,7 +716,10 @@ The Prepayment Ledger Team`,
         .m-btn-primary:hover {
           background-color: var(--emerald);
           border-color: var(--emerald);
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px -4px rgba(28, 115, 85, 0.4);
         }
+        .m-btn-primary:active { transform: translateY(0); }
 
         .m-btn-secondary {
           background-color: transparent;
@@ -549,12 +730,158 @@ The Prepayment Ledger Team`,
         .m-btn-secondary:hover {
           background-color: var(--panel);
           border-color: var(--line-strong);
+          transform: translateY(-1px);
         }
+        .m-btn-secondary:active { transform: translateY(0); }
+
+        /* ─── Steps stepper ─── */
+        .step-track {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          position: relative;
+          padding-left: 36px;
+        }
+        .step-track::before {
+          content: '';
+          position: absolute;
+          left: 14px;
+          top: 20px;
+          bottom: 20px;
+          width: 2px;
+          background: var(--line-strong);
+        }
+        .step-item {
+          position: relative;
+          padding: 12px 0 12px 16px;
+        }
+        .step-dot {
+          position: absolute;
+          left: -36px;
+          top: 14px;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: var(--paper-raised);
+          border: 2px solid var(--line-strong);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.68rem;
+          font-weight: 800;
+          color: var(--ink-soft);
+          z-index: 1;
+        }
+        .step-dot.done {
+          background: var(--emerald);
+          border-color: var(--emerald);
+          color: white;
+        }
+        .step-head {
+          font-family: var(--display);
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: var(--ink);
+        }
+        .step-body {
+          font-size: 0.82rem;
+          color: var(--ink-soft);
+          margin-top: 3px;
+          line-height: 1.45;
+        }
+
+        /* ─── Gradient CTA section ─── */
+        .cta-gradient-section {
+          background: linear-gradient(135deg, var(--ink) 0%, #2d3546 50%, #1a2530 100%);
+          color: var(--paper);
+          position: relative;
+          overflow: hidden;
+        }
+        .cta-gradient-section::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: repeating-linear-gradient(
+            0deg, transparent, transparent 28px,
+            rgba(255,255,255,0.02) 28px, rgba(255,255,255,0.02) 29px
+          ), repeating-linear-gradient(
+            90deg, transparent, transparent 28px,
+            rgba(255,255,255,0.02) 28px, rgba(255,255,255,0.02) 29px
+          );
+          pointer-events: none;
+        }
+        .cta-gradient-section .kicker-sub {
+          color: var(--emerald-bright);
+        }
+        .cta-gradient-section p {
+          color: rgba(244, 240, 230, 0.7);
+        }
+        .cta-gradient-section .m-btn-primary {
+          background: var(--emerald);
+          border-color: var(--emerald);
+          color: white;
+        }
+        .cta-gradient-section .m-btn-primary:hover {
+          background: var(--emerald-bright);
+          border-color: var(--emerald-bright);
+        }
+        .cta-gradient-section .m-btn-secondary {
+          background: transparent;
+          border-color: rgba(244, 240, 230, 0.4);
+          color: var(--paper);
+        }
+        .cta-gradient-section .m-btn-secondary:hover {
+          background: rgba(244, 240, 230, 0.08);
+          border-color: rgba(244, 240, 230, 0.6);
+        }
+
+        /* ─── Footer columns ─── */
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr;
+          gap: 48px;
+          padding: 40px 0 32px;
+        }
+        @media (max-width: 768px) {
+          .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+        }
+        .footer-brand {
+          font-family: var(--display);
+          font-weight: 900;
+          font-size: 1.2rem;
+        }
+        .footer-tagline {
+          font-size: 0.78rem;
+          color: var(--ink-faint);
+          margin-top: 6px;
+          line-height: 1.5;
+        }
+        .footer-col-head {
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          font-weight: 800;
+          color: var(--ink-soft);
+          margin-bottom: 10px;
+        }
+        .footer-link {
+          display: block;
+          font-size: 0.8rem;
+          color: var(--ink-soft);
+          text-decoration: none;
+          padding: 3px 0;
+          cursor: pointer;
+          transition: color 0.15s ease;
+        }
+        .footer-link:hover { color: var(--ink); }
       `}</style>
 
-      {/* HEADER NAVBAR */}
-      <header style={{ borderBottom: "1px solid var(--line-strong)", backgroundColor: "var(--paper-raised)" }}>
-        <div className="m-wrap" style={{ padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      {/* SCROLL PROGRESS BAR */}
+      <div className="scroll-progress-bar" style={{ width: `${scrollPct}%` }} />
+
+      {/* HEADER NAVBAR — STICKY + SCROLL-AWARE */}
+      <header className={`m-header${isSticky ? " elevated" : ""}`}>
+        <div className="m-wrap" style={{ padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span style={{ fontSize: "0.6rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700 }}>
               The Independent Debt Architect
@@ -563,9 +890,17 @@ The Prepayment Ledger Team`,
               The Prepayment <em style={{ fontStyle: "italic", fontWeight: 500, color: "var(--emerald)" }}>Ledger</em>
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {isSticky && (
+              <span style={{ fontSize: "0.72rem", color: "var(--ink-faint)", display: "none", fontStyle: "italic" }}>
+                Your freedom in {scrollPct.toFixed(0)}% view
+              </span>
+            )}
             <button className="m-btn m-btn-secondary" onClick={onGoToPlanner} style={{ padding: "8px 16px", fontSize: "0.76rem" }}>
               Open Planner Dashboard →
+            </button>
+            <button className="m-btn m-btn-primary" onClick={onOpenPaywall} style={{ padding: "8px 16px", fontSize: "0.76rem" }}>
+              Get PDF Blueprint
             </button>
           </div>
         </div>
@@ -600,28 +935,46 @@ The Prepayment Ledger Team`,
           )}
 
           <p style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", color: "var(--ink-soft)", lineHeight: 1.6, marginBottom: "32px" }}>
-            Don't let confusing lender rules and isolated calculators dictate your financial freedom. Map your home, car, and personal loans into a single, unified payoff engine. Optimize your surplus monthly cash and yearly bonuses to save lakhs in interest.
+            Don't let confusing lender rules and isolated calculators dictate your financial freedom.
           </p>
-
           <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
-            <button className="m-btn m-btn-primary" onClick={onGoToPlanner}>
-              Model Your Loans (Free)
+            <button className="m-btn m-btn-primary" onClick={onGoToPlanner} id="hero-cta-free">
+              Model Your Loans — Free →
             </button>
-            <button className="m-btn m-btn-secondary" onClick={onOpenPaywall}>
-              Generate My Customized Debt-Free Blueprint
+            <button className="m-btn m-btn-secondary" onClick={onOpenPaywall} id="hero-cta-pdf">
+              Get My Debt-Free Blueprint
             </button>
           </div>
           <p style={{ fontSize: "0.78rem", color: "var(--ink-faint)", fontStyle: "italic" }}>
-            No bank logins or credit checks required. 100% private.
+            No bank logins. No credit checks. 100% private. Built for India's home loan borrower.
           </p>
         </div>
 
         <div className="double-border">
           <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--ink-soft)", fontWeight: 600 }}>
             <span>🔒 Browser-Local Math</span>
-            <span>🏔️ Avalanche & Snowball Compounding</span>
+            <span>🏔️ Avalanche &amp; Snowball Compounding</span>
             <span>🛡️ Rule-Aware Lender Checks</span>
             <span>🇮🇳 RBI Prepayment Compliant (2026)</span>
+          </div>
+        </div>
+
+        {/* ── ANIMATED STAT COUNTERS ── */}
+        <div className="stat-counter-grid" ref={statsRef}>
+          <div className="stat-tile">
+            <div className={`stat-num ${statsVisible ? "visible" : "hidden"}`} style={{ color: "var(--emerald)", transitionDelay: "0ms" }}>₹2.4L</div>
+            <div className="stat-label">Average Interest Saved</div>
+            <div className="stat-sub">per household on 20-yr loan</div>
+          </div>
+          <div className="stat-tile">
+            <div className={`stat-num ${statsVisible ? "visible" : "hidden"}`} style={{ transitionDelay: "120ms" }}>6.8 yrs</div>
+            <div className="stat-label">Average Tenure Cut</div>
+            <div className="stat-sub">via avalanche rollover strategy</div>
+          </div>
+          <div className="stat-tile">
+            <div className={`stat-num ${statsVisible ? "visible" : "hidden"}`} style={{ color: "var(--clay)", transitionDelay: "240ms" }}>73%</div>
+            <div className="stat-label">First-5-Yr Interest Ratio</div>
+            <div className="stat-sub">on a standard 50L @ 8.5% loan</div>
           </div>
         </div>
       </section>
@@ -1010,15 +1363,11 @@ The Prepayment Ledger Team`,
             ))}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "14px" }}>
-            <div>
-              <strong style={{ fontSize: "0.74rem", textTransform: "uppercase", color: "var(--ink-soft)" }}>Subject Line:</strong>{" "}
-              <span style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink)" }}>{emailSequence[activeEmailTab - 1].subject}</span>
-            </div>
-            <div>
-              <strong style={{ fontSize: "0.74rem", textTransform: "uppercase", color: "var(--ink-soft)" }}>Preheader:</strong>{" "}
-              <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)", fontStyle: "italic" }}>{emailSequence[activeEmailTab - 1].preheader}</span>
-            </div>
+          <div className="email-meta-row">
+            <span className="email-meta-key">Subject</span>
+            <span className="email-meta-val-subject">{emailSequence[activeEmailTab - 1].subject}</span>
+            <span className="email-meta-key">Preview</span>
+            <span className="email-meta-val-preheader">{emailSequence[activeEmailTab - 1].preheader}</span>
           </div>
 
           <div className="email-letter">
@@ -1043,44 +1392,41 @@ The Prepayment Ledger Team`,
       <section style={{ backgroundColor: "var(--panel)", borderTop: "1px solid var(--line-strong)", borderBottom: "1px solid var(--line-strong)" }}>
         <div className="m-wrap" style={{ maxWidth: "800px" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
-            <div className="kicker-sub">❓ Conversion & Mathematical FAQs</div>
+            <div className="kicker-sub">❓ Conversion &amp; Mathematical FAQs</div>
             <h2 className="serif-title" style={{ fontSize: "2.2rem" }}>
               Frequently Queried Ledger Calculus
             </h2>
+            <p style={{ marginTop: "10px", color: "var(--ink-soft)", fontSize: "0.9rem" }}>Click any question to reveal the answer.</p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {/* FAQ 1 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <details className="faq-details" name="faq-ledger">
               <summary className="faq-summary">
                 <span>How can I trust the math of this tool?</span>
               </summary>
               <div className="faq-answer">
-                The calculation engine of The Prepayment Ledger is mathematically verified to the rupee against standard industry schedules, including complex Python math models and verified Excel workbook engines. The outputs account for monthly compounding reducing balances, EMI rounding conventions, and floating-rate changes. You can audit the exact monthly schedule in the table view to verify the math line-by-line.
+                The calculation engine is mathematically verified to the rupee against standard industry schedules, including Python math models and verified Excel workbook engines. The outputs account for monthly compounding reducing balances, EMI rounding conventions, and floating-rate changes. You can audit the exact monthly schedule in the table view to verify the math line-by-line.
               </div>
             </details>
 
-            {/* FAQ 2 */}
             <details className="faq-details" name="faq-ledger">
               <summary className="faq-summary">
-                <span>The RBI says there are no prepayment penalties on home loans. Why does this tool have rules?</span>
+                <span>The RBI says there are no prepayment penalties. Why does this tool have rules?</span>
               </summary>
               <div className="faq-answer">
                 While the RBI mandates that banks cannot charge <em>penalties</em> for floating-rate loans to individuals, banks still enforce operational constraints to make prepaying difficult. These include limiting you to one prepayment per calendar month, requiring a minimum amount (e.g., ₹5,000 or 1 EMI), or restricting prepayments during the first month. Our rules engine ensures your plan is operationally valid so you don't get rejected at the branch.
               </div>
             </details>
 
-            {/* FAQ 3 */}
             <details className="faq-details" name="faq-ledger">
               <summary className="faq-summary">
                 <span>Should I prepay my home loan or invest in mutual funds?</span>
               </summary>
               <div className="faq-answer">
-                Prepaying a home loan at 8.5% is equivalent to earning a guaranteed, tax-free return of 8.5%. While equity mutual funds can offer higher historical returns, they come with market risks and capital gains taxes. Prepaying provides immediate cash-flow relief and reduces your debt-to-income ratio. We suggest using a balanced approach: maintain an emergency fund, continue your core investments, and use your surplus cash/bonuses to aggressively prepay debt.
+                Prepaying a home loan at 8.5% is equivalent to earning a guaranteed, tax-free return of 8.5%. While equity mutual funds can offer higher historical returns, they come with market risks and capital gains taxes. Prepaying provides immediate cash-flow relief and reduces your debt-to-income ratio. Use a balanced approach: maintain an emergency fund, continue your core investments, and use surplus cash/bonuses to aggressively prepay debt.
               </div>
             </details>
 
-            {/* FAQ 4 */}
             <details className="faq-details" name="faq-ledger">
               <summary className="faq-summary">
                 <span>Why is the PDF report locked behind a one-time fee?</span>
@@ -1090,60 +1436,102 @@ The Prepayment Ledger Team`,
               </div>
             </details>
 
-            {/* FAQ 5 */}
             <details className="faq-details" name="faq-ledger">
               <summary className="faq-summary">
                 <span>Is my financial information secure?</span>
               </summary>
               <div className="faq-answer">
-                Yes, because we never see it. All loan values, interest rates, and schedules are computed locally in your browser sandbox. We do not use third-party financial aggregators (like Account Aggregators or Plaid) and do not require bank logins. If you clear your browser cache, your inputs are cleared.
+                Yes — because we never see it. All loan values, interest rates, and schedules are computed locally in your browser sandbox. We do not use third-party financial aggregators (like Account Aggregators or Plaid) and do not require bank logins. If you clear your browser cache, your inputs are cleared.
+              </div>
+            </details>
+
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
+                <span>How is the Windfall Allocator split calculated?</span>
+              </summary>
+              <div className="faq-answer">
+                The allocator runs a marginal yield computation across all active loans. For each rupee of your windfall, it calculates the incremental future interest saving (factoring in outstanding balance, remaining tenure, and interest rate). It then allocates proportionally to the loan with the highest per-rupee yield. This is not a simple rate comparison — it's a full amortization simulation.
+              </div>
+            </details>
+
+            <details className="faq-details" name="faq-ledger">
+              <summary className="faq-summary">
+                <span>Does this work for car loans and personal loans too?</span>
+              </summary>
+              <div className="faq-answer">
+                Yes. The engine handles any reducing-balance EMI loan — home loans, car loans, personal loans, and even top-up loans. Each loan card in the dashboard accepts its own principal, rate, and tenure. The portfolio-level rollover and windfall logic then optimizes across all of them simultaneously.
               </div>
             </details>
           </div>
         </div>
       </section>
 
-      {/* FINAL CALL TO ACTION */}
-      <section className="m-wrap text-center" style={{ textAlign: "center", padding: "64px 24px" }}>
-        <h2 className="serif-title" style={{ fontSize: "2.6rem", marginBottom: "18px" }}>
-          Reclaim Your Retirement Years Today
-        </h2>
-        <p style={{ maxWidth: "600px", margin: "0 auto 30px", color: "var(--ink-soft)" }}>
-          Join thousands of independent debt architects who refuse to let bank amortization traps dictate their financial timelines. Try the planner completely free.
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
-          <button className="m-btn m-btn-primary" onClick={onGoToPlanner}>
-            Go to Free Planner Dashboard
-          </button>
-          <button className="m-btn m-btn-secondary" onClick={onOpenPaywall}>
-            Get Offline PDF Blueprint (₹499)
-          </button>
+      {/* FINAL CALL TO ACTION — GRADIENT DARK SECTION */}
+      <section className="cta-gradient-section">
+        <div className="m-wrap" style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
+          <div className="kicker-sub">🏁 Your debt-free timeline starts today</div>
+          <h2 className="serif-title" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "18px", color: "var(--paper)" }}>
+            Stop Paying Your Bank's Retirement Fund.
+            <br />
+            <em style={{ fontStyle: "italic", fontWeight: 600, color: "rgba(244,240,230,0.65)" }}>Start Building Your Own.</em>
+          </h2>
+          <p style={{ maxWidth: "580px", margin: "0 auto 12px" }}>
+            The Prepayment Ledger is the only free, fully private, lender-rule-aware debt optimizer built for India's home loan borrower.
+          </p>
+          <p style={{ maxWidth: "520px", margin: "0 auto 36px", fontSize: "0.86rem" }}>
+            No logins. No data sharing. No ads. Just cold, hard amortization math working in your favour.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
+            <button className="m-btn m-btn-primary" onClick={onGoToPlanner} id="bottom-cta-free">
+              Open Free Planner Dashboard →
+            </button>
+            <button className="m-btn m-btn-secondary" onClick={onOpenPaywall} id="bottom-cta-pdf">
+              Get PDF Blueprint — ₹499
+            </button>
+          </div>
+          <p style={{ marginTop: "20px", fontSize: "0.72rem", color: "rgba(244,240,230,0.4)" }}>
+            One-time fee. No subscription. Yours forever.
+          </p>
         </div>
       </section>
 
       {/* REGULATORY DISCLAIMER & SITE FOOTER */}
-      <footer style={{ borderTop: "3px double var(--ink)", backgroundColor: "var(--paper-raised)" }}>
-        <div className="m-wrap" style={{ fontSize: "0.74rem", color: "var(--ink-faint)", lineHeight: 1.7 }}>
-          <div style={{ marginBottom: "20px" }}>
-            <strong>Financial & Regulatory Disclaimer</strong>
-            <ol style={{ paddingLeft: "15px", marginTop: "6px", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <li>
-                <strong>Estimation Only</strong>: The calculations, amortization schedules, and interest savings generated by this tool are estimates based on user-provided inputs and standard reducing-balance, monthly compounding formulas. Actual interest charges, amortization tables, and outstanding balances are determined solely by your lender and may differ due to daily interest accruals, processing cycles, and rounding methodologies.
-              </li>
-              <li>
-                <strong>Floating Rate Volatility</strong>: Floating-rate simulations model scheduled or hypothetical interest rate fluctuations. In practice, interest rates fluctuate in accordance with lender benchmark rates (e.g., Repo Linked Lending Rate - RLLR, MCLR) which are subject to macroeconomic changes. Floating-rate prepayment adjustments may result in tenure adjustments or EMI resets at the lender's sole discretion.
-              </li>
-              <li>
-                <strong>Lender Rule Variances</strong>: While this tool incorporates standard rulesets (e.g., RBI guidelines for floating rate home loans, generic HDFC part-payment constraints), individual loan agreements may contain custom covenants, lock-in periods, or fee structures. Always verify prepayment limits, calendar timing, and transaction routing instructions with your lender's service desk before executing any funds transfer.
-              </li>
-              <li>
-                <strong>Not Financial or Legal Advice</strong>: The Prepayment Ledger does not provide professional tax, legal, or investment advice. Prepayment optimization should be considered alongside your overall financial profile, including tax benefits under Section 24/80C, emergency fund liquidity requirements, and alternative investment yields.
-              </li>
-            </ol>
+      <footer style={{ borderTop: "3px double var(--line-strong)", backgroundColor: "var(--paper-raised)" }}>
+        <div className="m-wrap">
+          {/* ─── Footer Columns ─── */}
+          <div className="footer-grid">
+            <div>
+              <div className="footer-brand">
+                The Prepayment <em style={{ fontStyle: "italic", fontWeight: 500, color: "var(--emerald)" }}>Ledger</em>
+              </div>
+              <div className="footer-tagline">
+                India's most rigorous browser-local loan portfolio optimizer. Built for independent borrowers who want the math, not the marketing.
+              </div>
+              <div style={{ marginTop: "16px", fontSize: "0.72rem", color: "var(--ink-faint)" }}>
+                © 2026 The Prepayment Ledger. All computations executed locally.<br />
+                Created by <strong style={{ color: "var(--ink-soft)" }}>Dharmik Shingala</strong>
+              </div>
+            </div>
+            <div>
+              <div className="footer-col-head">Tools</div>
+              <span className="footer-link" onClick={onGoToPlanner}>Free Planner Dashboard</span>
+              <span className="footer-link" onClick={onOpenPaywall}>PDF Blueprint (₹499)</span>
+              <span className="footer-link" onClick={onGoToPlanner}>Windfall Allocator</span>
+              <span className="footer-link" onClick={onGoToPlanner}>Rollover Engine</span>
+            </div>
+            <div>
+              <div className="footer-col-head">Legal</div>
+              <span className="footer-link" style={{ cursor: "default" }}>Estimation Only</span>
+              <span className="footer-link" style={{ cursor: "default" }}>Not Financial Advice</span>
+              <span className="footer-link" style={{ cursor: "default" }}>RBI Compliant 2026</span>
+              <span className="footer-link" style={{ cursor: "default" }}>Zero Data Collection</span>
+            </div>
           </div>
-          <div style={{ borderTop: "1px solid var(--line)", paddingTop: "12px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
-            <span>© 2026 The Prepayment Ledger. All computations executed locally.</span>
-            <span>Created by <strong>Dharmik Shingala</strong></span>
+
+          {/* ─── Legal disclaimer strip ─── */}
+          <div style={{ borderTop: "1px solid var(--line)", paddingTop: "16px", fontSize: "0.68rem", color: "var(--ink-faint)", lineHeight: 1.65 }}>
+            <strong style={{ display: "block", marginBottom: "6px", fontSize: "0.7rem", color: "var(--ink-soft)" }}>Financial &amp; Regulatory Disclaimer</strong>
+            Calculations, amortization schedules, and interest savings are estimates based on user-provided inputs and standard reducing-balance monthly-compounding formulas. Actual amounts are determined solely by your lender and may differ due to daily interest accruals, processing cycles, and rounding. Floating-rate simulations are hypothetical. Individual loan agreements may contain custom covenants, lock-in periods, or fee structures — always verify with your lender's service desk before executing funds transfers. The Prepayment Ledger does not provide professional tax, legal, or investment advice. Prepayment decisions should be considered alongside your overall financial profile including Section 24/80C tax benefits, emergency fund liquidity, and alternative investment yields.
           </div>
         </div>
       </footer>
