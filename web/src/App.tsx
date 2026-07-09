@@ -145,6 +145,31 @@ export function App() {
 
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
   const [yearlyView, setYearlyView] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const sortLoans = (criteria: "rate" | "balance" | "name") => {
+    setState((s) => {
+      const sorted = [...s.loans].sort((a, b) => {
+        if (criteria === "rate") return b.ratePct - a.ratePct;
+        if (criteria === "balance") return b.outstanding - a.outstanding;
+        return a.name.localeCompare(b.name);
+      });
+      return { ...s, loans: sorted };
+    });
+    trackEvent("loans_sorted", { criteria });
+  };
 
   useEffect(() => {
     if (loans.length > 0 && !loans.some((l) => l.id === activeLoanId)) {
@@ -310,6 +335,16 @@ export function App() {
 
       <div className="grid">
         <aside className="col-left">
+          {loans.length > 1 && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", fontSize: "0.74rem", color: "var(--ink-soft)" }}>
+              <span>Sort priority:</span>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <button className="btn ghost" onClick={() => sortLoans("rate")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Rate</button>
+                <button className="btn ghost" onClick={() => sortLoans("balance")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Balance</button>
+                <button className="btn ghost" onClick={() => sortLoans("name")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Name</button>
+              </div>
+            </div>
+          )}
           {loans.map((loan, idx) => {
             const res = results[idx];
             if (!res) return null;
@@ -321,6 +356,7 @@ export function App() {
                 delay={`s${Math.min(idx + 2, 4)}`}
                 onChange={(p) => setLoan(loan.id, p)}
                 onDelete={loans.length > 1 ? () => removeLoan(loan.id) : undefined}
+                result={res}
               />
             );
           })}
@@ -533,6 +569,33 @@ export function App() {
         Set your real outstanding balances, rates and start months in the loan cards.
         Not financial advice; confirm current terms with your lender.
       </footer>
+
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            background: "var(--ink)",
+            color: "var(--paper)",
+            border: "none",
+            fontSize: "1.2rem",
+            cursor: "pointer",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+            zIndex: 100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+          title="Scroll to Top"
+        >
+          ▲
+        </button>
+      )}
 
       <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
     </div>

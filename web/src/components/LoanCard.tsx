@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Loan } from "../engine/planning";
+import type { Loan, LoanResult } from "../engine/planning";
 import { formatINR } from "../engine/format";
 
 interface Props {
@@ -8,9 +8,10 @@ interface Props {
   delay: string;
   onChange: (patch: Partial<Loan>) => void;
   onDelete?: () => void;
+  result?: LoanResult;
 }
 
-export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
+export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const sanitizeName = (val: string) => {
@@ -91,6 +92,27 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
           )}
         </div>
       </div>
+
+      {isCollapsed && (
+        <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "-6px", marginBottom: "8px" }}>
+          {formatINR(loan.outstanding)} @ {loan.ratePct}% · {loan.tenureMonths} mos
+        </div>
+      )}
+
+      {result && result.comparison.monthsSaved > 0 && (
+        <div style={{ marginBottom: "14px", marginTop: isCollapsed ? "0" : "8px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "var(--ink-soft)", marginBottom: "4px" }}>
+            <span>Payoff Speedup:</span>
+            <span style={{ color: "var(--emerald)", fontWeight: "bold" }}>
+              -{result.comparison.monthsSaved} months ({((result.comparison.monthsSaved / result.baseline.monthsToPayoff) * 100).toFixed(0)}% faster)
+            </span>
+          </div>
+          <div style={{ height: "6px", width: "100%", background: "var(--line)", borderRadius: "3px", overflow: "hidden", display: "flex" }}>
+            <div style={{ width: `${((result.plan.monthsToPayoff / result.baseline.monthsToPayoff) * 100)}%`, background: "var(--emerald)", height: "100%" }} />
+            <div style={{ flexGrow: 1, background: "rgba(16, 185, 129, 0.15)", height: "100%" }} />
+          </div>
+        </div>
+      )}
 
       {!isCollapsed && (
         <>
@@ -207,6 +229,16 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete }: Props) {
             style={{ cursor: "pointer", width: "15px", height: "15px", accentColor: "var(--emerald)" }}
           />
           <span>Pay 1 extra EMI every year (13th EMI)</span>
+        </label>
+
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--ink)", cursor: "pointer", marginBottom: "12px" }}>
+          <input
+            type="checkbox"
+            checked={!!loan.biWeekly}
+            onChange={(e) => onChange({ biWeekly: e.target.checked })}
+            style={{ cursor: "pointer", width: "15px", height: "15px", accentColor: "var(--emerald)" }}
+          />
+          <span>Use Bi-Weekly payments (13 EMIs/yr equivalent)</span>
         </label>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
