@@ -53,6 +53,8 @@ CI Workflow,Deployment,Dependabot & PR Templates,Completed,Created automated pac
 CD Pipeline,Deployment,GitHub Actions Pages Deployment (deploy.yml),Completed,Created automated GitHub Pages deployment workflow triggering on pushes to main to build and host the SingleFile app securely without git bloat.,.github/workflows/deploy.yml
 Security,Dependencies,NPM Dependency Vulnerability Audits,Completed,Ran npm audit and applied updates to resolve high-severity undici and dependent package vulnerability loopholes.,web/package-lock.json
 Broadsheet UI,Design,Premium Newspaper Masthead Header,Completed,Added an authentic, large broadsheet newspaper masthead banner at the top of the landing page, featuring a dynamic current date and issue metadata, resolved test locator collisions.,web/src/components/MarketingLandingPage.tsx
+Verification,CLI,Workbook verification printing corrections,Completed,Corrected verify_workbook.py printing of core EMI comparison calculations to dynamically query core values and resolved non-ASCII em-dash character replacement.,src/verify_workbook.py
+
 
 
 
