@@ -50,6 +50,9 @@ Security,Legal,SECURITY.md Vulnerability Policy,Completed,Added main security re
 Security,Deployment,Hardened .gitignore Rules,Completed,Hardened root .gitignore to exclude system files; IDE caches; local env variables; and untracked Playwright E2E browser test metadata.,.gitignore
 Compliance,Legal,GPL-3.0 License File Headers,Completed,Prepend GPL-3.0 copyleft license headers to core calculation engine source files to prevent unlicensed math module distribution.,web/src/engine/
 CI Workflow,Deployment,Dependabot & PR Templates,Completed,Created automated package dependency security checking (dependabot.yml) and configured standard Pull Request templates (PULL_REQUEST_TEMPLATE.md) for public contribution rules.,.github/
+CD Pipeline,Deployment,GitHub Actions Pages Deployment (deploy.yml),Completed,Created automated GitHub Pages deployment workflow triggering on pushes to main to build and host the SingleFile app securely without git bloat.,.github/workflows/deploy.yml
+Security,Dependencies,NPM Dependency Vulnerability Audits,Completed,Ran npm audit and applied updates to resolve high-severity undici and dependent package vulnerability loopholes.,web/package-lock.json
+
 
 
 
