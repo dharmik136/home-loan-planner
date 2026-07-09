@@ -38,6 +38,10 @@ Marketing,Design,Interactive Windfall Simulator Showcase,Completed,Replaced stat
 Balloon Engine,Math Engine,Feature 9 — Balloon Payment Calculator (planning.ts),Completed,Added balloonPayments array to Loan interface and aggregated them in buildPrepayments; schedules lump sums at year milestones (yearIndex * 12 months) and reduces interest/tenure.,web/src/engine/planning.ts
 Balloon UI,Feature,Feature 9 — Balloon Payments Loan Card integration,Completed,Added Balloon Payments list view and year/amount add form in LoanCard to easily schedule lump-sum payments at specific milestones.,web/src/components/LoanCard.tsx
 Balloon Testing,Testing,Feature 9 — Vitest balloon payment test,Completed,Added math verification test checking that balloon prepayments are properly applied at year milestones (Month 60) and reduce total interest/tenure in res.plan vs res.baseline.,web/src/engine/math_trust.test.ts
+Daily reducing Engine,Math Engine,Feature 14 — Daily Reducing Balance Option (amortization.ts),Completed,Added dailyReducing interest calculation mode to buildSchedule using calendar day-counts for precise SBI MaxGain-style interest calculations.,web/src/engine/amortization.ts
+Daily reducing UI,Feature,Feature 14 — Daily Reducing calculation selector,Completed,Added interest method select dropdown in LoanCard to allow choosing between Monthly Reducing (Standard) and Daily Reducing (SBI MaxGain-Style).,web/src/components/LoanCard.tsx
+Daily reducing Testing,Testing,Feature 14 — Vitest dailyReducing test,Completed,Added math verification test checking that daily reducing method calculates interest based on days in each month (31 vs 28) and matches expected day-count formula.,web/src/engine/math_trust.test.ts
+
 
 
 
