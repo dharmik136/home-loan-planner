@@ -48,6 +48,9 @@ Documentation,Docs,README.md Overhaul & Live Page Links,Completed,Overhauled mai
 Balance Transfer,Feature,Feature 5 / 67 — Balance Transfer Advisor Upgrade,Completed,Upgraded Balance Transfer Advisor component to support itemized charges (processing fee; legal; valuation) and added dynamic stacked-bar visual break-even progress bar.,web/src/components/BalanceTransferAdvisor.tsx
 Security,Legal,SECURITY.md Vulnerability Policy,Completed,Added main security reporting policy outlining private vulnerability email channels for safe open-source disclosures.,SECURITY.md
 Security,Deployment,Hardened .gitignore Rules,Completed,Hardened root .gitignore to exclude system files; IDE caches; local env variables; and untracked Playwright E2E browser test metadata.,.gitignore
+Compliance,Legal,GPL-3.0 License File Headers,Completed,Prepend GPL-3.0 copyleft license headers to core calculation engine source files to prevent unlicensed math module distribution.,web/src/engine/
+CI Workflow,Deployment,Dependabot & PR Templates,Completed,Created automated package dependency security checking (dependabot.yml) and configured standard Pull Request templates (PULL_REQUEST_TEMPLATE.md) for public contribution rules.,.github/
+
 
 
 
