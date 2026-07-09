@@ -273,6 +273,14 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 .badge.bad { background: var(--clay-wash); color: var(--clay); }
 .badge .mk { font-weight: 800; }
 
+.milestone-badge {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+}
+.milestone-badge:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(25, 29, 38, 0.06);
+}
+
 .add-btn {
   width: 100%; font-family: var(--body); font-weight: 600; font-size: 0.84rem; letter-spacing: 0.04em;
   padding: 10px; background: var(--paper); color: var(--ink); border: 1px dashed var(--line-strong);

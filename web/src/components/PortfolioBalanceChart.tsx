@@ -44,7 +44,7 @@ export function PortfolioBalanceChart({ results }: Props) {
   }
 
   // Pre-defined color palette for up to 6 loans
-  const colors = ["#4ca771", "#3b82f6", "#f59e0b", "#ec4899", "#8b5cf6", "#10b981"];
+  const colors = ["#1c7355", "#4a6984", "#b0542f", "#b88a2a", "#2e7075", "#333c4d"];
 
   return (
     <div className="panel s4" style={{ marginTop: "24px" }}>
