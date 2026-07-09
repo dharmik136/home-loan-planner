@@ -43,6 +43,9 @@ Daily reducing UI,Feature,Feature 14 — Daily Reducing calculation selector,Com
 Daily reducing Testing,Testing,Feature 14 — Vitest dailyReducing test,Completed,Added math verification test checking that daily reducing method calculates interest based on days in each month (31 vs 28) and matches expected day-count formula.,web/src/engine/math_trust.test.ts
 Build Automation,Deployment,Automated Build Copy (copy-build.js),Completed,Created platform-independent Node.js copy-build.js script to automatically copy web/dist/index.html to the repository root index.html upon running npm run build to keep GitHub Pages branch fully synchronized.,web/copy-build.js
 Compliance,Legal,GNU GPL v3 License Update,Completed,Updated project LICENSE file with standard GNU General Public License v3 terms for open-source public repository compliance.,LICENSE
+CI Workflow,Deployment,GitHub Actions CI Pipeline (ci.yml),Completed,Created GitHub Actions CI workflow to automate typescript build compiling and Vitest unit testing on every repository push.,.github/workflows/ci.yml
+Documentation,Docs,README.md Overhaul & Live Page Links,Completed,Overhauled main project README.md to describe new math engines; show 57 passing tests; include GPL v3 license shield; and provide direct URL link to GitHub Pages live app.,README.md
+
 
 
 
