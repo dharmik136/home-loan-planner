@@ -11,7 +11,7 @@ test('End-to-End User Flow verification', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Before you prepay');
   
   // 2. Click the CTA to navigate to the app workspace
-  await page.click('button:has-text("Model Your Loans (Free)")');
+  await page.click('#hero-cta-free');
   
   // 3. Verify app page title
   await expect(page.locator('h1')).toContainText('The Prepayment');
