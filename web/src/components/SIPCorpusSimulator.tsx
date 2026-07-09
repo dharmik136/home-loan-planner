@@ -71,7 +71,7 @@ export function SIPCorpusSimulator({ results }: Props) {
       </div>
 
       {/* Main result */}
-      <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(99,102,241,0.08))", border: "1px solid #c4dac9", borderRadius: "4px", padding: "14px", marginBottom: "12px", textAlign: "center" }}>
+      <div style={{ background: "linear-gradient(135deg, rgba(28, 115, 85, 0.08), rgba(74, 105, 132, 0.06))", border: "1px solid #b2cbb9", borderRadius: "4px", padding: "14px", marginBottom: "12px", textAlign: "center" }}>
         <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Corpus in {years} years</div>
         <div style={{ fontSize: "1.6rem", fontWeight: "900", color: "var(--emerald)", lineHeight: 1 }}>{formatINR(corpus)}</div>
         <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "4px" }}>
@@ -86,7 +86,7 @@ export function SIPCorpusSimulator({ results }: Props) {
           {milestones.map((m) => (
             <div key={m.target} style={{
               background: m.months ? "var(--emerald-wash)" : "var(--panel)",
-              border: `1px solid ${m.months ? "#c4dac9" : "var(--line)"}`,
+              border: `1px solid ${m.months ? "#b2cbb9" : "var(--line)"}`,
               borderRadius: "3px", padding: "6px 10px", fontSize: "0.72rem", textAlign: "center"
             }}>
               <div style={{ fontWeight: "700" }}>{formatINR(m.target)}</div>
@@ -106,7 +106,7 @@ export function SIPCorpusSimulator({ results }: Props) {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>EMI + SIP combined:</span>
-            <span style={{ fontWeight: "700", color: "#6366f1" }}><b>{formatINR(combinedMonthlyCommitment)}/month</b></span>
+            <span style={{ fontWeight: "700", color: "#4a6984" }}><b>{formatINR(combinedMonthlyCommitment)}/month</b></span>
           </div>
         </div>
       )}

@@ -50,10 +50,10 @@ export function PrepaymentScenarios({ results }: Props) {
 
     return [
       { label: "No Prepayment (Baseline)", color: "var(--ink-faint)", monthlyExtra: 0, ...simulate(0), interestSaved: 0, monthsSaved: 0, totalPaid: Math.round(baseEmi * tenure) },
-      { label: "+₹2,000 / month", color: "#6366f1", monthlyExtra: 2_000, ...simulate(2_000) },
-      { label: "+₹5,000 / month", color: "#f59e0b", monthlyExtra: 5_000, ...simulate(5_000) },
+      { label: "+₹2,000 / month", color: "#4a6984", monthlyExtra: 2_000, ...simulate(2_000) },
+      { label: "+₹5,000 / month", color: "var(--gold)", monthlyExtra: 5_000, ...simulate(5_000) },
       { label: "+₹10,000 / month", color: "var(--emerald)", monthlyExtra: 10_000, ...simulate(10_000) },
-      { label: "+₹20,000 / month", color: "#22d3ee", monthlyExtra: 20_000, ...simulate(20_000) },
+      { label: "+₹20,000 / month", color: "var(--clay)", monthlyExtra: 20_000, ...simulate(20_000) },
     ];
   }, [result, loan]);
 

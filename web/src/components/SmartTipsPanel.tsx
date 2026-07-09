@@ -45,7 +45,7 @@ export function SmartTipsPanel({ results }: Props) {
   if (activeTips.length === 0) return null;
 
   return (
-    <div className="panel" style={{ marginTop: "16px", borderLeft: "3px solid #6366f1" }}>
+    <div className="panel" style={{ marginTop: "16px", borderLeft: "3px solid var(--gold)" }}>
       <div className="panel-title">
         <span className="num">💡 / Insights</span>
         Smart Tips for You ({activeTips.length})
