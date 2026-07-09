@@ -24,13 +24,18 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
   const rateWarning = (loan.ratePct > 30 && loan.ratePct <= 100) ? "Interest rate above 30% looks unusually high. Please verify." : null;
   const tenureError = (loan.tenureMonths <= 0 || loan.tenureMonths > 600) ? "Tenure must be between 1 and 600 months" : null;
 
-  const monthlyInterestRate = loan.ratePct / 100 / 12;
-  const firstMonthInterest = Math.round(loan.outstanding * monthlyInterestRate);
-  const isEmiTooLow = emi <= firstMonthInterest && loan.ratePct > 0;
+  const maxRate = Math.max(loan.ratePct, ...(loan.rateChanges || []).map((rc) => rc.newRatePct));
+  const maxMonthlyInterestRate = maxRate / 100 / 12;
+  const firstMonthInterest = Math.round(loan.outstanding * (loan.ratePct / 100 / 12));
+  const maxMonthlyInterest = Math.round(loan.outstanding * maxMonthlyInterestRate);
+
+  const isEmiTooLow = emi <= maxMonthlyInterest && loan.ratePct > 0;
   const emiError = emi <= 0
     ? "EMI must be greater than 0"
     : (isEmiTooLow
-        ? `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) must exceed first month interest (₹${firstMonthInterest.toLocaleString("en-IN")})`
+        ? (maxRate > loan.ratePct
+            ? `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) is insufficient to cover simulated rate hikes (interest reaches ₹${maxMonthlyInterest.toLocaleString("en-IN")})`
+            : `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) must exceed first month interest (₹${firstMonthInterest.toLocaleString("en-IN")})`)
         : null);
 
   const hasErrors = outstandingError || rateError || rateWarning || tenureError || emiError;
