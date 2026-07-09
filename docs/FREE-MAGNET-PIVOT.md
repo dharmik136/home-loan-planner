@@ -69,7 +69,7 @@ ALTER TABLE public.profiles
 
 ## 📈 4. Growth & Educational Drip Loops
 
-Once an email is captured, the 5-stage welcome sequence (detailed in the [Copywriting Playbook](file:///C:/Users/Dharmik%20Shingala/HomeLoan-Planner/docs/MVP-PRODUCT-PROPOSAL.md)) triggers automatically:
+Once an email is captured, the 5-stage welcome sequence (detailed in the [Copywriting Playbook](./MVP-PRODUCT-PROPOSAL.md)) triggers automatically:
 
 * **Email 1: Onboarding**: Guides the user to return to their saved dashboard.
 * **Email 2: Educational**: Explains the math behind why 50/50 windfall splits leak money, establishing analytical authority.

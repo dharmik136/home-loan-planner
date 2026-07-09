@@ -111,7 +111,7 @@ dist/index.html  602.40 kB │ gzip: 171.29 kB
 
 ### 7.2 Vitest Suite Run Output (`npm test`)
 ```
- RUN  v2.1.9 C:/Users/Dharmik Shingala/HomeLoan-Planner/web
+ RUN  v2.1.9 ./web
 
  ✓ src/engine/rollover.test.ts (3 tests) 7ms
  ✓ src/engine/amortization.test.ts (13 tests) 11ms

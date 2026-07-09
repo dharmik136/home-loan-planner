@@ -24,7 +24,7 @@ All input forms and calculations are protected against invalid bounds, division-
 
 ## 🧪 Phase 2: Math Trust Test Fixtures
 
-Ten mathematical verification tests were added to the Vitest suite in [math_trust.test.ts](file:///C:/Users/Dharmik%20Shingala/HomeLoan-Planner/web/src/engine/math_trust.test.ts):
+Ten mathematical verification tests were added to the Vitest suite in [math_trust.test.ts](../web/src/engine/math_trust.test.ts):
 
 1. **Single loan baseline schedule**: Validates monthly compounding interest matches reducing balance.
 2. **Multi-loan avalanche**: Asserts extra payments roll into the highest interest rate first.
@@ -41,7 +41,7 @@ Ten mathematical verification tests were added to the Vitest suite in [math_trus
 
 ## 🎭 Phase 3: Playwright E2E User Flows
 
-The Playwright browser testing suite in [e2e-trust-flows.e2e.ts](file:///C:/Users/Dharmik%20Shingala/HomeLoan-Planner/web/e2e-trust-flows.e2e.ts) automates the six core user flows:
+The Playwright browser testing suite in [e2e-trust-flows.e2e.ts](../web/e2e-trust-flows.e2e.ts) automates the six core user flows:
 
 * **Flow 1: Add one home loan**: Verifies outcome cards and month-by-month schedules are displayed.
 * **Flow 2: Compare avalanche vs snowball**: Toggles priority modes in the Rollover Planner.
