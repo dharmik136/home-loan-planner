@@ -429,7 +429,11 @@ function RateChangeForm({ tenureMonths, baseRate, onAdd }: { tenureMonths: numbe
         />
       </div>
       <button
-        onClick={() => onAdd(month, rate)}
+        onClick={() => {
+          const clampedMonth = Math.max(2, Math.min(tenureMonths, month));
+          const clampedRate = Math.max(0, Math.min(100, rate));
+          onAdd(clampedMonth, clampedRate);
+        }}
         className="add-btn"
         style={{ padding: "6px 10px", fontSize: "0.74rem", height: "29px", width: "auto", display: "flex", alignItems: "center", justifyContent: "center" }}
       >

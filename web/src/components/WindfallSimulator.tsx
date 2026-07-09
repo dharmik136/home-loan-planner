@@ -83,6 +83,15 @@ function findOptimalSplit(loans: Loan[], amount: number, monthIndex: number): Sp
 export function WindfallSimulator({ loans }: Props) {
   const [amount, setAmount] = useState(500_000);
   const [month, setMonth] = useState(12);
+  const [timerId, setTimerId] = useState<number | null>(null);
+
+  const trackWindfallSimulation = (amt: number, mth: number) => {
+    if (timerId) window.clearTimeout(timerId);
+    const id = window.setTimeout(() => {
+      trackEvent("windfall_simulation_run", { amount: amt, month: mth });
+    }, 800);
+    setTimerId(id);
+  };
 
   if (loans.length === 0) return null;
 
@@ -175,7 +184,7 @@ export function WindfallSimulator({ loans }: Props) {
         onChange={(e) => {
           const val = Number(e.target.value);
           setAmount(val);
-          trackEvent("windfall_simulation_run", { amount: val, month });
+          trackWindfallSimulation(val, month);
         }}
       />
 
@@ -191,7 +200,7 @@ export function WindfallSimulator({ loans }: Props) {
         onChange={(e) => {
           const val = Number(e.target.value);
           setMonth(val);
-          trackEvent("windfall_simulation_run", { amount, month: val });
+          trackWindfallSimulation(amount, val);
         }}
       />
 
