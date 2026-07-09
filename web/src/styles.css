@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
+
 /* ============================================================
    THE PREPAYMENT LEDGER — editorial financial-broadsheet system
    ============================================================ */
@@ -18,7 +20,7 @@
   --clay-wash: #f0e2d6;
   --gold: #b88a2a;
 
-  --shadow: 0 1px 0 #fff inset, 0 18px 40px -28px rgba(25, 29, 38, 0.5);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 32px -16px rgba(25, 29, 38, 0.08), 0 2px 6px rgba(25, 29, 38, 0.03);
   --display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
 }
@@ -35,7 +37,7 @@ body.dark {
   
   --emerald-wash: #0e241c;
   --clay-wash: #281912;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.8);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -145,14 +147,15 @@ body {
 .panel {
   background: var(--paper-raised);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 4px;
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 18px;
   animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s ease;
 }
 .panel:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 20px 48px -20px rgba(25, 29, 38, 0.12), 0 4px 12px rgba(25, 29, 38, 0.05);
   border-color: var(--line-strong);
 }
 .panel-title {
@@ -193,7 +196,12 @@ body {
   color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong);
   border-radius: 2px; padding: 9px 11px; transition: border-color 0.15s, box-shadow 0.15s;
 }
-.field input:focus { outline: none; border-color: var(--emerald); box-shadow: 0 0 0 3px var(--emerald-wash); }
+.field input:focus {
+  outline: none;
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 1px var(--emerald), 0 4px 12px -4px rgba(28, 115, 85, 0.12);
+  background: var(--paper-raised);
+}
 .field.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .emi-line {
   margin-top: 6px; padding-top: 12px; border-top: 1px dashed var(--line-strong);
@@ -205,8 +213,16 @@ body {
 /* ---------- Summary headline cards ---------- */
 .headline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 @media (max-width: 720px) { .headline-grid { grid-template-columns: 1fr 1fr; } }
-.stat { padding: 6px 20px; border-left: 1px solid var(--line); }
+.stat {
+  padding: 6px 20px;
+  border-left: 1px solid var(--line);
+  transition: background-color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .stat:first-child { border-left: none; padding-left: 4px; }
+.stat:hover {
+  background-color: rgba(28, 115, 85, 0.035);
+  transform: scale(1.02);
+}
 .stat .k { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
 .stat .v {
   font-family: var(--display); font-weight: 700; line-height: 1.02;
@@ -260,9 +276,10 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 .add-btn {
   width: 100%; font-family: var(--body); font-weight: 600; font-size: 0.84rem; letter-spacing: 0.04em;
   padding: 10px; background: var(--paper); color: var(--ink); border: 1px dashed var(--line-strong);
-  border-radius: 3px; cursor: pointer; transition: all 0.15s; text-transform: uppercase;
+  border-radius: 3px; cursor: pointer; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.1s ease; text-transform: uppercase;
 }
 .add-btn:hover { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-wash); }
+.add-btn:active { transform: scale(0.98); }
 
 /* ---------- Charts ---------- */
 .chart-wrap { width: 100%; height: 220px; margin-top: 4px; }
@@ -314,9 +331,10 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 .btn {
   font-family: var(--body); font-weight: 600; font-size: 0.82rem; letter-spacing: 0.04em;
   padding: 10px 18px; border-radius: 3px; cursor: pointer; border: 1px solid var(--ink);
-  background: var(--ink); color: var(--paper); transition: all 0.15s; text-transform: uppercase;
+  background: var(--ink); color: var(--paper); transition: background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.1s ease; text-transform: uppercase;
 }
 .btn:hover { background: var(--emerald); border-color: var(--emerald); }
+.btn:active { transform: scale(0.97); }
 .btn.ghost { background: transparent; color: var(--ink); }
 .btn.ghost:hover { background: var(--panel); color: var(--ink); border-color: var(--line-strong); }
 .foot { margin-top: 40px; padding-top: 18px; border-top: 3px double var(--ink); font-size: 0.74rem; color: var(--ink-faint); line-height: 1.7; }
