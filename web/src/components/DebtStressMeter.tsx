@@ -29,8 +29,8 @@ export function DebtStressMeter({ results }: Props) {
     stressBg = "var(--clay-wash)";
   } else if (dtiPct > 35) {
     stressLabel = "Moderate Debt Load";
-    stressColor = "#d97706"; // Amber
-    stressBg = "#fef3c7";
+    stressColor = "var(--gold)";
+    stressBg = "var(--gold-wash)";
   }
 
   // EMI Buffer (1% and 2% rate increase shock)
@@ -96,7 +96,7 @@ export function DebtStressMeter({ results }: Props) {
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem" }}>
             <span>If rates rise by 1.0%:</span>
-            <span style={{ color: "#d97706" }}><b>+{formatINR(shock1Diff)}</b> / month</span>
+            <span style={{ color: "var(--gold)" }}><b>+{formatINR(shock1Diff)}</b> / month</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem" }}>
             <span>If rates rise by 2.0%:</span>

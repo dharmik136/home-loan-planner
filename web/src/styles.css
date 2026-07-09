@@ -19,6 +19,7 @@
   --clay: #b0542f;          /* interest PAID / cost */
   --clay-wash: #f0e2d6;
   --gold: #b88a2a;
+  --gold-wash: #f8f1df;
 
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 32px -16px rgba(25, 29, 38, 0.08), 0 2px 6px rgba(25, 29, 38, 0.03);
   --display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
@@ -37,6 +38,7 @@ body.dark {
   
   --emerald-wash: #0e241c;
   --clay-wash: #281912;
+  --gold-wash: #261e10;
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
