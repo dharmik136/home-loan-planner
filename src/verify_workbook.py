@@ -115,8 +115,8 @@ def main():
         fails.append(f"PLAN-column months saved {plan_months_a} != core {plan_core['months_saved']}")
 
     print("=== VERIFICATION ===")
-    print(f"EMI A:                 {float(emi_a):,.0f}   (core {monthly_emi(3_000_000,7.5,180):,})")
-    print(f"EMI B:                 {float(emi_b):,.0f}   (core {monthly_emi(5_000_000,7.5,180):,})")
+    print(f"EMI A:                 {float(emi_a):,.0f}   (core {monthly_emi(3_500_000, 7.25, 180):,})")
+    print(f"EMI B:                 {float(emi_b):,.0f}   (core {monthly_emi(5_000_000, 7.5, 180):,})")
     print(f"Baseline interest A:   {float(sum_base_a):,.0f}   (core {core_a.total_interest:,.0f})")
     print(f"Baseline interest B:   {float(sum_base_b):,.0f}   (core {core_b.total_interest:,.0f})")
     print(f"Plan interest A (no prepay): {float(get(sol,'SUMMARY','B7')):,.0f}   (should equal baseline)")
@@ -132,7 +132,7 @@ def main():
         for f in fails:
             print("  -", f)
         sys.exit(1)
-    print("\nALL FORMULA CHECKS PASSED — live workbook matches the tested engine.")
+    print("\nALL FORMULA CHECKS PASSED - live workbook matches the tested engine.")
 
 
 if __name__ == "__main__":
