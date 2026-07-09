@@ -14,8 +14,14 @@ function monthlyEmiCalc(principal: number, annualRate: number, months: number): 
 }
 
 export function BalanceTransferAdvisor({ results }: Props) {
-  const [newRate, setNewRate] = useState(8.25);
-  const [switchCostPct, setSwitchCostPct] = useState(0.5);
+  const [newRate, setNewRate] = useState<number>(8.25);
+  
+  // Fee configuration states
+  const [isItemized, setIsItemized] = useState<boolean>(false);
+  const [switchCostPct, setSwitchCostPct] = useState<number>(0.5); // flat fee pct
+  const [processingFee, setProcessingFee] = useState<number>(10000);
+  const [legalStampDuty, setLegalStampDuty] = useState<number>(15000);
+  const [valuationFee, setValuationFee] = useState<number>(5000);
 
   if (results.length === 0) return null;
 
@@ -35,89 +41,233 @@ export function BalanceTransferAdvisor({ results }: Props) {
         const newEmi = monthlyEmiCalc(outstandingNow, newRate, remainingMonths);
         const newTotalLeft = newEmi * remainingMonths;
 
-        // Switch cost (processing fee on outstanding)
-        const switchCost = Math.round(outstandingNow * switchCostPct / 100);
+        // Calculate switch cost
+        const switchCost = isItemized
+          ? (processingFee + legalStampDuty + valuationFee)
+          : Math.round(outstandingNow * switchCostPct / 100);
 
         const interestSavingsGross = currentTotalLeft - newTotalLeft;
         const netSavings = interestSavingsGross - switchCost;
-        const breakEvenMonths = netSavings > 0
-          ? Math.ceil(switchCost / (currentEmi - newEmi))
+        
+        const monthlySavings = currentEmi - newEmi;
+        const breakEvenMonths = netSavings > 0 && monthlySavings > 0
+          ? Math.ceil(switchCost / monthlySavings)
           : null;
-        const worthSwitching = netSavings > 0 && loan.ratePct - newRate >= 0.5;
+          
+        const worthSwitching = netSavings > 0 && loan.ratePct - newRate >= 0.25;
 
         return {
           loanName: loan.name,
           currentRate: loan.ratePct,
           currentEmi,
           newEmi,
+          monthlySavings,
           switchCost,
           netSavings: Math.round(netSavings),
           breakEvenMonths,
+          remainingMonths,
           worthSwitching,
         };
       });
-  }, [results, newRate, switchCostPct]);
+  }, [results, newRate, isItemized, switchCostPct, processingFee, legalStampDuty, valuationFee]);
 
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🔄 / Refinance</span>
-        Balance Transfer Advisor — Should you switch lenders?
+        <span className="num">🔄</span>
+        Balance Transfer Evaluator (Sec 5)
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
-        <div>
-          <div className="slider-meta" style={{ marginBottom: "4px" }}>
-            <span>New Lender Rate</span><span><b>{newRate}%</b></span>
-          </div>
-          <input type="range" min={7} max={14} step={0.05} value={newRate}
-            onChange={(e) => setNewRate(Number(e.target.value))} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div className="slider-meta" style={{ marginBottom: "4px" }}>
-            <span>Switch Cost (% of outstanding)</span><span><b>{switchCostPct}%</b></span>
-          </div>
-          <input type="range" min={0} max={3} step={0.25} value={switchCostPct}
-            onChange={(e) => setSwitchCostPct(Number(e.target.value))} style={{ width: "100%" }} />
-        </div>
-      </div>
+      <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", margin: "-4px 0 16px 0", lineHeight: "1.4" }}>
+        Determine if refinancing your outstanding home loan with another lender is financially viable by calculating the exact break-even timeline after accounting for processing fees and stamp duty.
+      </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {advice.map((a) => (
-          <div key={a.loanName} style={{
-            background: a.worthSwitching ? "var(--emerald-wash)" : "var(--panel)",
-            border: `1px solid ${a.worthSwitching ? "#c4dac9" : "var(--line)"}`,
-            borderRadius: "4px", padding: "11px 13px"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-              <span style={{ fontWeight: "700", fontSize: "0.84rem" }}>{a.loanName}</span>
-              <span style={{
-                fontSize: "0.72rem", fontWeight: "700", padding: "2px 8px", borderRadius: "2px",
-                background: a.worthSwitching ? "var(--emerald)" : "var(--clay)",
-                color: "white"
-              }}>
-                {a.worthSwitching ? "✅ Switch Recommended" : "❌ Stay Put"}
-              </span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "0.76rem" }}>
-              <span>Current Rate: <b>{a.currentRate}%</b></span>
-              <span>New Rate: <b style={{ color: "var(--emerald)" }}>{newRate}%</b></span>
-              <span>Current EMI: <b>{formatINR(a.currentEmi)}</b></span>
-              <span>New EMI: <b style={{ color: "var(--emerald)" }}>{formatINR(a.newEmi)}</b></span>
-              <span>Switch Cost: <b style={{ color: "var(--clay)" }}>{formatINR(a.switchCost)}</b></span>
-              <span>Net Savings: <b style={{ color: a.netSavings > 0 ? "var(--emerald)" : "var(--clay)" }}>{formatINR(Math.abs(a.netSavings))}{a.netSavings < 0 ? " loss" : ""}</b></span>
-            </div>
-            {a.breakEvenMonths && a.worthSwitching && (
-              <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "6px" }}>
-                Break-even in <b>{a.breakEvenMonths} months</b> — after that, every month saves {formatINR(a.currentEmi - a.newEmi)}.
+      {/* Inputs Section */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginBottom: "20px", borderBottom: "1px dashed var(--line-strong)", paddingBottom: "16px" }}>
+        
+        {/* New rate slider */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: "600", marginBottom: "6px" }}>
+            <span style={{ color: "var(--ink-soft)" }}>New Offered Interest Rate</span>
+            <span><b style={{ color: "var(--emerald)", fontSize: "0.95rem" }}>{newRate.toFixed(2)}%</b></span>
+          </div>
+          <input
+            type="range"
+            min={7}
+            max={14}
+            step={0.05}
+            value={newRate}
+            onChange={(e) => setNewRate(Number(e.target.value))}
+            style={{ width: "100%", accentColor: "var(--emerald)" }}
+          />
+        </div>
+
+        {/* Cost Method Toggler */}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "12px" }}>
+            <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "var(--ink-soft)" }}>Switch Cost Model:</span>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.82rem", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="costModel"
+                checked={!isItemized}
+                onChange={() => setIsItemized(false)}
+                style={{ accentColor: "var(--emerald)" }}
+              />
+              <span>Flat Percentage</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.82rem", cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="costModel"
+                checked={isItemized}
+                onChange={() => setIsItemized(true)}
+                style={{ accentColor: "var(--emerald)" }}
+              />
+              <span>Itemized Charges</span>
+            </label>
+          </div>
+
+          {!isItemized ? (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: "600", marginBottom: "4px" }}>
+                <span style={{ color: "var(--ink-soft)" }}>Estimated Total Charges</span>
+                <span><b>{switchCostPct}% of Outstanding</b></span>
               </div>
-            )}
-          </div>
-        ))}
+              <input
+                type="range"
+                min={0.1}
+                max={2.5}
+                step={0.05}
+                value={switchCostPct}
+                onChange={(e) => setSwitchCostPct(Number(e.target.value))}
+                style={{ width: "100%", accentColor: "var(--emerald)" }}
+              />
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginTop: "8px" }}>
+              <div>
+                <label style={{ fontSize: "0.62rem", display: "block", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "3px" }}>Processing Fee (₹)</label>
+                <input
+                  type="number"
+                  step={1000}
+                  value={processingFee}
+                  onChange={(e) => setProcessingFee(Math.max(0, Number(e.target.value)))}
+                  style={{ width: "100%", padding: "5px 7px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper)", color: "var(--ink)", outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "0.62rem", display: "block", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "3px" }}>Stamp Duty & Legal (₹)</label>
+                <input
+                  type="number"
+                  step={1000}
+                  value={legalStampDuty}
+                  onChange={(e) => setLegalStampDuty(Math.max(0, Number(e.target.value)))}
+                  style={{ width: "100%", padding: "5px 7px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper)", color: "var(--ink)", outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "0.62rem", display: "block", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "3px" }}>Valuation Fee (₹)</label>
+                <input
+                  type="number"
+                  step={500}
+                  value={valuationFee}
+                  onChange={(e) => setValuationFee(Math.max(0, Number(e.target.value)))}
+                  style={{ width: "100%", padding: "5px 7px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper)", color: "var(--ink)", outline: "none" }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
 
-      <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 RBI mandates floating-rate home loans can be transferred with zero prepayment penalty. Switch when rate difference is ≥0.50% and remaining tenure is ≥5 years.
+      {/* Results Advice Cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+        {advice.map((a) => {
+          const breakEvenPct = a.breakEvenMonths && a.remainingMonths
+            ? Math.min(100, Math.round((a.breakEvenMonths / a.remainingMonths) * 100))
+            : 0;
+
+          return (
+            <div key={a.loanName} className="thin-border" style={{
+              background: a.worthSwitching ? "var(--emerald-wash)" : "var(--paper-raised)",
+              border: `1px solid ${a.worthSwitching ? "var(--emerald)" : "var(--line-strong)"}`,
+              borderRadius: "3px", padding: "14px", transition: "all 0.2s ease"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <span style={{ fontFamily: "var(--display)", fontWeight: "700", fontSize: "0.95rem" }}>{a.loanName}</span>
+                <span style={{
+                  fontSize: "0.65rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: "800", padding: "3px 8px", borderRadius: "2px",
+                  background: a.worthSwitching ? "var(--emerald)" : "var(--clay)",
+                  color: "white"
+                }}>
+                  {a.worthSwitching ? "✓ Switch Recommended" : "Stay Put"}
+                </span>
+              </div>
+
+              {/* Stats Table */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", fontSize: "0.78rem", borderBottom: "1px dashed var(--line-strong)", paddingBottom: "12px", marginBottom: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Current EMI:</span>
+                  <span><b>{formatINR(a.currentEmi)}</b> ({a.currentRate}%)</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--ink-soft)" }}>New EMI:</span>
+                  <span><b style={{ color: "var(--emerald)" }}>{formatINR(a.newEmi)}</b> ({newRate.toFixed(2)}%)</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Total Switch Cost:</span>
+                  <span><b style={{ color: "var(--clay)" }}>{formatINR(a.switchCost)}</b></span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Net Savings:</span>
+                  <span><b style={{ color: a.netSavings > 0 ? "var(--emerald)" : "var(--clay)" }}>{formatINR(a.netSavings)}</b></span>
+                </div>
+              </div>
+
+              {/* Break-Even Progress Visualization */}
+              {a.breakEvenMonths && a.worthSwitching ? (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "var(--ink-soft)", marginBottom: "5px" }}>
+                    <span>Break-even: <b>{a.breakEvenMonths} months</b></span>
+                    <span>Remaining tenure: <b>{a.remainingMonths} months</b></span>
+                  </div>
+                  
+                  {/* Stacked bar */}
+                  <div style={{ height: "14px", width: "100%", borderRadius: "2px", display: "flex", overflow: "hidden", border: "1px solid var(--line-strong)", backgroundColor: "var(--paper)" }}>
+                    <div
+                      style={{ width: `${breakEvenPct}%`, backgroundColor: "var(--clay-wash)", borderRight: "1px dashed var(--clay)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.55rem", fontWeight: "700", color: "var(--clay)" }}
+                      title={`Break-even period: ${a.breakEvenMonths} months`}
+                    >
+                      {breakEvenPct > 15 ? "Paying Fees" : ""}
+                    </div>
+                    <div
+                      style={{ width: `${100 - breakEvenPct}%`, backgroundColor: "var(--emerald-wash)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.55rem", fontWeight: "700", color: "var(--emerald)" }}
+                      title={`Pure Savings: ${a.remainingMonths - a.breakEvenMonths} months`}
+                    >
+                      {(100 - breakEvenPct) > 15 ? "Pure Savings" : ""}
+                    </div>
+                  </div>
+                  
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "6px" }}>
+                    💡 You recover all transfer costs in <b>{a.breakEvenMonths} months</b>. Every month after that adds <b>{formatINR(a.monthlySavings)}</b> in net cash flow.
+                  </div>
+                </div>
+              ) : (
+                <div style={{ fontSize: "0.72rem", color: "var(--clay)", fontWeight: "600" }}>
+                  {a.netSavings <= 0
+                    ? "❌ The interest saved does not cover the refinancing charges. Staying with your current lender is advised."
+                    : `⚠️ The rate difference is only ${(a.currentRate - newRate).toFixed(2)}%. Balance transfer typically requires a gap of ≥0.25% to justify the operational hassle.`}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "14px", lineHeight: "1.4", borderTop: "1px solid var(--line-strong)", paddingTop: "8px" }}>
+        💡 **RBI Guidelines**: Individual floating-rate home loans have zero foreclosure penalties in India. To maximize balance transfer benefits, it is best to switch during the early years (first 1/3 of tenure) where interest components are heavily front-loaded.
       </div>
     </div>
   );
