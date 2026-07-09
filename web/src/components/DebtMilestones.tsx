@@ -47,7 +47,7 @@ export function DebtMilestones({ results }: Props) {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "10px" }}>
                 
                 {/* Milestone 1: Crossover */}
-                <div style={{ background: "var(--panel)", padding: "8px 10px", borderRadius: "2px", textAlign: "center" }}>
+                <div className="milestone-badge" style={{ background: "var(--panel)", padding: "8px 10px", borderRadius: "2px", textAlign: "center" }}>
                   <div style={{ fontSize: "0.58rem", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "700" }}>Principal &gt; Interest</div>
                   <div style={{ fontSize: "0.86rem", fontWeight: "700", marginTop: "4px" }}>
                     {crossoverMonth !== -1 ? `Month ${crossoverMonth}` : "N/A"}
@@ -58,7 +58,7 @@ export function DebtMilestones({ results }: Props) {
                 </div>
 
                 {/* Milestone 2: Halfway */}
-                <div style={{ background: "var(--panel)", padding: "8px 10px", borderRadius: "2px", textAlign: "center" }}>
+                <div className="milestone-badge" style={{ background: "var(--panel)", padding: "8px 10px", borderRadius: "2px", textAlign: "center" }}>
                   <div style={{ fontSize: "0.58rem", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "700" }}>50% Debt Cleared</div>
                   <div style={{ fontSize: "0.86rem", fontWeight: "700", marginTop: "4px" }}>
                     {halfwayMonth !== -1 ? `Month ${halfwayMonth}` : "N/A"}
@@ -69,7 +69,7 @@ export function DebtMilestones({ results }: Props) {
                 </div>
 
                 {/* Milestone 3: Savings */}
-                <div style={{ background: "var(--emerald-wash)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", border: "1px solid #c4dac9" }}>
+                <div className="milestone-badge" style={{ background: "var(--emerald-wash)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", border: "1px solid #c4dac9" }}>
                   <div style={{ fontSize: "0.58rem", textTransform: "uppercase", color: "var(--emerald)", fontWeight: "700" }}>Payoff Boost</div>
                   <div style={{ fontSize: "0.86rem", fontWeight: "700", marginTop: "4px", color: "var(--emerald)" }}>
                     {comparison.monthsSaved > 0 ? `${formatDuration(comparison.monthsSaved)} saved` : "No boost yet"}
@@ -80,7 +80,7 @@ export function DebtMilestones({ results }: Props) {
                 </div>
 
                 {/* Milestone 4: Final payoff */}
-                <div style={{ background: "var(--ink)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", color: "var(--paper)" }}>
+                <div className="milestone-badge" style={{ background: "var(--ink)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", color: "var(--paper)" }}>
                   <div style={{ fontSize: "0.58rem", textTransform: "uppercase", color: "var(--ink-faint)", fontWeight: "700" }}>Debt Free Date</div>
                   <div style={{ fontSize: "0.86rem", fontWeight: "700", marginTop: "4px", color: "var(--paper)" }}>
                     {monthLabel(loan.startYYYYMM, plan.monthsToPayoff)}
