@@ -140,4 +140,75 @@ describe("Math Trust Fixtures", () => {
     const sched = buildSchedule(principal, ratePct, tenureMonths, 1_000);
     expect(sched.rows.length).toBeLessThanOrEqual(600);
   });
+
+  // 11. Principal Moratorium: Interest-Only Option
+  it("Verify Interest-Only moratorium payments and tenure extension", () => {
+    const principal = 1_000_000;
+    const ratePct = 12.0; // 1% per month = 10,000 interest
+    const tenureMonths = 120;
+    const emi = monthlyEmi(principal, ratePct, tenureMonths);
+
+    // moratorium starting at month 12 for 6 months
+    const sched = buildSchedule(
+      principal,
+      ratePct,
+      tenureMonths,
+      emi,
+      {},
+      "reduceTenure",
+      {},
+      0,
+      12,
+      6,
+      "interestOnly"
+    );
+
+    // Check moratorium month (month 12 is index 11)
+    const m12 = sched.rows[11];
+    expect(Math.round(m12.interest)).toBe(Math.round(m12.opening * 0.01));
+    expect(Math.round(m12.emi)).toBe(Math.round(m12.interest));
+    expect(m12.principalPaid).toBe(0);
+    expect(m12.closing).toBe(m12.opening);
+
+    // Tenure should be extended because of paused principal repayments
+    expect(sched.monthsToPayoff).toBeGreaterThan(120);
+    expect(sched.rows[sched.rows.length - 1].closing).toBe(0);
+  });
+
+  // 12. Principal Moratorium: Full Holiday Option
+  it("Verify Full Holiday moratorium compounds interest and extends tenure", () => {
+    const principal = 1_000_000;
+    const ratePct = 12.0; // 1% per month = 10,000 interest
+    const tenureMonths = 120;
+    const emi = monthlyEmi(principal, ratePct, tenureMonths);
+
+    // moratorium starting at month 12 for 6 months
+    const sched = buildSchedule(
+      principal,
+      ratePct,
+      tenureMonths,
+      emi,
+      {},
+      "reduceTenure",
+      {},
+      0,
+      12,
+      6,
+      "fullHoliday"
+    );
+
+    // Check moratorium month (month 12 is index 11)
+    const m12 = sched.rows[11];
+    expect(Math.round(m12.interest)).toBe(Math.round(m12.opening * 0.01));
+    expect(m12.emi).toBe(0);
+    expect(Math.round(m12.principalPaid)).toBe(Math.round(-m12.interest));
+    expect(Math.round(m12.closing)).toBe(Math.round(m12.opening + m12.interest));
+
+    // Balance should have increased
+    expect(m12.closing).toBeGreaterThan(m12.opening);
+
+    // Tenure should be extended even further than interest-only
+    expect(sched.monthsToPayoff).toBeGreaterThan(120);
+    expect(sched.rows[sched.rows.length - 1].closing).toBe(0);
+  });
 });

@@ -29,6 +29,9 @@ export interface Loan {
   extraEmiPerYear?: boolean;
   stepUpPct?: number;
   biWeekly?: boolean;
+  moratoriumStart?: number;
+  moratoriumDuration?: number;
+  moratoriumType?: "interestOnly" | "fullHoliday";
 }
 
 export interface PrepayEntry {
@@ -103,11 +106,35 @@ export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
   const emptySchedule: ScheduleResult = { rows: [], totalInterest: 0, totalPaid: 0, monthsToPayoff: 0 };
   const baseline = loan.outstanding <= 0 
     ? emptySchedule 
-    : buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
+    : buildSchedule(
+        loan.outstanding,
+        loan.ratePct,
+        loan.tenureMonths,
+        emi,
+        {},
+        "reduceTenure",
+        rateChangesMap,
+        loan.stepUpPct,
+        loan.moratoriumStart,
+        loan.moratoriumDuration,
+        loan.moratoriumType
+      );
   
   const plan = loan.outstanding <= 0 
     ? emptySchedule 
-    : buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
+    : buildSchedule(
+        loan.outstanding,
+        loan.ratePct,
+        loan.tenureMonths,
+        emi,
+        prepayments,
+        behavior,
+        rateChangesMap,
+        loan.stepUpPct,
+        loan.moratoriumStart,
+        loan.moratoriumDuration,
+        loan.moratoriumType
+      );
 
   return { loan, emi, baseline, plan, comparison: compare(baseline, plan) };
 }
@@ -123,7 +150,31 @@ export function windfallEffect(loan: Loan, amount: number, monthIndex: number): 
   const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly);
   prepayments[monthIndex] = (prepayments[monthIndex] ?? 0) + amount;
   
-  const baseline = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, {}, "reduceTenure", rateChangesMap, loan.stepUpPct);
-  const plan = buildSchedule(loan.outstanding, loan.ratePct, loan.tenureMonths, emi, prepayments, behavior, rateChangesMap, loan.stepUpPct);
+  const baseline = buildSchedule(
+    loan.outstanding,
+    loan.ratePct,
+    loan.tenureMonths,
+    emi,
+    {},
+    "reduceTenure",
+    rateChangesMap,
+    loan.stepUpPct,
+    loan.moratoriumStart,
+    loan.moratoriumDuration,
+    loan.moratoriumType
+  );
+  const plan = buildSchedule(
+    loan.outstanding,
+    loan.ratePct,
+    loan.tenureMonths,
+    emi,
+    prepayments,
+    behavior,
+    rateChangesMap,
+    loan.stepUpPct,
+    loan.moratoriumStart,
+    loan.moratoriumDuration,
+    loan.moratoriumType
+  );
   return compare(baseline, plan);
 }

@@ -45,6 +45,9 @@ export function buildSchedule(
   prepayBehavior: "reduceTenure" | "reduceEmi" = "reduceTenure",
   rateChanges: Record<number, number> = {},
   stepUpPct: number = 0,
+  moraStart?: number,
+  moraDuration?: number,
+  moraType?: "interestOnly" | "fullHoliday",
 ): ScheduleResult {
   let currentRate = annualRatePct;
   let r = currentRate / 100 / 12;
@@ -57,7 +60,8 @@ export function buildSchedule(
   let balance = principal;
   let m = 0;
 
-  while (balance > 0.005 && m < months) {
+  // Let loop run up to 600 months to allow tenure extension for rate hikes / moratoriums
+  while (balance > 0.005 && m < 600) {
     m += 1;
     
     // Apply yearly step-up to base EMI (month 13, 25, 37...)
@@ -80,7 +84,35 @@ export function buildSchedule(
 
     const opening = balance;
     const interest = opening * r;
-    const payment = Math.min(pay, opening + interest); // final EMI may be smaller
+
+    // Check if moratorium is active for this month
+    const isMora =
+      moraStart !== undefined &&
+      moraDuration !== undefined &&
+      moraType !== undefined &&
+      m >= moraStart &&
+      m < moraStart + moraDuration;
+
+    // Safe guard: If interest exceeds payment outside moratorium, loan is infinite.
+    // Stop at original months limit to prevent infinite loop.
+    if (!isMora && interest >= pay && r > 0) {
+      if (m >= months) {
+        break;
+      }
+    }
+
+    let payment = 0;
+    if (isMora) {
+      if (moraType === "interestOnly") {
+        payment = interest;
+      } else {
+        // fullHoliday
+        payment = 0;
+      }
+    } else {
+      payment = Math.min(pay, opening + interest);
+    }
+
     const principalPaid = payment - interest;
     balance = opening - principalPaid;
 
@@ -99,8 +131,13 @@ export function buildSchedule(
     totalInterest += interest;
     totalPaid += payment + prepay;
 
-    // If EMI reduction strategy is selected and a prepayment is made, recalculate the EMI for remaining term
-    if (prepayBehavior === "reduceEmi" && prepay > 0 && months - m > 0 && balance > 0.005) {
+    // If EMI reduction strategy is selected and a prepayment is made (or exiting moratorium), recalculate EMI
+    const justExitedMora =
+      moraStart !== undefined &&
+      moraDuration !== undefined &&
+      m === moraStart + moraDuration - 1;
+
+    if (prepayBehavior === "reduceEmi" && (prepay > 0 || justExitedMora) && months - m > 0 && balance > 0.005) {
       pay = monthlyEmi(balance, currentRate, months - m);
     }
   }

@@ -437,7 +437,7 @@ export function TaxSavingsDeductor({ results }: Props) {
               }}>
                 Year-by-Year Tax Deduction Breakdown
               </div>
-              <div style={{ overflowX: "auto" }}>
+              <div style={{ overflowX: "auto", width: "100%" }}>
                 <table className="tax-table">
                   <thead>
                     <tr>

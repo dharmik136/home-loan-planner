@@ -158,9 +158,9 @@ body {
   gap: 20px;
   align-items: start;
 }
-.col-left { display: flex; flex-direction: column; gap: 16px; }
+.col-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .col-mid { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-.col-right { display: flex; flex-direction: column; gap: 18px; }
+.col-right { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 
 @container workspace (max-width: 1380px) {
   .grid {

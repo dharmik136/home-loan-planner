@@ -313,6 +313,107 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           }}
         />
       </div>
+
+      {/* Principal Moratorium Simulator */}
+      <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px dashed var(--line-strong)", marginBottom: "12px" }}>
+        <label style={{ display: "block", fontSize: "0.68rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "600", marginBottom: "8px" }}>
+          Moratorium Option (Sec 8)
+        </label>
+        
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--ink)", cursor: "pointer", marginBottom: "8px" }}>
+          <input
+            type="checkbox"
+            checked={loan.moratoriumStart !== undefined}
+            onChange={(e) => {
+              if (e.target.checked) {
+                onChange({
+                  moratoriumStart: 12,
+                  moratoriumDuration: 6,
+                  moratoriumType: "interestOnly"
+                });
+              } else {
+                onChange({
+                  moratoriumStart: undefined,
+                  moratoriumDuration: undefined,
+                  moratoriumType: undefined
+                });
+              }
+            }}
+            style={{ cursor: "pointer", width: "15px", height: "15px", accentColor: "var(--emerald)" }}
+          />
+          <span>Simulate Principal Moratorium (Pause Payments)</span>
+        </label>
+
+        {loan.moratoriumStart !== undefined && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "10px" }}>
+            <div>
+              <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Start Month</label>
+              <input
+                type="number"
+                min={1}
+                max={loan.tenureMonths}
+                value={loan.moratoriumStart}
+                onChange={(e) => onChange({ moratoriumStart: Math.max(1, Number(e.target.value)) })}
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--body)",
+                  fontSize: "0.82rem",
+                  color: "var(--ink)",
+                  background: "var(--paper)",
+                  border: "1px solid var(--line-strong)",
+                  borderRadius: "2px",
+                  padding: "5px 7px",
+                  outline: "none"
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Duration (months)</label>
+              <input
+                type="number"
+                min={1}
+                max={60}
+                value={loan.moratoriumDuration}
+                onChange={(e) => onChange({ moratoriumDuration: Math.max(1, Number(e.target.value)) })}
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--body)",
+                  fontSize: "0.82rem",
+                  color: "var(--ink)",
+                  background: "var(--paper)",
+                  border: "1px solid var(--line-strong)",
+                  borderRadius: "2px",
+                  padding: "5px 7px",
+                  outline: "none"
+                }}
+              />
+            </div>
+            <div style={{ gridColumn: "span 2" }}>
+              <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Moratorium Type</label>
+              <select
+                value={loan.moratoriumType}
+                onChange={(e) => onChange({ moratoriumType: e.target.value as "interestOnly" | "fullHoliday" })}
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--body)",
+                  fontSize: "0.82rem",
+                  fontWeight: "600",
+                  color: "var(--ink)",
+                  background: "var(--paper)",
+                  border: "1px solid var(--line-strong)",
+                  borderRadius: "2px",
+                  padding: "6px 8px",
+                  outline: "none",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="interestOnly">Interest-Only Payment (Principal paused)</option>
+                <option value="fullHoliday">Full EMI Holiday (Interest compounds)</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
       </>)}
 
       {hasErrors && (
