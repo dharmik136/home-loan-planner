@@ -280,7 +280,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         {/* List of existing rate changes */}
         {loan.rateChanges && loan.rateChanges.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
-            {loan.rateChanges.map((rc) => (
+            {[...loan.rateChanges].sort((a, b) => a.monthIndex - b.monthIndex).map((rc) => (
               <div key={rc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel)", padding: "4px 8px", borderRadius: "2px", fontSize: "0.78rem" }}>
                 <span>Month {rc.monthIndex} ➔ <b>{rc.newRatePct}%</b></span>
                 <button
