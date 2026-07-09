@@ -19,6 +19,8 @@ Native UI,Design,Input field-sizing: content,Completed,Applied Chrome-native fie
 Native UI,Design,Workspace Container Queries layout,Completed,Refactored media queries to container-based workspace layout rules to allow flexible split-pane resizing,web/src/styles.css
 Aesthetic,Typography,Newspaper Paragraph Indents layout,Completed,Replaced raw monospace email sequence logs with serif typography and traditional first-line indent paragraphs (1.8em) mimicking physical broadsheet columns,web/src/components/MarketingLandingPage.tsx
 Native UI,Design,Discrete top-layer dialog transitions,Completed,Integrated modern allow-discrete CSS transitions and @starting-style to smoothly scale/fade native modal <dialog> and backdrop elements on entry/exit,web/src/styles.css
+Native UI,Design,Visual bar segment overflow handling,Completed,Added CSS text-overflow ellipsis and hidden bounds to shock visualizer segments to prevent labels overlapping at low percentages,web/src/components/MarketingLandingPage.tsx
+
 
 
 
