@@ -45,6 +45,8 @@ Build Automation,Deployment,Automated Build Copy (copy-build.js),Completed,Creat
 Compliance,Legal,GNU GPL v3 License Update,Completed,Updated project LICENSE file with standard GNU General Public License v3 terms for open-source public repository compliance.,LICENSE
 CI Workflow,Deployment,GitHub Actions CI Pipeline (ci.yml),Completed,Created GitHub Actions CI workflow to automate typescript build compiling and Vitest unit testing on every repository push.,.github/workflows/ci.yml
 Documentation,Docs,README.md Overhaul & Live Page Links,Completed,Overhauled main project README.md to describe new math engines; show 57 passing tests; include GPL v3 license shield; and provide direct URL link to GitHub Pages live app.,README.md
+Balance Transfer,Feature,Feature 5 / 67 — Balance Transfer Advisor Upgrade,Completed,Upgraded Balance Transfer Advisor component to support itemized charges (processing fee; legal; valuation) and added dynamic stacked-bar visual break-even progress bar.,web/src/components/BalanceTransferAdvisor.tsx
+
 
 
 
