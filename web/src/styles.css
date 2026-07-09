@@ -337,9 +337,34 @@ p, li {
   text-wrap: pretty;
 }
 
+.native-modal-dialog {
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), display 0.35s allow-discrete, overlay 0.35s allow-discrete;
+  opacity: 0;
+  transform: scale(0.94) translateY(12px);
+}
+.native-modal-dialog[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+@starting-style {
+  .native-modal-dialog[open] {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+}
 .native-modal-dialog::backdrop {
+  transition: opacity 0.35s ease, display 0.35s allow-discrete, overlay 0.35s allow-discrete;
+  opacity: 0;
   background: rgba(25, 29, 38, 0.4);
   backdrop-filter: blur(4px);
+}
+.native-modal-dialog[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .native-modal-dialog[open]::backdrop {
+    opacity: 0;
+  }
 }
 
 .faq-details {
