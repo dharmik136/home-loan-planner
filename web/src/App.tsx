@@ -283,6 +283,7 @@ export function App() {
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
           <button
             onClick={() => setView("landing")}
+            className="nav-btn"
             style={{
               background: "none",
               border: "1px solid var(--line-strong)",
@@ -301,6 +302,7 @@ export function App() {
           </button>
           <button
             onClick={toggleDarkMode}
+            className="theme-btn"
             style={{
               background: "none",
               border: "1px solid var(--line-strong)",
