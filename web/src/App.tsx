@@ -31,6 +31,9 @@ import { NetWorthProjector } from "./components/NetWorthProjector";
 import { BonusWindfallPlanner } from "./components/BonusWindfallPlanner";
 import { SIPCorpusSimulator } from "./components/SIPCorpusSimulator";
 import { PrepaymentScenarios } from "./components/PrepaymentScenarios";
+import { InterestShockVisualizer } from "./components/InterestShockVisualizer";
+import { SavingsValueWidget } from "./components/SavingsValueWidget";
+import { DebtFreeCelebration } from "./components/DebtFreeCelebration";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -327,6 +330,10 @@ export function App() {
         <main className="col-mid">
           <SummaryCards results={results} />
 
+          {loans.length >= 1 && <DebtFreeCelebration results={results} />}
+
+          {loans.length >= 1 && <SavingsValueWidget results={results} />}
+
           {loans.length > 0 && (
             <div className="panel s3">
               <div className="panel-title"><span className="num">02 / Your moves</span> Plan extra payments</div>
@@ -421,6 +428,8 @@ export function App() {
           {loans.length >= 1 && <WindfallSimulator loans={loans} />}
 
           {loans.length >= 1 && <TaxSavingsDeductor results={results} />}
+
+          {loans.length >= 1 && <InterestShockVisualizer results={results} />}
 
           {loans.length >= 1 && <InvestmentVsPrepay results={results} />}
 
