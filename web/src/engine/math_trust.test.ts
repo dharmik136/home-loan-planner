@@ -242,4 +242,45 @@ describe("Math Trust Fixtures", () => {
     // Tenure should be shorter
     expect(res.plan.monthsToPayoff).toBeLessThan(240);
   });
+
+  // 14. Daily Reducing Balance Option
+  it("Verify Daily Reducing Balance interest calculations based on monthly day-counts", () => {
+    const principal = 2_000_000;
+    const ratePct = 9.0;
+    const tenureMonths = 120;
+    const emi = monthlyEmi(principal, ratePct, tenureMonths);
+
+    // 1. Calculate standard monthly reducing schedule
+    const monthlySched = buildSchedule(principal, ratePct, tenureMonths, emi);
+
+    // 2. Calculate daily reducing schedule starting Jan 2026
+    const dailySched = buildSchedule(
+      principal,
+      ratePct,
+      tenureMonths,
+      emi,
+      {},
+      "reduceTenure",
+      {},
+      0,
+      undefined,
+      undefined,
+      undefined,
+      "dailyReducing",
+      "2026-01" // Jan 2026
+    );
+
+    // Month 1 (January, 31 days)
+    const m1 = dailySched.rows[0];
+    const expectedJanInterest = principal * (ratePct / 100 / 365) * 31;
+    expect(Math.round(m1.interest)).toBe(Math.round(expectedJanInterest));
+
+    // Month 2 (February, 28 days in 2026)
+    const m2 = dailySched.rows[1];
+    const expectedFebInterest = m2.opening * (ratePct / 100 / 365) * 28;
+    expect(Math.round(m2.interest)).toBe(Math.round(expectedFebInterest));
+
+    // Verify that daily reducing interest differs from static monthly reducing interest
+    expect(m1.interest).not.toBe(monthlySched.rows[0].interest);
+  });
 });

@@ -48,6 +48,8 @@ export function buildSchedule(
   moraStart?: number,
   moraDuration?: number,
   moraType?: "interestOnly" | "fullHoliday",
+  interestMethod: "monthlyReducing" | "dailyReducing" = "monthlyReducing",
+  startYYYYMM?: string,
 ): ScheduleResult {
   let currentRate = annualRatePct;
   let r = currentRate / 100 / 12;
@@ -59,6 +61,17 @@ export function buildSchedule(
   let totalPaid = 0;
   let balance = principal;
   let m = 0;
+
+  // Parse start date if provided to calculate exact days in month for daily reducing method
+  let startYear = 2026;
+  let startMonth = 7;
+  if (startYYYYMM) {
+    const parts = startYYYYMM.split("-");
+    if (parts.length === 2) {
+      startYear = parseInt(parts[0]) || 2026;
+      startMonth = parseInt(parts[1]) || 7;
+    }
+  }
 
   // Let loop run up to 600 months to allow tenure extension for rate hikes / moratoriums
   while (balance > 0.005 && m < 600) {
@@ -83,7 +96,20 @@ export function buildSchedule(
     }
 
     const opening = balance;
-    const interest = opening * r;
+    
+    // Compute interest based on calculation method
+    let interest = 0;
+    if (interestMethod === "dailyReducing") {
+      // Find calendar year/month for month index m (1-indexed)
+      const currentMonthIndex = (startMonth + m - 2) % 12; // 0-11
+      const currentYear = startYear + Math.floor((startMonth + m - 2) / 12);
+      const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
+      
+      const r_daily = currentRate / 100 / 365;
+      interest = opening * r_daily * daysInMonth;
+    } else {
+      interest = opening * r;
+    }
 
     // Check if moratorium is active for this month
     const isMora =
@@ -95,7 +121,7 @@ export function buildSchedule(
 
     // Safe guard: If interest exceeds payment outside moratorium, loan is infinite.
     // Stop at original months limit to prevent infinite loop.
-    if (!isMora && interest >= pay && r > 0) {
+    if (!isMora && interest >= pay && currentRate > 0) {
       if (m >= months) {
         break;
       }
