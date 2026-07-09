@@ -908,6 +908,24 @@ The Prepayment Ledger Team`,
 
       {/* HERO SECTION */}
       <section className="m-wrap" style={{ textAlign: "center", paddingBottom: 0 }}>
+        {/* BROADSHEET MASTHEAD BANNER */}
+        <div className="double-border" style={{ textAlign: "center", marginBottom: "40px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.15em", color: "var(--ink-soft)", borderBottom: "1px solid var(--line-strong)", paddingBottom: "8px", marginBottom: "12px", padding: "0 10px" }}>
+            <span>Price: Free & Open Source</span>
+            <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>Vol. I ... No. 1</span>
+          </div>
+          <span style={{ fontSize: "0.8rem", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: "6px" }}>
+            THE INDEPENDENT DEBT ARCHITECT
+          </span>
+          <div style={{ fontFamily: "var(--display)", fontWeight: 950, fontSize: "clamp(2.2rem, 6.5vw, 4.5rem)", margin: "8px 0", letterSpacing: "-0.01em", textTransform: "uppercase", lineHeight: "1.05" }}>
+            THE PREPAYMENT LEDGER
+          </div>
+          <div style={{ borderTop: "1px solid var(--line-strong)", paddingTop: "8px", fontSize: "0.72rem", fontStyle: "italic", color: "var(--ink-soft)" }}>
+            "Knowledge is interest-free — math is your maximum leverage."
+          </div>
+        </div>
+
         <div className="mode-selector">
           <button
             className={`mode-btn ${headlineMode === "direct" ? "active" : ""}`}
