@@ -17,4 +17,6 @@ Aesthetic,Design,Global Input Focus Glows,Completed,Added custom emerald focus s
 Micro-interactions,Design,Slider Label Micro-interactions,Completed,Scaled up slider label values dynamically on focus/active range drags via pure CSS focus-within rules,web/src/styles.css
 Native UI,Design,Input field-sizing: content,Completed,Applied Chrome-native field-sizing content styling to LoanCard name inputs to dynamically fit typed content,web/src/components/LoanCard.tsx
 Native UI,Design,Workspace Container Queries layout,Completed,Refactored media queries to container-based workspace layout rules to allow flexible split-pane resizing,web/src/styles.css
+Aesthetic,Typography,Newspaper Paragraph Indents layout,Completed,Replaced raw monospace email sequence logs with serif typography and traditional first-line indent paragraphs (1.8em) mimicking physical broadsheet columns,web/src/components/MarketingLandingPage.tsx
+
 
