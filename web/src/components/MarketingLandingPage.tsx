@@ -395,6 +395,10 @@ The Prepayment Ledger Team`,
           font-weight: 700;
           color: white;
           transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding: 0 6px;
         }
 
         /* Tabbed sequence viewer */
