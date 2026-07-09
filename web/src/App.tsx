@@ -144,6 +144,18 @@ export function App() {
 
   const { loans, entries } = state;
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (loans.length > 0) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes in your prepayment plan. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [loans]);
+
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
   const [yearlyView, setYearlyView] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
