@@ -18,13 +18,13 @@ export function MarketingLandingPage({ onGoToPlanner, onOpenPaywall }: Marketing
 
   // Interactive Widget 2: Windfall Allocator State
   const [windfallAmount, setWindfallAmount] = useState<number>(300000); // 3 Lakhs
-  const loanAOutstanding = 3500000; // 35 Lakhs, 7.5%, 15 years
-  const loanARate = 7.5;
-  const loanATenure = 180; // months
+  const [loanAOutstanding, setLoanAOutstanding] = useState<number>(3500000); // 35 Lakhs
+  const [loanARate, setLoanARate] = useState<number>(7.5);
+  const loanATenure = 180; // months (constant)
 
-  const loanBOutstanding = 1000000; // 10 Lakhs, 8.5%, 5 years
-  const loanBRate = 8.5;
-  const loanBTenure = 60; // months
+  const [loanBOutstanding, setLoanBOutstanding] = useState<number>(1000000); // 10 Lakhs
+  const [loanBRate, setLoanBRate] = useState<number>(8.5);
+  const loanBTenure = 60; // months (constant)
 
   // Interactive Rule Configuration State
   const [selectedLenderRule, setSelectedLenderRule] = useState<"hdfc" | "sbi" | "rbi">("hdfc");
@@ -1159,17 +1159,64 @@ The Prepayment Ledger Team`,
               />
             </div>
 
-            {/* Show configured mock loans */}
+            {/* Show configured mock loans (Interactive) */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
-              <div className="thin-border" style={{ padding: "8px 12px", borderRadius: "3px", backgroundColor: "var(--paper)" }}>
-                <div style={{ fontSize: "0.65rem", textTransform: "uppercase", fontWeight: 700, color: "var(--ink-soft)" }}>Loan A (Home Loan)</div>
-                <div style={{ fontSize: "0.85rem", fontWeight: 700 }}>{formatCompactINR(loanAOutstanding)} @ {loanARate}%</div>
-                <div style={{ fontSize: "0.72rem", color: "var(--ink-faint)" }}>15 Years Remaining</div>
+              <div className="thin-border" style={{ padding: "10px 12px", borderRadius: "3px", backgroundColor: "var(--paper)", border: "1px solid var(--line-strong)" }}>
+                <div style={{ fontSize: "0.65rem", textTransform: "uppercase", fontWeight: 700, color: "var(--ink-soft)", marginBottom: "6px" }}>Loan A (Home Loan)</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "0.76rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.6rem", display: "block", color: "var(--ink-faint)", textTransform: "uppercase" }}>Balance (₹)</label>
+                    <input
+                      type="number"
+                      value={loanAOutstanding}
+                      step={100000}
+                      min={100000}
+                      onChange={(e) => setLoanAOutstanding(Math.max(100000, Number(e.target.value)))}
+                      style={{ width: "100%", padding: "4px 6px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper-raised)", color: "var(--ink)", outline: "none" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.6rem", display: "block", color: "var(--ink-faint)", textTransform: "uppercase" }}>Rate (%)</label>
+                    <input
+                      type="number"
+                      step={0.1}
+                      min={1}
+                      max={30}
+                      value={loanARate}
+                      onChange={(e) => setLoanARate(Math.max(1, Math.min(30, Number(e.target.value))))}
+                      style={{ width: "100%", padding: "4px 6px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper-raised)", color: "var(--ink)", outline: "none" }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="thin-border" style={{ padding: "8px 12px", borderRadius: "3px", backgroundColor: "var(--paper)" }}>
-                <div style={{ fontSize: "0.65rem", textTransform: "uppercase", fontWeight: 700, color: "var(--ink-soft)" }}>Loan B (Car Loan)</div>
-                <div style={{ fontSize: "0.85rem", fontWeight: 700 }}>{formatCompactINR(loanBOutstanding)} @ {loanBRate}%</div>
-                <div style={{ fontSize: "0.72rem", color: "var(--ink-faint)" }}>5 Years Remaining</div>
+
+              <div className="thin-border" style={{ padding: "10px 12px", borderRadius: "3px", backgroundColor: "var(--paper)", border: "1px solid var(--line-strong)" }}>
+                <div style={{ fontSize: "0.65rem", textTransform: "uppercase", fontWeight: 700, color: "var(--ink-soft)", marginBottom: "6px" }}>Loan B (Car Loan)</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "0.76rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.6rem", display: "block", color: "var(--ink-faint)", textTransform: "uppercase" }}>Balance (₹)</label>
+                    <input
+                      type="number"
+                      value={loanBOutstanding}
+                      step={50000}
+                      min={50000}
+                      onChange={(e) => setLoanBOutstanding(Math.max(50000, Number(e.target.value)))}
+                      style={{ width: "100%", padding: "4px 6px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper-raised)", color: "var(--ink)", outline: "none" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.6rem", display: "block", color: "var(--ink-faint)", textTransform: "uppercase" }}>Rate (%)</label>
+                    <input
+                      type="number"
+                      step={0.1}
+                      min={1}
+                      max={30}
+                      value={loanBRate}
+                      onChange={(e) => setLoanBRate(Math.max(1, Math.min(30, Number(e.target.value))))}
+                      style={{ width: "100%", padding: "4px 6px", fontSize: "0.78rem", border: "1px solid var(--line-strong)", borderRadius: "2px", background: "var(--paper-raised)", color: "var(--ink)", outline: "none" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1189,19 +1236,25 @@ The Prepayment Ledger Team`,
               </div>
 
               {/* Optimized Strategy */}
-              <div style={{ padding: "12px", borderRadius: "3px", backgroundColor: "var(--emerald-wash)", border: "1px solid var(--emerald)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 800, color: "var(--emerald)" }}>
-                    💡 LEDGER OPTIMIZED SPLIT (73/27)
-                  </span>
-                  <span style={{ fontFamily: "var(--display)", fontWeight: 800, fontSize: "1.2rem", color: "var(--emerald)" }}>
-                    Saves {formatINR(windfallComparison.totalSavedOpt)}
-                  </span>
-                </div>
-                <div style={{ fontSize: "0.72rem", color: "var(--emerald)", fontWeight: 600, marginTop: "4px" }}>
-                  Deploy {formatINR(windfallComparison.splitA_opt)} to Loan A & {formatINR(windfallComparison.splitB_opt)} to Loan B
-                </div>
-              </div>
+              {(() => {
+                const optPctA = windfallAmount > 0 ? Math.round((windfallComparison.splitA_opt / windfallAmount) * 100) : 0;
+                const optPctB = 100 - optPctA;
+                return (
+                  <div style={{ padding: "12px", borderRadius: "3px", backgroundColor: "var(--emerald-wash)", border: "1px solid var(--emerald)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 800, color: "var(--emerald)" }}>
+                        💡 LEDGER OPTIMIZED SPLIT ({optPctA}/{optPctB})
+                      </span>
+                      <span style={{ fontFamily: "var(--display)", fontWeight: 800, fontSize: "1.2rem", color: "var(--emerald)" }}>
+                        Saves {formatINR(windfallComparison.totalSavedOpt)}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--emerald)", fontWeight: 600, marginTop: "4px" }}>
+                      Deploy {formatINR(windfallComparison.splitA_opt)} to Loan A & {formatINR(windfallComparison.splitB_opt)} to Loan B
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Savings Highlight */}
               <div style={{ textAlign: "center", borderTop: "1px dashed var(--line-strong)", paddingTop: "12px", marginTop: "4px" }}>
