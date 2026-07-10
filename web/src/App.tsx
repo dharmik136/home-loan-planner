@@ -161,6 +161,7 @@ export function App() {
   const [yearlyView, setYearlyView] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isTourActive, setIsTourActive] = useState(false);
+  const [rightTab, setRightTab] = useState<"simulators" | "risk" | "tax" | "tools" | "editorial">("simulators");
 
   const applyScenario = (scenario: string) => {
     if (scenario === "prepayment_optimizer") {
@@ -630,47 +631,61 @@ export function App() {
         </main>
 
         <aside className="col-right">
-          {loans.length >= 1 && <WindfallSimulator loans={loans} onApplySplit={handleApplyWindfallSplit} />}
+          {loans.length >= 1 && (
+            <div className="seg" style={{ marginBottom: "16px", display: "flex", flexWrap: "wrap", gap: "4px", borderBottom: "2px solid var(--line-strong)", paddingBottom: "8px" }}>
+              <button className={rightTab === "simulators" ? "active" : ""} onClick={() => setRightTab("simulators")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>🗞️ Simulators</button>
+              <button className={rightTab === "risk" ? "active" : ""} onClick={() => setRightTab("risk")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>🔍 Risk & Audits</button>
+              <button className={rightTab === "tax" ? "active" : ""} onClick={() => setRightTab("tax")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>📊 Tax & Planning</button>
+              <button className={rightTab === "tools" ? "active" : ""} onClick={() => setRightTab("tools")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>⚙️ Reference Tools</button>
+              <button className={rightTab === "editorial" ? "active" : ""} onClick={() => setRightTab("editorial")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>✍️ Editorial Desk</button>
+            </div>
+          )}
 
-          {loans.length >= 1 && <TaxSavingsDeductor results={results} />}
+          {loans.length >= 1 && rightTab === "simulators" && (
+            <>
+              <WindfallSimulator loans={loans} onApplySplit={handleApplyWindfallSplit} />
+              <BonusWindfallPlanner results={results} />
+              <PartPaymentPlanner />
+              <InvestmentVsPrepay results={results} />
+              <SIPCorpusSimulator results={results} />
+            </>
+          )}
 
-          {loans.length >= 1 && <InterestShockVisualizer results={results} />}
+          {loans.length >= 1 && rightTab === "risk" && (
+            <>
+              <DebtStressMeter results={results} />
+              <InterestShockVisualizer results={results} />
+              <BalanceTransferAdvisor results={results} />
+              <RulesPanel />
+            </>
+          )}
 
-          {loans.length >= 1 && <InvestmentVsPrepay results={results} />}
+          {loans.length >= 1 && rightTab === "tax" && (
+            <>
+              <TaxSavingsDeductor results={results} />
+              <PrepayGoalPlanner results={results} />
+              <MonthlyBudgetPlanner results={results} />
+              <ForeclosureCalculator results={results} />
+            </>
+          )}
 
-          {loans.length >= 1 && <DebtStressMeter results={results} />}
+          {loans.length >= 1 && rightTab === "tools" && (
+            <>
+              <LoanEligibilityChecker />
+              <BankEMIComparator />
+              <StampDutyCalculator />
+              <RentVsBuyCalculator />
+              <InflationAdjustedView results={results} />
+              <NetWorthProjector results={results} />
+            </>
+          )}
 
-          {loans.length >= 1 && <ForeclosureCalculator results={results} />}
-
-          {loans.length >= 1 && <PrepayGoalPlanner results={results} />}
-
-          <LoanEligibilityChecker />
-
-          <BankEMIComparator />
-
-          {loans.length >= 1 && <AchievementBadges results={results} />}
-
-          {loans.length >= 1 && <LettersToEditor results={results} />}
-
-          {loans.length >= 1 && <InflationAdjustedView results={results} />}
-
-          <StampDutyCalculator />
-
-          <PartPaymentPlanner />
-
-          {loans.length >= 1 && <BalanceTransferAdvisor results={results} />}
-
-          <RentVsBuyCalculator />
-
-          {loans.length >= 1 && <MonthlyBudgetPlanner results={results} />}
-
-          {loans.length >= 1 && <BonusWindfallPlanner results={results} />}
-
-          {loans.length >= 1 && <NetWorthProjector results={results} />}
-
-          <SIPCorpusSimulator results={results} />
-          
-          <RulesPanel />
+          {loans.length >= 1 && rightTab === "editorial" && (
+            <>
+              <AchievementBadges results={results} />
+              <LettersToEditor results={results} />
+            </>
+          )}
 
           {leads.length > 0 && (
             <div className="panel s6" style={{ borderLeft: "4px solid var(--emerald)", width: "100%" }}>

@@ -66,6 +66,8 @@ describe("App smoke", () => {
 
   it("renders the HDFC rules panel", () => {
     render(<App />);
+    const riskTabButton = screen.getByText(/Risk & Audits/i);
+    fireEvent.click(riskTabButton);
     const panel = screen.getByText(/rules this model enforces/i);
     expect(within(panel.closest(".panel") as HTMLElement).getByText(/Prepayment penalty/i)).toBeTruthy();
   });
