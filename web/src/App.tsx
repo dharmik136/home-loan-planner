@@ -632,12 +632,124 @@ export function App() {
 
         <aside className="col-right">
           {loans.length >= 1 && (
-            <div className="seg" style={{ marginBottom: "16px", display: "flex", flexWrap: "wrap", gap: "4px", borderBottom: "2px solid var(--line-strong)", paddingBottom: "8px" }}>
-              <button className={rightTab === "simulators" ? "active" : ""} onClick={() => setRightTab("simulators")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>🗞️ Simulators</button>
-              <button className={rightTab === "risk" ? "active" : ""} onClick={() => setRightTab("risk")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>🔍 Risk & Audits</button>
-              <button className={rightTab === "tax" ? "active" : ""} onClick={() => setRightTab("tax")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>📊 Tax & Planning</button>
-              <button className={rightTab === "tools" ? "active" : ""} onClick={() => setRightTab("tools")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>⚙️ Reference Tools</button>
-              <button className={rightTab === "editorial" ? "active" : ""} onClick={() => setRightTab("editorial")} style={{ fontSize: "0.72rem", padding: "4px 8px" }}>✍️ Editorial Desk</button>
+            <div className="panel" style={{ marginBottom: "16px", border: "2px solid var(--ink)", padding: "14px" }}>
+              <div className="double-border-bottom" style={{ borderBottom: "3px double var(--line-strong)", paddingBottom: "6px", marginBottom: "10px", textAlign: "center" }}>
+                <span style={{ fontSize: "0.68rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-soft)" }}>Today's Issue Index</span>
+                <h4 style={{ margin: "2px 0 0", fontFamily: "var(--display)", fontSize: "1.15rem", fontWeight: "900", color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                  📰 The Ledger Directory
+                </h4>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div
+                  onClick={() => setRightTab("simulators")}
+                  style={{
+                    padding: "8px 10px",
+                    border: rightTab === "simulators" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
+                    background: rightTab === "simulators" ? "var(--emerald-wash)" : "var(--paper)",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                    transition: "all 0.15s"
+                  }}
+                  onMouseEnter={(e) => { if (rightTab !== "simulators") e.currentTarget.style.borderColor = "var(--emerald)"; }}
+                  onMouseLeave={(e) => { if (rightTab !== "simulators") e.currentTarget.style.borderColor = "var(--line)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION I. SURPLUS SIMULATORS</span>
+                    {rightTab === "simulators" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
+                    Windfall Simulator, Bonus Planner, Part-Payments, SIP vs Prepay, SIP Corpus.
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setRightTab("risk")}
+                  style={{
+                    padding: "8px 10px",
+                    border: rightTab === "risk" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
+                    background: rightTab === "risk" ? "var(--emerald-wash)" : "var(--paper)",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                    transition: "all 0.15s"
+                  }}
+                  onMouseEnter={(e) => { if (rightTab !== "risk") e.currentTarget.style.borderColor = "var(--emerald)"; }}
+                  onMouseLeave={(e) => { if (rightTab !== "risk") e.currentTarget.style.borderColor = "var(--line)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION II. RISK & AUDITS</span>
+                    {rightTab === "risk" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
+                    Debt Stress Meter, Interest Hikes Shock, Balance Transfer Advisor, Lender Rules.
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setRightTab("tax")}
+                  style={{
+                    padding: "8px 10px",
+                    border: rightTab === "tax" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
+                    background: rightTab === "tax" ? "var(--emerald-wash)" : "var(--paper)",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                    transition: "all 0.15s"
+                  }}
+                  onMouseEnter={(e) => { if (rightTab !== "tax") e.currentTarget.style.borderColor = "var(--emerald)"; }}
+                  onMouseLeave={(e) => { if (rightTab !== "tax") e.currentTarget.style.borderColor = "var(--line)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION III. TAX & PLANNING</span>
+                    {rightTab === "tax" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
+                    Income Tax Savings (Sec 24b/80C), Prepayment Goals, Budget Planner, Foreclosure Calculator.
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setRightTab("tools")}
+                  style={{
+                    padding: "8px 10px",
+                    border: rightTab === "tools" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
+                    background: rightTab === "tools" ? "var(--emerald-wash)" : "var(--paper)",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                    transition: "all 0.15s"
+                  }}
+                  onMouseEnter={(e) => { if (rightTab !== "tools") e.currentTarget.style.borderColor = "var(--emerald)"; }}
+                  onMouseLeave={(e) => { if (rightTab !== "tools") e.currentTarget.style.borderColor = "var(--line)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION IV. REFERENCE TOOLS</span>
+                    {rightTab === "tools" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
+                    Loan Eligibility, Bank EMI Comparator, Stamp Duty, Rent vs Buy, Inflation adjustments, Net Worth.
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setRightTab("editorial")}
+                  style={{
+                    padding: "8px 10px",
+                    border: rightTab === "editorial" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
+                    background: rightTab === "editorial" ? "var(--emerald-wash)" : "var(--paper)",
+                    borderRadius: "3px",
+                    cursor: "pointer",
+                    transition: "all 0.15s"
+                  }}
+                  onMouseEnter={(e) => { if (rightTab !== "editorial") e.currentTarget.style.borderColor = "var(--emerald)"; }}
+                  onMouseLeave={(e) => { if (rightTab !== "editorial") e.currentTarget.style.borderColor = "var(--line)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION V. EDITORIAL DESK</span>
+                    {rightTab === "editorial" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
+                    Borrower Badges & Achievements, Letters to the Editor Q&A Advice Column.
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
