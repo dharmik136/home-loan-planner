@@ -58,7 +58,7 @@ export function PortfolioBalanceChart({ results }: Props) {
   return (
     <div className="panel s4" style={{ marginTop: "24px" }}>
       <div className="panel-title">
-        <span className="num">📊 / Combined Portfolio</span>
+        <span className="num">Portfolio</span>
         Total Outstanding Debt Over Time
       </div>
       <div className="legend">

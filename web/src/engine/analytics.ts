@@ -4,7 +4,7 @@
  */
 export function trackEvent(eventName: string, metadata?: Record<string, any>) {
   const timestamp = new Date().toLocaleString();
-  console.log(`📊 [ANALYTICS] Event: ${eventName} | Timestamp: ${timestamp}`, metadata || {});
+  console.log(`[analytics] Event: ${eventName} | Timestamp: ${timestamp}`, metadata || {});
 
   try {
     const raw = localStorage.getItem("prepayment-ledger-analytics-events");

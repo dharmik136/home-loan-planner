@@ -111,7 +111,7 @@ export function PrepaymentScenarios({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 Even ₹2,000 extra per month consistently applied from Month 1 compounds significantly over a 15–20 year tenure.
+        Even Rs 2,000 extra per month consistently applied from Month 1 can reduce interest over a 15 to 20 year tenure.
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error inside Prepayment Ledger:", error, errorInfo);
+    console.error("Uncaught error inside Loan Plan Workspace:", error, errorInfo);
   }
 
   private handleReset = () => {
@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
             padding: "32px 24px",
             boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
           }}>
-            <span style={{ fontSize: "3rem" }}>⚠️</span>
+            <span aria-hidden="true" style={{ display: "block", width: "48px", height: "6px", borderRadius: "999px", background: "var(--clay)", margin: "0 auto" }} />
             <h2 style={{ fontFamily: "var(--display)", margin: "16px 0 8px 0", fontSize: "1.4rem" }}>
               Something went wrong
             </h2>

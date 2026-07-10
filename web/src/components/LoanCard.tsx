@@ -44,6 +44,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
     <div className={`panel loan-card ${delay}`} style={{ paddingTop: '28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
         <input
+          aria-label="Loan name"
           value={loan.name}
           onChange={(e) => onChange({ name: sanitizeName(e.target.value) })}
           style={{
@@ -76,7 +77,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             }}
             title={isCollapsed ? "Expand card" : "Collapse card"}
           >
-            {isCollapsed ? "▼" : "▲"}
+            {isCollapsed ? "Show" : "Hide"}
           </button>
           {onDelete && (
             <button
@@ -94,7 +95,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
               onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--clay)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-faint)')}
             >
-              ✕
+              Remove
             </button>
           )}
         </div>
@@ -102,7 +103,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
 
       {isCollapsed && (
         <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "-6px", marginBottom: "8px" }}>
-          {formatINR(loan.outstanding)} @ {loan.ratePct}% · {loan.tenureMonths} mos
+          {formatINR(loan.outstanding)} @ {loan.ratePct}% - {loan.tenureMonths} mos
         </div>
       )}
 
@@ -152,6 +153,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         <div className="field" style={{ marginBottom: 0 }}>
           <label>Lender Rules</label>
           <select
+            aria-label="Lender rules"
             value={loan.ruleset || "hdfc"}
             onChange={(e) => onChange({ ruleset: e.target.value as LenderRuleset })}
             style={{
@@ -187,6 +189,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       <div className="field" style={{ marginBottom: "13px" }}>
         <label>Interest calculation method</label>
         <select
+          aria-label="Interest calculation method"
           value={loan.interestMethod || "monthlyReducing"}
           onChange={(e) => onChange({ interestMethod: e.target.value as "monthlyReducing" | "dailyReducing" })}
           style={{
@@ -216,6 +219,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       <div className="field">
         <label>EMI start month</label>
         <input
+          aria-label="EMI start month"
           type="month"
           value={loan.startYYYYMM}
           onChange={(e) => onChange({ startYYYYMM: e.target.value || loan.startYYYYMM })}
@@ -225,6 +229,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       <div className="field" style={{ marginBottom: "16px" }}>
         <label>Prepayment strategy</label>
         <select
+          aria-label="Prepayment strategy"
           value={loan.prepayBehavior || "reduceTenure"}
           onChange={(e) => onChange({ prepayBehavior: e.target.value as "reduceTenure" | "reduceEmi" })}
           style={{
@@ -282,6 +287,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             Step-up EMI (increase payment yearly)
           </label>
           <select
+            aria-label="Step-up EMI percentage"
             value={loan.stepUpPct || 0}
             onChange={(e) => onChange({ stepUpPct: Number(e.target.value) })}
             style={{
@@ -318,13 +324,13 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
             {[...loan.rateChanges].sort((a, b) => a.monthIndex - b.monthIndex).map((rc) => (
               <div key={rc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel)", padding: "4px 8px", borderRadius: "2px", fontSize: "0.78rem" }}>
-                <span>Month {rc.monthIndex} ➔ <b>{rc.newRatePct}%</b></span>
+                <span>Month {rc.monthIndex} - <b>{rc.newRatePct}%</b></span>
                 <button
                   onClick={() => onChange({ rateChanges: loan.rateChanges?.filter(x => x.id !== rc.id) })}
                   style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: "0.8rem" }}
                   title="Delete rate change"
                 >
-                  ✕
+                  Remove
                 </button>
               </div>
             ))}
@@ -378,6 +384,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             <div>
               <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Start Month</label>
               <input
+                aria-label="Moratorium start month"
                 type="number"
                 min={1}
                 max={loan.tenureMonths}
@@ -399,6 +406,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             <div>
               <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Duration (months)</label>
               <input
+                aria-label="Moratorium duration in months"
                 type="number"
                 min={1}
                 max={60}
@@ -420,6 +428,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             <div style={{ gridColumn: "span 2" }}>
               <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Moratorium Type</label>
               <select
+                aria-label="Moratorium type"
                 value={loan.moratoriumType}
                 onChange={(e) => onChange({ moratoriumType: e.target.value as "interestOnly" | "fullHoliday" })}
                 style={{
@@ -455,13 +464,13 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
             {[...loan.balloonPayments].sort((a, b) => a.yearIndex - b.yearIndex).map((bp) => (
               <div key={bp.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel)", padding: "4px 8px", borderRadius: "2px", fontSize: "0.78rem" }}>
-                <span>Year {bp.yearIndex} Milestone ➔ <b>{formatINR(bp.amount)}</b></span>
+                <span>Year {bp.yearIndex} milestone - <b>{formatINR(bp.amount)}</b></span>
                 <button
                   onClick={() => onChange({ balloonPayments: loan.balloonPayments?.filter(x => x.id !== bp.id) })}
                   style={{ background: "none", border: "none", color: "var(--clay)", cursor: "pointer", fontSize: "0.8rem" }}
                   title="Delete balloon payment"
                 >
-                  ✕
+                  Remove
                 </button>
               </div>
             ))}
@@ -482,11 +491,11 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
 
       {hasErrors && (
         <div className="callout-warning-pulse" style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
-          {outstandingError && <span className="error-principal">• {outstandingError}</span>}
-          {rateError && <span className="error-rate">• {rateError}</span>}
-          {rateWarning && <span className="warning-rate" style={{ color: "#b45309" }}>• ⚠️ {rateWarning}</span>}
-          {tenureError && <span className="error-tenure">• {tenureError}</span>}
-          {emiError && <span className="error-emi">• {emiError}</span>}
+          {outstandingError && <span className="error-principal">- {outstandingError}</span>}
+          {rateError && <span className="error-rate">- {rateError}</span>}
+          {rateWarning && <span className="warning-rate" style={{ color: "#b45309" }}>- {rateWarning}</span>}
+          {tenureError && <span className="error-tenure">- {tenureError}</span>}
+          {emiError && <span className="error-emi">- {emiError}</span>}
         </div>
       )}
 
@@ -543,6 +552,7 @@ function NumericInput({
     <div className="field" style={{ marginBottom: "13px" }}>
       <label>{label}</label>
       <input
+        aria-label={label}
         value={displayValue}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -561,6 +571,7 @@ function RateChangeForm({ tenureMonths, baseRate, onAdd }: { tenureMonths: numbe
       <div>
         <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Month</label>
         <input
+          aria-label="Rate change month"
           type="number"
           min={2}
           max={tenureMonths}
@@ -582,6 +593,7 @@ function RateChangeForm({ tenureMonths, baseRate, onAdd }: { tenureMonths: numbe
       <div>
         <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Rate %</label>
         <input
+          aria-label="New interest rate"
           type="number"
           step="0.05"
           min={0}
@@ -624,6 +636,7 @@ function BalloonPaymentForm({ maxYears, onAdd }: { maxYears: number; onAdd: (y: 
       <div>
         <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Year</label>
         <input
+          aria-label="Balloon payment year"
           type="number"
           min={1}
           max={maxYears}
@@ -643,8 +656,9 @@ function BalloonPaymentForm({ maxYears, onAdd }: { maxYears: number; onAdd: (y: 
         />
       </div>
       <div>
-        <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Amount (₹)</label>
+        <label style={{ fontSize: "0.6rem", color: "var(--ink-soft)", display: "block", marginBottom: "3px" }}>Amount (Rs)</label>
         <input
+          aria-label="Balloon payment amount"
           type="number"
           step="10000"
           min={1000}

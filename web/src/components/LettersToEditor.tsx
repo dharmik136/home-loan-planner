@@ -47,16 +47,16 @@ export function LettersToEditor({ results }: Props) {
     if (type === "sip") {
       q = "Should I prepay my home loan or invest surplus cash in mutual fund SIPs?";
       const isRateHigh = rate >= 8.75;
-      a = `Dear Reader, with your active loan rate at ${rate.toFixed(2)}%, the math is a balance of certainty vs. risk. Prepaying your loan yields a guaranteed, tax-free return of ${rate.toFixed(2)}% by avoiding compounding interest. While equity mutual funds can return 12% in the long term, they are subject to market volatility and a 12.5% Long-Term Capital Gains (LTCG) tax. If your interest rate is high (${isRateHigh ? "which it currently is" : "though yours is moderate"}), prepaying is highly recommended to secure immediate risk-free savings. For lower rates, a split strategy (50% prepay, 50% SIP) is ideal.`;
+      a = `Your active loan rate is ${rate.toFixed(2)}%. Prepaying gives a certain benefit equal to avoided interest, while SIP returns are uncertain and taxable. Since this rate is ${isRateHigh ? "on the higher side" : "moderate"}, compare a split plan against full prepayment before deciding.`;
     } else if (type === "moratorium") {
-      q = "Dear Editor, how does a moratorium pause affect my long-term debt?";
-      a = `Dear Reader, a moratorium is not an interest waiver; it is merely a payment holiday. During a moratorium, interest continues to accrue daily on your outstanding balance. In a "Full Holiday", this accrued interest is capitalized (added back to your principal), causing you to pay interest on interest. For your loan, pausing for 6 months at ${rate.toFixed(2)}% will increase your principal balance, compounding your total interest liability and extending your tenure. Use moratoriums only for emergencies, and always opt for "Interest-Only" payments if possible.`;
+      q = "How does a moratorium pause affect the long-term loan cost?";
+      a = `A moratorium pauses payment; it usually does not waive interest. During the pause, interest continues to accrue on the outstanding balance. If unpaid interest is capitalized, the principal increases and the tenure can extend. Use the moratorium fields only for genuine cash-flow stress testing.`;
     } else if (type === "shock") {
-      q = "How do I shield my family against base rate hikes and floating rate shock?";
-      a = `Dear Reader, floating-rate home loans are vulnerable to RBI repo rate cycles. A 1.5% hike on your current ₹${(activeLoan.outstanding / 100000).toFixed(1)} Lakh balance can inflate your tenure by 4–5 years or force your monthly EMI to surge. To shield yourself, build a "Rate Shock Buffer" cash reserve equal to 3 months of EMIs (₹${formatINR(emi * 3)}). Additionally, checking "Extra EMI per year" or adding a minor 5% annual step-up prepayment will neutralize any rate hikes the bank throws at you.`;
+      q = "How do I prepare for base-rate hikes on a floating-rate loan?";
+      a = `A 1.5% rate increase on the current Rs ${(activeLoan.outstanding / 100000).toFixed(1)} lakh balance can increase tenure or EMI pressure. As a planning buffer, keep at least three EMIs (${formatINR(emi * 3)}) available and test the effect of an annual extra EMI or step-up payment.`;
     } else if (type === "reducing") {
       q = "What is the difference between Monthly Reducing and Daily Reducing interest?";
-      a = `Dear Reader, standard monthly reducing loans compute interest once a month on the opening balance. Daily reducing loans (like SBI MaxGain) calculate interest daily on the exact outstanding balance using calendar day counts (31, 30, or 28 days). If you prepay in the middle of a month (e.g. Day 10), a daily reducing method starts saving you interest from Day 11, whereas a monthly reducing method ignores it until the next month. Prepaying frequently makes daily reducing calculators significantly more rewarding!`;
+      a = `Monthly reducing loans calculate interest on the monthly opening balance. Daily reducing loans calculate interest on each day's outstanding balance. If a prepayment is made mid-month, a daily reducing method reflects the lower balance sooner.`;
     }
 
     setActiveQA({ question: q, answer: a });
@@ -70,17 +70,17 @@ export function LettersToEditor({ results }: Props) {
     let reply = "";
 
     if (lower.includes("sip") || lower.includes("invest") || lower.includes("mutual")) {
-      reply = `Dear Reader, regarding investing vs prepaying: your loan interest is ${rate.toFixed(2)}%. A mutual fund SIP yields ~12% but incurs LTCG tax and market risk. Prepaying saves a guaranteed ${rate.toFixed(2)}% risk-free. A balanced approach is to prepay a portion while maintaining a regular equity SIP.`;
+      reply = `Your loan rate is ${rate.toFixed(2)}%. Prepayment gives a certain avoided-interest benefit. SIP returns are uncertain and taxable, so compare full prepayment with a split plan.`;
     } else if (lower.includes("moratorium") || lower.includes("pause") || lower.includes("holiday")) {
-      reply = `Dear Reader, interest accrued during moratorium pauses continues to compound daily on your outstanding loan balance. It is a tool for emergency cash preservation, not cost savings.`;
+      reply = `Interest during a moratorium can continue to accrue and may be capitalized. Treat it as an emergency liquidity tool, not a cost-saving method.`;
     } else if (lower.includes("tax") || lower.includes("24") || lower.includes("80c") || lower.includes("regime")) {
-      reply = `Dear Reader, home loan interest qualifies for up to ₹2 Lakh deduction under Section 24b, and principal qualifies up to ₹1.5 Lakh under Section 80C. This tax shelter lowers your effective post-tax rate from ${rate.toFixed(2)}% to around ${(rate * 0.7).toFixed(2)}%, depending on your tax bracket (assuming 30% bracket).`;
+      reply = `Under the old regime, home loan interest can qualify under Section 24 and principal can qualify under Section 80C, subject to limits and eligibility. Use the tax panel to estimate the post-tax effect for your income inputs.`;
     } else if (lower.includes("sbi") || lower.includes("hdfc") || lower.includes("maxgain") || lower.includes("daily")) {
-      reply = `Dear Reader, daily reducing interest calculates your charge on daily closing balances. It is highly beneficial if you make multiple micro-prepayments throughout the month instead of a single monthly lump sum.`;
+      reply = `Daily reducing interest uses daily closing balances. Frequent payments can reflect sooner than in a monthly reducing method, depending on lender processing rules.`;
     } else if (lower.includes("prepay") || lower.includes("extra") || lower.includes("lump")) {
-      reply = `Dear Reader, prepaying early in your loan tenure is mathematically most optimal. Because interest is front-loaded, an extra payment made in Year 2 saves 3x more interest than the exact same payment made in Year 12.`;
+      reply = `Earlier prepayments usually save more interest because the outstanding balance is higher in the early years. Compare payment month options in the windfall tool.`;
     } else {
-      reply = `Dear Reader, home loans compound interest monthly on outstanding balances. Prepaying early, choosing tenure reduction over EMI reduction, and maintaining a rate-shock cache are the three pillars of debt freedom. Let amortization math work in your favor!`;
+      reply = `Home loan interest is driven by outstanding balance, rate, and time. Test payment timing, tenure reduction, and rate changes before making a decision.`;
     }
 
     setActiveQA({ question: query, answer: reply });
@@ -90,11 +90,11 @@ export function LettersToEditor({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px", borderLeft: "3px solid var(--ink)" }}>
       <div className="panel-title">
-         <span className="num">✍️ / Editorial</span>
-         Letters to the Editor
+         <span className="num">Guidance</span>
+         Loan planning Q&amp;A
       </div>
       <p style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginBottom: "12px", lineHeight: "1.4" }}>
-        Amortization can be counter-intuitive. Ask the Editor a loan management question below:
+        Ask a loan-management question or use a preset topic:
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
@@ -176,9 +176,6 @@ export function LettersToEditor({ results }: Props) {
             }}
           >
             {activeQA.answer}
-          </div>
-          <div style={{ textAlign: "right", fontSize: "0.72rem", color: "var(--ink-faint)", marginTop: "8px", fontWeight: "700", fontStyle: "italic" }}>
-            — The Editor
           </div>
         </div>
       )}

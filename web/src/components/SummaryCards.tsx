@@ -58,7 +58,7 @@ export function SummaryCards({ results }: Props) {
           </div>
         </div>
         <div className="stat">
-          <div className="k">Debt-free by</div>
+          <div className="k">Payoff by</div>
           <div className="v">{monthLabel(first.startYYYYMM, totalPayoffPlan)}</div>
           <div className="sub">last loan cleared</div>
         </div>
@@ -66,7 +66,7 @@ export function SummaryCards({ results }: Props) {
       <div className="recommend">
         <span className="dot" />
         <div>
-          Attack <b>{first.name}</b> first — {reason}.
+          Prioritize <b>{first.name}</b> first because it has the {reason}.
           {interestSaved > 0
             ? ` Your prepayments save ${formatCompactINR(interestSaved)} in interest.`
             : " Add a prepayment to see your savings."}

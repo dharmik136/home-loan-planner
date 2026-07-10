@@ -63,7 +63,7 @@ export function RentVsBuyCalculator() {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🏠 / Decision</span>
+        <span className="num">Decision</span>
         Rent vs Buy Calculator
       </div>
 
@@ -116,7 +116,7 @@ export function RentVsBuyCalculator() {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 Net Buy Cost = all EMIs + maintenance − property appreciation gain. Does not account for tax benefits (Sec 24b/80C), opportunity cost of down payment, or rental yield.
+        Net buy cost equals all EMIs plus maintenance minus estimated property appreciation. This does not include tax benefits, opportunity cost of down payment, or rental yield.
       </div>
     </div>
   );

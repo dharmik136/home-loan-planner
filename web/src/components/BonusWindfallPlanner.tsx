@@ -66,12 +66,12 @@ export function BonusWindfallPlanner({ results }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
         <div>
           <div className="slider-meta" style={{ marginBottom: "4px" }}><span>Windfall Amount</span><span><b>{formatINR(amount)}</b></span></div>
-          <input type="range" min={10_000} max={2_000_000} step={10_000} value={amount}
+          <input type="range" aria-label="Annual bonus amount" min={10_000} max={2_000_000} step={10_000} value={amount}
             onChange={(e) => setAmount(Number(e.target.value))} style={{ width: "100%" }} />
         </div>
         <div>
           <div className="slider-meta" style={{ marginBottom: "4px" }}><span>Apply at Month</span><span><b>{applyAtMonth}</b></span></div>
-          <input type="range" min={1} max={maxMonth} step={1} value={applyAtMonth}
+          <input type="range" aria-label="Bonus application month" min={1} max={maxMonth} step={1} value={applyAtMonth}
             onChange={(e) => setApplyAtMonth(Number(e.target.value))} style={{ width: "100%" }} />
         </div>
       </div>
@@ -102,7 +102,7 @@ export function BonusWindfallPlanner({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 To lock this simulation into your plan, add a prepayment of {formatINR(amount)} at Month {applyAtMonth} in the loan's prepayment schedule above.
+        To use this result in the main plan, add a prepayment of {formatINR(amount)} at Month {applyAtMonth} in the loan's prepayment schedule above.
       </div>
     </div>
   );

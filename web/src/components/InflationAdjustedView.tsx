@@ -69,7 +69,7 @@ export function InflationAdjustedView({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 As inflation rises, each future EMI rupee is worth less in today's money. A ₹30,000 EMI in Year 10 has the purchasing power of ~{formatINR(Math.round(30_000 / Math.pow(1 + inflationPct / 100, 10)))} today at {inflationPct}% inflation.
+        As inflation rises, each future EMI rupee is worth less in today's money. A Rs 30,000 EMI in Year 10 has the purchasing power of about {formatINR(Math.round(30_000 / Math.pow(1 + inflationPct / 100, 10)))} today at {inflationPct}% inflation.
       </div>
     </div>
   );

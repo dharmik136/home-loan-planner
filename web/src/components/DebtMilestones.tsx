@@ -12,7 +12,7 @@ export function DebtMilestones({ results }: Props) {
     <div className="panel s6">
       <div className="panel-title">
         <span className="num">Milestones</span>
-        Debt-Free Milestones & Progress
+        Loan payoff milestones
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {results.map((res) => {

@@ -16,7 +16,7 @@ test.describe("Mobile & Interactive UX Integrity", () => {
     await page.goto(fileUrl);
     
     // Verify landing CTA is visible on mobile
-    const startCta = page.locator('#hero-cta-free');
+    const startCta = page.getByRole('button', { name: /Open planner/i });
     await expect(startCta).toBeVisible();
     await startCta.click();
     
@@ -39,7 +39,7 @@ test.describe("Mobile & Interactive UX Integrity", () => {
   // 2. Input Keyboard & Focus Dismiss Behavior
   test("Verify numeric inputs have numeric inputmodes and keyboard focus dismisses on outside clicks", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('#hero-cta-free');
+    await page.getByRole('button', { name: /Open planner/i }).click();
 
     // 1. Check inputmode attribute for numeric input fields
     const principalInput = page.locator('input[inputmode="numeric"]').first();
@@ -60,15 +60,15 @@ test.describe("Mobile & Interactive UX Integrity", () => {
   // 3. CTA Visibility & Modal Close Behavior
   test("Verify PDF CTA visibility and modal close/dismiss flows", async ({ page }) => {
     await page.goto(fileUrl);
-    await page.click('#hero-cta-free');
+    await page.getByRole('button', { name: /Open planner/i }).click();
 
     // Verify key save plan CTA button is visible
-    const saveCta = page.locator('button:has-text("Save Plan & Get PDF (Free)")');
+    const saveCta = page.getByRole('button', { name: /Save Plan & Get PDF/i });
     await expect(saveCta).toBeVisible();
     await saveCta.click();
 
     // Verify lead capture modal opens
-    const modalHeader = page.locator('text=Save Plan & Download PDF');
+    const modalHeader = page.locator('#save-plan-title');
     await expect(modalHeader).toBeVisible();
 
     // Verify closing modal using close button

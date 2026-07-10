@@ -45,7 +45,7 @@ export function InvestmentVsPrepay({ results }: Props) {
   return (
     <div className="panel s7" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📈 / Opportunity Cost</span>
+        <span className="num">Opportunity cost</span>
         Prepay Loan vs. Invest in Mutual Funds
       </div>
 
@@ -56,6 +56,7 @@ export function InvestmentVsPrepay({ results }: Props) {
         </div>
         <input
           type="range"
+          aria-label="Assumed investment return CAGR"
           min={6}
           max={18}
           step={0.5}
@@ -101,11 +102,11 @@ export function InvestmentVsPrepay({ results }: Props) {
       }}>
         {prepayWins ? (
           <div>
-            🎉 <b>Prepaying wins!</b> Prepaying saves you <b>{formatINR(Math.round(-difference))}</b> more than investing in a {cagr}% CAGR fund.
+            <b>Prepayment is ahead in this model.</b> It saves <b>{formatINR(Math.round(-difference))}</b> more than investing at {cagr}% CAGR.
           </div>
         ) : (
           <div>
-            📈 <b>Investing wins!</b> Putting extra cash in a {cagr}% CAGR fund earns you <b>{formatINR(Math.round(difference))}</b> more than prepaying.
+            <b>Investing is ahead in this model.</b> Investing at {cagr}% CAGR earns <b>{formatINR(Math.round(difference))}</b> more than prepaying.
           </div>
         )}
       </div>

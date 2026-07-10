@@ -33,7 +33,7 @@ export function StampDutyCalculator() {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📋 / Hidden Costs</span>
+        <span className="num">Property costs</span>
         Stamp Duty &amp; Registration Cost Calculator
       </div>
 
@@ -93,7 +93,7 @@ export function StampDutyCalculator() {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 Stamp duty rates change periodically. Women buyers get 1–2% concession in many states. Verify with your local sub-registrar office before closing.
+        Stamp duty rates change periodically. Some states offer concessions for women buyers. Verify current rates with the local sub-registrar office before closing.
       </div>
     </div>
   );

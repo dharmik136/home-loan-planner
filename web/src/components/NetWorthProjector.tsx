@@ -61,7 +61,7 @@ export function NetWorthProjector({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📈 / Net Worth</span>
+        <span className="num">Net worth</span>
         Financial Independence Projector
       </div>
 
@@ -125,7 +125,7 @@ export function NetWorthProjector({ results }: Props) {
                 <td style={{ padding: "5px 6px", fontWeight: "600" }}>Yr {p.year}</td>
                 <td style={{ padding: "5px 6px", textAlign: "right" }}>{formatINR(p.portfolioValue)}</td>
                 <td style={{ padding: "5px 6px", textAlign: "right", color: p.loanBalance > 0 ? "var(--clay)" : "var(--emerald)" }}>
-                  {p.loanBalance > 0 ? formatINR(p.loanBalance) : "✅ Paid"}
+                  {p.loanBalance > 0 ? formatINR(p.loanBalance) : "Paid"}
                 </td>
                 <td style={{ padding: "5px 6px", textAlign: "right", fontWeight: "700", color: p.netWorth > 0 ? "var(--emerald)" : "var(--clay)" }}>
                   {formatINR(p.netWorth)}

@@ -81,7 +81,7 @@ test.describe("Playwright MVP Integrity Flows", () => {
       expect(dialog.message()).toContain('valid email');
       await dialog.dismiss();
     });
-    await page.click('button:has-text("Generate My Free PDF")');
+    await page.click('button:has-text("Save My Planner Snapshot")');
   });
 
   // Flow 5: User tries bad inputs and sees clear validation errors

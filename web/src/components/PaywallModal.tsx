@@ -1,16 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../engine/analytics";
+import type { SavePlanResult } from "../services/persistence";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCapture: (email: string, newsletter: boolean) => void;
+  onCapture: (email: string, newsletter: boolean) => Promise<SavePlanResult>;
 }
 
 export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
   const [email, setEmail] = useState("");
   const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [saveResult, setSaveResult] = useState<SavePlanResult | null>(null);
+  const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -18,13 +22,12 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
     if (!dialog) return;
 
     if (isOpen) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-    } else {
-      if (dialog.open) {
-        dialog.close();
-      }
+      setError("");
+      setSubmitted(false);
+      setSaveResult(null);
+      if (!dialog.open) dialog.showModal();
+    } else if (dialog.open) {
+      dialog.close();
     }
   }, [isOpen]);
 
@@ -32,41 +35,49 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    const handleCancel = (e: Event) => {
-      e.preventDefault();
+    const handleCancel = (event: Event) => {
+      event.preventDefault();
       onClose();
     };
 
     dialog.addEventListener("cancel", handleCancel);
-    return () => {
-      dialog.removeEventListener("cancel", handleCancel);
-    };
+    return () => dialog.removeEventListener("cancel", handleCancel);
   }, [onClose]);
 
-  // Click outside to dismiss
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
     const rect = dialogRef.current?.getBoundingClientRect();
     if (!rect) return;
     if (
-      e.clientX < rect.left ||
-      e.clientX > rect.right ||
-      e.clientY < rect.top ||
-      e.clientY > rect.bottom
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
     ) {
       onClose();
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
+      setError("Please enter a valid email address.");
       return;
     }
-    trackEvent("email_lead_captured", { email, newsletter: newsletterOptIn });
-    onCapture(email, newsletterOptIn);
-    setSubmitted(true);
+
+    setIsSaving(true);
+    setError("");
+    try {
+      trackEvent("email_lead_capture_started", { newsletter: newsletterOptIn });
+      const result = await onCapture(email, newsletterOptIn);
+      setSaveResult(result);
+      setSubmitted(true);
+      trackEvent("email_lead_captured", { savedTo: result.savedTo, newsletter: newsletterOptIn });
+    } catch {
+      setError("We could not save your planner snapshot. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -74,6 +85,7 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
       ref={dialogRef}
       onClick={handleBackdropClick}
       className="native-modal-dialog"
+      aria-labelledby="save-plan-title"
       style={{
         background: "var(--paper)",
         border: "1px solid var(--line-strong)",
@@ -83,16 +95,17 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
         padding: "24px",
         boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
         position: "relative",
-        outline: "none"
+        outline: "none",
       }}
     >
       <button
         className="modal-close"
+        aria-label="Close save plan dialog"
         onClick={onClose}
         style={{
           position: "absolute",
-          top: "16px",
-          right: "16px",
+          top: "12px",
+          right: "12px",
           background: "none",
           border: "none",
           color: "var(--ink-faint)",
@@ -100,40 +113,32 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
           cursor: "pointer",
         }}
       >
-        ✕
+        x
       </button>
 
       {!submitted ? (
         <form onSubmit={handleSubmit}>
-          <h3 style={{ fontFamily: "var(--display)", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "8px", color: "var(--ink)" }}>
-            📄 Save Plan & Download PDF (100% Free)
+          <h3 id="save-plan-title" style={{ fontFamily: "var(--display)", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "8px", color: "var(--ink)" }}>
+            Save Plan & Download PDF (100% Free)
           </h3>
           <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "20px", lineHeight: "1.4" }}>
-            Enter your email to save your debt-free timeline and generate a printable PDF payoff report.
+            Enter your email to save the current loan setup, prepayment entries, and calculated savings.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
-            <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
-              <span>📋</span>
-              <span><b>Printable Payoff Schedule</b>: Get a step-by-step month-by-month guide.</span>
-            </div>
-            <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
-              <span>💾</span>
-              <span><b>Cloud Portfolio Save</b>: Re-access your configured loans anytime without re-typing.</span>
-            </div>
-            <div style={{ display: "flex", gap: "10px", fontSize: "0.84rem", alignItems: "flex-start" }}>
-              <span>🎓</span>
-              <span><b>Prepayment Hacks</b>: Receive occasional, verified interest-saving tips and calculator updates.</span>
-            </div>
+          <div className="save-flow-list">
+            <div><b>Planner snapshot:</b> Stores the current loan cards and prepayment entries.</div>
+            <div><b>Optional sync:</b> Saves remotely when Supabase URL and anon key are configured.</div>
+            <div><b>Plan context:</b> Captures calculated savings with the saved record.</div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-            <label style={{ fontSize: "0.74rem", color: "var(--ink-soft)", fontWeight: "600" }}>Your Email Address</label>
+            <label htmlFor="lead-email" style={{ fontSize: "0.74rem", color: "var(--ink-soft)", fontWeight: "600" }}>Your Email Address</label>
             <input
+              id="lead-email"
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               style={{
                 width: "100%",
@@ -149,42 +154,49 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
             />
           </div>
 
+          {error && (
+            <div role="alert" style={{ fontSize: "0.78rem", color: "var(--clay)", background: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 10px", marginBottom: "16px" }}>
+              {error}
+            </div>
+          )}
+
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
             <input
               type="checkbox"
               id="newsletter"
               checked={newsletterOptIn}
-              onChange={(e) => setNewsletterOptIn(e.target.checked)}
+              onChange={(event) => setNewsletterOptIn(event.target.checked)}
               style={{ cursor: "pointer" }}
             />
             <label htmlFor="newsletter" style={{ fontSize: "0.76rem", color: "var(--ink-soft)", cursor: "pointer", userSelect: "none" }}>
-              Sign me up for the Free Debt-Free newsletter (monthly tips).
+              Send me occasional loan planning updates.
             </label>
           </div>
 
           <button
             type="submit"
             className="add-btn"
+            disabled={isSaving}
             style={{ width: "100%", padding: "10px", fontSize: "0.88rem", height: "auto" }}
           >
-            Generate My Free PDF Blueprint
+            {isSaving ? "Saving your plan..." : "Save My Planner Snapshot"}
           </button>
 
           <span style={{ display: "block", fontSize: "0.68rem", color: "var(--ink-faint)", textAlign: "center", marginTop: "12px" }}>
-            We respect your privacy. No spam. No selling your email.
+            No bank login required. No account sync. You control the planner data.
           </span>
         </form>
       ) : (
         <div style={{ textAlign: "center", padding: "10px 0" }}>
-          <span style={{ fontSize: "2.4rem" }}>✉️</span>
+          <span aria-hidden="true" style={{ fontSize: "2rem" }}>Saved</span>
           <h3 style={{ fontFamily: "var(--display)", fontSize: "1.2rem", fontWeight: "bold", marginTop: "12px", marginBottom: "8px", color: "var(--ink)" }}>
-            Check Your Inbox!
+            Plan Saved
           </h3>
           <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "20px", lineHeight: "1.4" }}>
-            We have saved your plan portfolio and sent your customized PDF payoff schedule to <b>{email}</b>.
+            Your planner snapshot for <b>{email}</b> is saved.
           </p>
           <p style={{ fontSize: "0.76rem", color: "var(--ink-faint)", marginBottom: "20px", lineHeight: "1.4" }}>
-            (Note: In this client-only offline MVP demo, check console logs to verify that the lead data was logged successfully).
+            {saveResult?.message || "Saved locally in this browser."}
           </p>
           <button
             onClick={onClose}

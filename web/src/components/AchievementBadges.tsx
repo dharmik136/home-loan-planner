@@ -35,63 +35,63 @@ export function AchievementBadges({ results }: Props) {
     return [
       {
         id: "first_prepay",
-        icon: "🚀",
+        icon: "01",
         label: "First Prepayment",
         detail: "Made your first extra payment",
         achieved: hasPrepay,
       },
       {
         id: "saver_5l",
-        icon: "💰",
-        label: "5-Lakh Saver",
-        detail: "Saved ₹5L+ in interest",
+        icon: "02",
+        label: "Rs 5L saved",
+        detail: "Saved Rs 5L+ in interest",
         achieved: bigSaver,
         value: bigSaver ? formatINR(Math.round(totalInterestSaved)) : undefined,
       },
       {
         id: "lakhpati",
-        icon: "🤑",
-        label: "Interest Crorepati",
-        detail: "Saved ₹10L+ in interest",
+        icon: "03",
+        label: "Rs 10L saved",
+        detail: "Saved Rs 10L+ in interest",
         achieved: lakshpati,
         value: lakshpati ? formatINR(Math.round(totalInterestSaved)) : undefined,
       },
       {
         id: "multi_loan",
-        icon: "🏗️",
-        label: "Portfolio Builder",
+        icon: "04",
+        label: "Multiple loans",
         detail: "Tracking 2+ loans at once",
         achieved: multiLoan,
         value: multiLoan ? `${totalLoans} loans` : undefined,
       },
       {
         id: "big_ticket",
-        icon: "🏛️",
-        label: "High-Value Borrower",
-        detail: "Portfolio above ₹1 Crore",
+        icon: "05",
+        label: "Large portfolio",
+        detail: "Portfolio above Rs 1 crore",
         achieved: heavyBorrower,
         value: heavyBorrower ? formatINR(totalPrincipal) : undefined,
       },
       {
         id: "year_saved",
-        icon: "📅",
-        label: "Year Reclaimed",
+        icon: "06",
+        label: "One year saved",
         detail: "Cut loan by 1+ year",
         achieved: yearsSaved,
         value: yearsSaved ? `${(totalMonthsSaved / 12).toFixed(1)} yrs` : undefined,
       },
       {
         id: "five_years_saved",
-        icon: "⚡",
-        label: "Speed Runner",
+        icon: "07",
+        label: "Five years saved",
         detail: "Cut loan by 5+ years",
         achieved: fiveYearsSaved,
         value: fiveYearsSaved ? `${Math.round(totalMonthsSaved / 12)} yrs` : undefined,
       },
       {
         id: "all_loans_positive",
-        icon: "✅",
-        label: "Smart Planner",
+        icon: "08",
+        label: "All loans improving",
         detail: "All loans generate savings",
         achieved: allAvoidedInterest && totalLoans >= 1,
       },
@@ -104,8 +104,8 @@ export function AchievementBadges({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🏅 / Achievements</span>
-        Your Borrower Badges ({earned.length}/{badges.length} unlocked)
+        <span className="num">Checkpoints</span>
+        Plan checkpoints ({earned.length}/{badges.length} active)
       </div>
 
       {earned.length > 0 && (

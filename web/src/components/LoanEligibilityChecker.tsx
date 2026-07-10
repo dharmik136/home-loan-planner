@@ -122,15 +122,15 @@ export function LoanEligibilityChecker() {
           </div>
         )}
         <div style={{ marginTop: "8px", display: "flex", gap: "10px", fontSize: "0.72rem" }}>
-          <span style={{ color: dtiOk ? "var(--emerald)" : "var(--clay)" }}>{dtiOk ? "✅ FOIR OK" : "❌ FOIR Exceeded"}</span>
+          <span style={{ color: dtiOk ? "var(--emerald)" : "var(--clay)" }}>{dtiOk ? "FOIR OK" : "FOIR exceeded"}</span>
           {(loanType === "home" || loanType === "car" || loanType === "lap") && (
-            <span style={{ color: ltvOk ? "var(--emerald)" : "#d97706" }}>{ltvOk ? `✅ LTV OK (${(config.ltv * 100).toFixed(0)}%)` : `⚠️ LTV Cap Applied`}</span>
+            <span style={{ color: ltvOk ? "var(--emerald)" : "#d97706" }}>{ltvOk ? `LTV OK (${(config.ltv * 100).toFixed(0)}%)` : `LTV cap applied`}</span>
           )}
         </div>
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 Based on 50% FOIR guideline used by most Indian banks. Actual sanction depends on CIBIL score, employer category, and lender policy.
+        Based on a 50% FOIR guideline used by many banks. Actual sanction depends on credit score, employer category, and lender policy.
       </div>
     </div>
   );

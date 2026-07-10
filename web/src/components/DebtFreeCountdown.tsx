@@ -97,12 +97,12 @@ export function DebtFreeCountdown({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px", background: "var(--panel)", border: "1px solid var(--line-strong)", borderRadius: "4px", padding: "14px", textAlign: "center" }}>
       <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: "600", marginBottom: "8px" }}>
-        ⌛ Countdown to Absolute Debt Freedom
+        Estimated payoff countdown
       </div>
 
       {timeLeft.isOver ? (
         <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--emerald)" }}>
-          🎉 You are 100% Debt-Free! Congratulations!
+          Loan payoff date reached
         </div>
       ) : (
         <div style={{ display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap" }}>

@@ -47,26 +47,26 @@ export function SIPCorpusSimulator({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📊 / SIP</span>
+        <span className="num">SIP</span>
         SIP Corpus Simulator — What your savings become
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
         <div>
           <div className="slider-meta" style={{ marginBottom: "4px" }}><span>Monthly SIP</span><span><b>{formatINR(monthlySIP)}</b></span></div>
-          <input type="range" min={500} max={100_000} step={500} value={monthlySIP}
+          <input type="range" aria-label="Monthly SIP amount" min={500} max={100_000} step={500} value={monthlySIP}
             onChange={(e) => setMonthlySIP(Number(e.target.value))} style={{ width: "100%" }} />
         </div>
         <div>
           <div className="slider-meta" style={{ marginBottom: "4px" }}><span>Expected CAGR</span><span><b>{cagr}%</b></span></div>
-          <input type="range" min={6} max={20} step={0.5} value={cagr}
+          <input type="range" aria-label="Expected SIP CAGR" min={6} max={20} step={0.5} value={cagr}
             onChange={(e) => setCagr(Number(e.target.value))} style={{ width: "100%" }} />
         </div>
       </div>
 
       <div style={{ marginBottom: "14px" }}>
         <div className="slider-meta" style={{ marginBottom: "4px" }}><span>Investment Horizon</span><span><b>{years} years</b></span></div>
-        <input type="range" min={1} max={40} step={1} value={years}
+        <input type="range" aria-label="SIP investment horizon" min={1} max={40} step={1} value={years}
           onChange={(e) => setYears(Number(e.target.value))} style={{ width: "100%" }} />
       </div>
 
