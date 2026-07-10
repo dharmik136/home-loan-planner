@@ -35,8 +35,9 @@ import { InterestShockVisualizer } from "./components/InterestShockVisualizer";
 import { SavingsValueWidget } from "./components/SavingsValueWidget";
 import { DebtFreeCelebration } from "./components/DebtFreeCelebration";
 import { DebtFreeCountdown } from "./components/DebtFreeCountdown";
-import { PartPaymentPlanner } from "./components/PartPaymentPlanner";
 import { OnboardingTour } from "./components/OnboardingTour";
+import { LettersToEditor } from "./components/LettersToEditor";
+import { PartPaymentPlanner } from "./components/PartPaymentPlanner";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
@@ -648,6 +649,8 @@ export function App() {
           <BankEMIComparator />
 
           {loans.length >= 1 && <AchievementBadges results={results} />}
+
+          {loans.length >= 1 && <LettersToEditor results={results} />}
 
           {loans.length >= 1 && <InflationAdjustedView results={results} />}
 

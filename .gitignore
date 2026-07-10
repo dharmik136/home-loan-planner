@@ -50,8 +50,11 @@ web/.vite/
 web/dist-ssr/
 next-app/.next/
 next-app/next-env.d.ts
+*.tsbuildinfo
 
 # Test outputs
+test-results/
+playwright-report/
 web/test-results/
 web/playwright-report/
 htmlreport/
