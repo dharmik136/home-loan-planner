@@ -42,8 +42,7 @@ You can access the live, fully interactive prepayment calculator dashboard here:
 ### 1. Excel Core & Python Workbook Generator
 Requires Python 3.10+ and standard dependencies:
 ```bash
-pip install openpyxl formulas pytest
-python -m pytest tests/ -q          # Run unit tests on the Python amortization engine
+pip install -r requirements.txt
 python src/build_workbook.py        # Rebuild the .xlsx spreadsheet
 python src/verify_workbook.py       # Recalculate workbook formulas and cross-verify with engine
 ```
@@ -65,6 +64,19 @@ npx playwright test
 
 # Build production app (inlines CSS/JS into web/dist/index.html and copies to root index.html)
 npm run build    
+```
+
+### 3. Root Script Shortcuts
+For convenience, you can manage both development and test suites from the root directory using:
+```bash
+npm run web:install    # Install web dashboard dependencies
+npm run web:dev        # Start local development server
+npm run web:build      # Compile production single-file bundle
+npm run web:test       # Run Vitest test suite
+npm run web:e2e        # Run Playwright E2E browser tests
+npm run next:install   # Install Next.js template dependencies
+npm run next:dev       # Start Next.js development server
+npm run next:build     # Build Next.js static pages
 ```
 
 ---
