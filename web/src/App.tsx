@@ -732,6 +732,7 @@ export function App() {
 
           {loans.length >= 1 && rightTab === "guidance" && (
             <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <PlanningTipsPanel results={results} />
               <AchievementBadges results={results} />
               <LettersToEditor results={results} />
             </div>
