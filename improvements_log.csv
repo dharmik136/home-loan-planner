@@ -65,6 +65,8 @@ Interactive UI,Feature,Windfall Allocator Apply Split,Completed,Integrated an 'A
 Configuration,Deployment,Root package.json monorepo scripts,Completed,Added root-level package.json to orchestrate dev, test, and build commands for both the web dashboard and Next.js app router stubs.,package.json
 Configuration,Deployment,Python Workbook Dependencies (requirements.txt),Completed,Created requirements.txt in workspace root listing required open-source packages for running Python build and verification tools.,requirements.txt
 Broadsheet UI,Feature,Letters to the Editor Q&A Advice Column,Completed,Created the LettersToEditor component providing themed editorial responses to common questions (SIP vs Prepay; Moratorium; Rate Shock) dynamically matched against active loan figures.,web/src/components/LettersToEditor.tsx
+Broadsheet UI,Design,Tabbed Right Column Widget Organisation,Completed,Grouped the 20+ stacked right-sidebar widgets into 5 styled tab categories (Simulators; Risk; Tax; Tools; Editorial) to balance layout length and prevent excessive scrolling.,web/src/App.tsx
+
 
 
 
