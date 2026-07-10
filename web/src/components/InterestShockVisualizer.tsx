@@ -35,7 +35,7 @@ export function InterestShockVisualizer({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px", borderLeft: "3px solid var(--clay)" }}>
       <div className="panel-title">
-        <span className="num">⚠️ / Trap Alert</span>
+        <span className="num">Rate shock</span>
         The Front-Loaded Interest Trap
       </div>
       <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "14px", lineHeight: "1.4" }}>

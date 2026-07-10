@@ -26,7 +26,7 @@ import { StampDutyCalculator } from "./components/StampDutyCalculator";
 import { BalanceTransferAdvisor } from "./components/BalanceTransferAdvisor";
 import { RentVsBuyCalculator } from "./components/RentVsBuyCalculator";
 import { MonthlyBudgetPlanner } from "./components/MonthlyBudgetPlanner";
-import { SmartTipsPanel } from "./components/SmartTipsPanel";
+import { PlanningTipsPanel } from "./components/PlanningTipsPanel";
 import { NetWorthProjector } from "./components/NetWorthProjector";
 import { BonusWindfallPlanner } from "./components/BonusWindfallPlanner";
 import { SIPCorpusSimulator } from "./components/SIPCorpusSimulator";
@@ -42,13 +42,7 @@ import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./eng
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
 import { trackEvent } from "./engine/analytics";
-
-export interface Lead {
-  email: string;
-  newsletter: boolean;
-  calculatedSavings: number;
-  capturedAt: string;
-}
+import { clearLocalLeads, loadLocalLeads, savePlanLead, type LeadRecord } from "./services/persistence";
 
 const STORAGE_KEY = "prepayment-ledger-v1";
 
@@ -89,6 +83,40 @@ function load(): State {
 let idSeq = 1;
 const newId = () => `pp-${Date.now()}-${idSeq++}`;
 
+type RightTab = "simulators" | "risk" | "tax" | "tools" | "guidance";
+
+const WORKFLOW_STEPS = [
+  { id: "loan-setup", label: "Setup", detail: "Loan inputs" },
+  { id: "results", label: "Results", detail: "Savings impact" },
+  { id: "prepayments", label: "Prepay", detail: "Extra payments" },
+  { id: "schedule", label: "Schedule", detail: "Charts and table" },
+  { id: "tools", label: "Tools", detail: "Advanced checks" },
+  { id: "save-plan", label: "Save", detail: "Export or sync" },
+] as const;
+
+const TOOL_TABS: Record<RightTab, { title: string; detail: string }> = {
+  simulators: {
+    title: "Payment simulators",
+    detail: "Windfall, bonus, part-payment, SIP comparison, and corpus checks.",
+  },
+  risk: {
+    title: "Risk checks",
+    detail: "Debt load, rate shock, transfer break-even, and lender rules.",
+  },
+  tax: {
+    title: "Tax and budget",
+    detail: "Section 24/80C, prepayment goals, monthly budget, and foreclosure estimate.",
+  },
+  tools: {
+    title: "Reference tools",
+    detail: "Eligibility, EMI comparison, stamp duty, rent vs buy, inflation, and net worth.",
+  },
+  guidance: {
+    title: "Guidance",
+    detail: "Progress badges and practical borrower questions.",
+  },
+};
+
 export function App() {
   const [state, setState] = useState<State>(load);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
@@ -99,28 +127,18 @@ export function App() {
     return "landing";
   });
 
-  const [leads, setLeads] = useState<Lead[]>(() => {
-    try {
-      const raw = localStorage.getItem("prepayment-ledger-leads");
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [leads, setLeads] = useState<LeadRecord[]>(loadLocalLeads);
 
-  useEffect(() => {
-    localStorage.setItem("prepayment-ledger-leads", JSON.stringify(leads));
-  }, [leads]);
-
-  const handleCaptureLead = (email: string, newsletter: boolean) => {
+  const handleCaptureLead = async (email: string, newsletter: boolean) => {
     const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
-    const newLead: Lead = {
+    const result = await savePlanLead({
       email,
       newsletter,
       calculatedSavings: totalSavings,
-      capturedAt: new Date().toLocaleString()
-    };
-    setLeads(prev => [newLead, ...prev]);
+      state,
+    });
+    setLeads(loadLocalLeads());
+    return result;
   };
 
   const [darkMode, setDarkMode] = useState(() => {
@@ -161,7 +179,7 @@ export function App() {
   const [yearlyView, setYearlyView] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isTourActive, setIsTourActive] = useState(false);
-  const [rightTab, setRightTab] = useState<"simulators" | "risk" | "tax" | "tools" | "editorial">("simulators");
+  const [rightTab, setRightTab] = useState<RightTab>("simulators");
 
   const applyScenario = (scenario: string) => {
     if (scenario === "prepayment_optimizer") {
@@ -276,7 +294,7 @@ export function App() {
       return { ...s, entries: newEntries };
     });
     trackEvent("windfall_split_applied", { count: allocations.length });
-    alert("Optimized windfall prepayments successfully applied to your plan!");
+    alert("Recommended windfall prepayments were applied to your plan.");
   };
 
   useEffect(() => {
@@ -289,6 +307,10 @@ export function App() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToWorkflowStep = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const sortLoans = (criteria: "rate" | "balance" | "name") => {
@@ -394,14 +416,9 @@ export function App() {
   }, [loans, entries]);
 
   const changeView = (newView: "landing" | "app") => {
-    const doc = document as any;
-    if (doc.startViewTransition) {
-      doc.startViewTransition(() => {
-        setView(newView);
-      });
-    } else {
-      setView(newView);
-    }
+    const resetScroll = () => window.setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }), 0);
+    setView(newView);
+    resetScroll();
   };
 
   if (view === "landing") {
@@ -420,8 +437,8 @@ export function App() {
     <div className="wrap">
       <header className="masthead">
         <div>
-          <div className="kicker">A planning ledger · est. 2026</div>
-          <h1>The Prepayment <em>Ledger</em></h1>
+          <div className="kicker">Loan Plan Workspace</div>
+          <h1>The Prepayment Ledger</h1>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
           <button
@@ -441,7 +458,7 @@ export function App() {
               transition: "all 0.2s"
             }}
           >
-            ← Marketing Page
+            Overview
           </button>
           <button
             onClick={toggleDarkMode}
@@ -462,7 +479,7 @@ export function App() {
             }}
             title="Toggle Light/Dark Theme"
           >
-            {darkMode ? "☀️" : "🌙"}
+            {darkMode ? "Light" : "Dark"}
           </button>
           <button
             onClick={() => setIsTourActive(true)}
@@ -483,24 +500,39 @@ export function App() {
             }}
             title="Start Onboarding Tour"
           >
-            ❓
+            Help
           </button>
           <div className="edition">
             Interactive home loan planner<br />
-            Pay early · cut years · keep interest<br />
-            <b>No prepayment penalty (RBI 2026)</b>
+            Local calculations and export-ready plans<br />
+            <b>No bank login required</b>
           </div>
         </div>
       </header>
       <div className="rule-row">
         <span>{loans.length} loan{loans.length !== 1 ? 's' : ''} configured</span>
         <span>Tenure-reduction model</span>
-        <span><b>Drag a slider →</b> watch the years fall</span>
+        <span><b>Adjust inputs</b> and compare payoff dates</span>
         <span>Everything stays in your browser</span>
       </div>
 
+      <nav className="workflow-nav" aria-label="Planner workflow">
+        {WORKFLOW_STEPS.map((step, index) => (
+          <button key={step.id} type="button" onClick={() => scrollToWorkflowStep(step.id)}>
+            <span className="workflow-index">{String(index + 1).padStart(2, "0")}</span>
+            <span>
+              <b>{step.label}</b>
+              <small>{step.detail}</small>
+            </span>
+          </button>
+        ))}
+        <button type="button" className="workflow-tour" onClick={() => setIsTourActive(true)}>
+          Guided setup
+        </button>
+      </nav>
+
       <div className="grid">
-        <aside className="col-left">
+        <aside className="col-left" id="loan-setup">
           {loans.length > 1 && (
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", fontSize: "0.74rem", color: "var(--ink-soft)" }}>
               <span>Sort priority:</span>
@@ -532,7 +564,9 @@ export function App() {
         </aside>
 
         <main className="col-mid">
-          <SummaryCards results={results} />
+          <section id="results" className="workflow-section">
+            <SummaryCards results={results} />
+          </section>
 
           {loans.length >= 1 && <DebtFreeCelebration results={results} />}
 
@@ -541,7 +575,7 @@ export function App() {
           {loans.length >= 1 && <SavingsValueWidget results={results} />}
 
           {loans.length > 0 && (
-            <div className="panel s3">
+            <div className="panel s3" id="prepayments">
               <div className="panel-title"><span className="num">02 / Your moves</span> Plan extra payments</div>
               {loans.map((loan) => (
                 <PrepaymentControls
@@ -559,7 +593,7 @@ export function App() {
           {loans.length >= 1 && <PortfolioBalanceChart results={results} />}
 
           {loans.length > 0 && (
-            <div className="panel s4">
+            <div className="panel s4" id="schedule">
               <div className="panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                 <span>
                   <span className="num">04 / Detailed Analysis</span> Schedules & Charts
@@ -606,19 +640,19 @@ export function App() {
 
           <DebtMilestones results={results} />
 
-          {loans.length >= 1 && <SmartTipsPanel results={results} />}
+          {loans.length >= 1 && <PlanningTipsPanel results={results} />}
 
           {loans.length >= 1 && <PrepaymentScenarios results={results} />}
 
-          <div className="actions" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          <div className="actions" id="save-plan" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
             <button className="btn" onClick={() => {
               const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
               trackEvent("save_plan_cta_clicked", { savings: totalSavings });
               setIsPaywallOpen(true);
-            }}>📄 Save Plan & Get PDF (Free)</button>
-            <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>↓ Download CSV</button>
-            <button className="btn ghost" onClick={exportWorkspaceJSON}>💾 Export JSON</button>
-            <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>📤 Import JSON</button>
+            }}>Save Plan & Get PDF (Free)</button>
+            <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>Download CSV</button>
+            <button className="btn ghost" onClick={exportWorkspaceJSON}>Export JSON</button>
+            <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>Import JSON</button>
             <input type="file" id="import-json-file" accept=".json" onChange={importWorkspaceJSON} style={{ display: "none" }} />
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
@@ -630,182 +664,86 @@ export function App() {
           )}
         </main>
 
-        <aside className="col-right">
+        <aside className="col-right" id="tools">
           {loans.length >= 1 && (
-            <div className="panel" style={{ marginBottom: "16px", border: "2px solid var(--ink)", padding: "14px" }}>
-              <div className="double-border-bottom" style={{ borderBottom: "3px double var(--line-strong)", paddingBottom: "6px", marginBottom: "10px", textAlign: "center" }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-soft)" }}>Today's Issue Index</span>
-                <h4 style={{ margin: "2px 0 0", fontFamily: "var(--display)", fontSize: "1.15rem", fontWeight: "900", color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
-                  📰 The Ledger Directory
-                </h4>
+            <div className="panel tool-switcher" style={{ marginBottom: "16px" }}>
+              <div className="tool-switcher-head">
+                <span className="num">Tool groups</span>
+                <h4>Planning workspace</h4>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div
-                  onClick={() => setRightTab("simulators")}
-                  style={{
-                    padding: "8px 10px",
-                    border: rightTab === "simulators" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
-                    background: rightTab === "simulators" ? "var(--emerald-wash)" : "var(--paper)",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                    transition: "all 0.15s"
-                  }}
-                  onMouseEnter={(e) => { if (rightTab !== "simulators") e.currentTarget.style.borderColor = "var(--emerald)"; }}
-                  onMouseLeave={(e) => { if (rightTab !== "simulators") e.currentTarget.style.borderColor = "var(--line)"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION I. SURPLUS SIMULATORS</span>
-                    {rightTab === "simulators" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
-                    Windfall Simulator, Bonus Planner, Part-Payments, SIP vs Prepay, SIP Corpus.
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setRightTab("risk")}
-                  style={{
-                    padding: "8px 10px",
-                    border: rightTab === "risk" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
-                    background: rightTab === "risk" ? "var(--emerald-wash)" : "var(--paper)",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                    transition: "all 0.15s"
-                  }}
-                  onMouseEnter={(e) => { if (rightTab !== "risk") e.currentTarget.style.borderColor = "var(--emerald)"; }}
-                  onMouseLeave={(e) => { if (rightTab !== "risk") e.currentTarget.style.borderColor = "var(--line)"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION II. RISK & AUDITS</span>
-                    {rightTab === "risk" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
-                    Debt Stress Meter, Interest Hikes Shock, Balance Transfer Advisor, Lender Rules.
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setRightTab("tax")}
-                  style={{
-                    padding: "8px 10px",
-                    border: rightTab === "tax" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
-                    background: rightTab === "tax" ? "var(--emerald-wash)" : "var(--paper)",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                    transition: "all 0.15s"
-                  }}
-                  onMouseEnter={(e) => { if (rightTab !== "tax") e.currentTarget.style.borderColor = "var(--emerald)"; }}
-                  onMouseLeave={(e) => { if (rightTab !== "tax") e.currentTarget.style.borderColor = "var(--line)"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION III. TAX & PLANNING</span>
-                    {rightTab === "tax" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
-                    Income Tax Savings (Sec 24b/80C), Prepayment Goals, Budget Planner, Foreclosure Calculator.
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setRightTab("tools")}
-                  style={{
-                    padding: "8px 10px",
-                    border: rightTab === "tools" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
-                    background: rightTab === "tools" ? "var(--emerald-wash)" : "var(--paper)",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                    transition: "all 0.15s"
-                  }}
-                  onMouseEnter={(e) => { if (rightTab !== "tools") e.currentTarget.style.borderColor = "var(--emerald)"; }}
-                  onMouseLeave={(e) => { if (rightTab !== "tools") e.currentTarget.style.borderColor = "var(--line)"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION IV. REFERENCE TOOLS</span>
-                    {rightTab === "tools" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
-                    Loan Eligibility, Bank EMI Comparator, Stamp Duty, Rent vs Buy, Inflation adjustments, Net Worth.
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setRightTab("editorial")}
-                  style={{
-                    padding: "8px 10px",
-                    border: rightTab === "editorial" ? "1.5px solid var(--emerald)" : "1px solid var(--line)",
-                    background: rightTab === "editorial" ? "var(--emerald-wash)" : "var(--paper)",
-                    borderRadius: "3px",
-                    cursor: "pointer",
-                    transition: "all 0.15s"
-                  }}
-                  onMouseEnter={(e) => { if (rightTab !== "editorial") e.currentTarget.style.borderColor = "var(--emerald)"; }}
-                  onMouseLeave={(e) => { if (rightTab !== "editorial") e.currentTarget.style.borderColor = "var(--line)"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: "800", fontFamily: "var(--display)", color: "var(--ink)" }}>SECTION V. EDITORIAL DESK</span>
-                    {rightTab === "editorial" && <span style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700" }}>● Active</span>}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "2px", lineHeight: "1.3" }}>
-                    Borrower Badges & Achievements, Letters to the Editor Q&A Advice Column.
-                  </div>
-                </div>
+              <div className="tool-tabs">
+                {(Object.keys(TOOL_TABS) as RightTab[]).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    className="directory-tab"
+                    aria-pressed={rightTab === tab}
+                    onClick={() => setRightTab(tab)}
+                  >
+                    <span>
+                      <b>{TOOL_TABS[tab].title}</b>
+                      <small>{TOOL_TABS[tab].detail}</small>
+                    </span>
+                    {rightTab === tab && <em>Active</em>}
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
           {loans.length >= 1 && rightTab === "simulators" && (
-            <>
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <WindfallSimulator loans={loans} onApplySplit={handleApplyWindfallSplit} />
               <BonusWindfallPlanner results={results} />
               <PartPaymentPlanner />
               <InvestmentVsPrepay results={results} />
               <SIPCorpusSimulator results={results} />
-            </>
+            </div>
           )}
 
           {loans.length >= 1 && rightTab === "risk" && (
-            <>
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <DebtStressMeter results={results} />
               <InterestShockVisualizer results={results} />
               <BalanceTransferAdvisor results={results} />
               <RulesPanel />
-            </>
+            </div>
           )}
 
           {loans.length >= 1 && rightTab === "tax" && (
-            <>
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <TaxSavingsDeductor results={results} />
               <PrepayGoalPlanner results={results} />
               <MonthlyBudgetPlanner results={results} />
               <ForeclosureCalculator results={results} />
-            </>
+            </div>
           )}
 
           {loans.length >= 1 && rightTab === "tools" && (
-            <>
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <LoanEligibilityChecker />
               <BankEMIComparator />
               <StampDutyCalculator />
               <RentVsBuyCalculator />
               <InflationAdjustedView results={results} />
               <NetWorthProjector results={results} />
-            </>
+            </div>
           )}
 
-          {loans.length >= 1 && rightTab === "editorial" && (
-            <>
+          {loans.length >= 1 && rightTab === "guidance" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <AchievementBadges results={results} />
               <LettersToEditor results={results} />
-            </>
+            </div>
           )}
 
           {leads.length > 0 && (
             <div className="panel s6" style={{ borderLeft: "4px solid var(--emerald)", width: "100%" }}>
               <div className="panel-title">
-                <span className="num">Database</span> 📋 Captured Leads ({leads.length})
+                <span className="num">Saved records</span> Captured plan requests ({leads.length})
               </div>
               <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "14px", lineHeight: "1.4" }}>
-                Simulates Supabase lead database, collecting user emails and portfolio savings.
+                Stores email opt-ins and calculated savings locally, then syncs to Supabase when configured.
               </p>
               <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
@@ -813,6 +751,7 @@ export function App() {
                     <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
                       <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
                       <th style={{ padding: "8px", textAlign: "right" }}>Savings</th>
+                      <th style={{ padding: "8px", textAlign: "right" }}>Store</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -822,6 +761,7 @@ export function App() {
                         <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 700 }}>
                           {formatINR(l.calculatedSavings)}
                         </td>
+                        <td style={{ padding: "8px", textAlign: "right", textTransform: "capitalize" }}>{l.savedTo}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -831,18 +771,19 @@ export function App() {
                 <button
                   className="btn"
                   onClick={() => {
-                    const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Captured At"];
-                    const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, `"${l.capturedAt}"`]);
+                    const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Saved To", "Captured At"];
+                    const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, l.savedTo, `"${l.capturedAt}"`]);
                     downloadCSV(headers, rows, "captured-customer-leads.csv");
                   }}
                   style={{ fontSize: "0.76rem", padding: "8px 14px", width: "100%" }}
                 >
-                  📥 Export Leads to CSV
+                  Export Leads to CSV
                 </button>
                 <button
                   className="btn ghost"
                   onClick={() => {
                     if (confirm("Are you sure you want to clear the captured leads database?")) {
+                      clearLocalLeads();
                       setLeads([]);
                     }
                   }}

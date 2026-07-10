@@ -104,7 +104,7 @@ export function ForeclosureCalculator({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 RBI mandates <b>zero foreclosure penalty for floating-rate loans</b> from scheduled commercial banks. Penalty applies only on fixed-rate or NBFC loans.
+        RBI note: Scheduled commercial banks generally cannot charge foreclosure penalties on individual floating-rate home loans. Check fixed-rate and NBFC terms separately.
       </div>
     </div>
   );

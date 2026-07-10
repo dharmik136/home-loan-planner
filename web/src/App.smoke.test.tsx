@@ -28,7 +28,7 @@ afterEach(() => cleanup());
 describe("App smoke", () => {
   it("mounts and shows the masthead + verified default EMI", () => {
     render(<App />);
-    expect(screen.getAllByText(/Prepayment/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Loan Plan Workspace/i).length).toBeGreaterThan(0);
     // Loan A default EMI (35L @ 7.25% / 180) = ₹31,951 — must appear.
     expect(screen.getAllByText(/31,951/).length).toBeGreaterThan(0);
     // Loan B default EMI (50L @ 7.5% / 180) = ₹46,351.
@@ -50,10 +50,10 @@ describe("App smoke", () => {
     expect(document.body.textContent).toMatch(/Within HDFC rules/i);
   });
 
-  it("windfall simulator names a best-choice loan", () => {
+  it("windfall simulator names a recommended loan", () => {
     render(<App />);
-    // Default windfall 5L @ month 12 -> Loan B saves more, so a 'Best choice' marker shows.
-    expect(screen.getAllByText(/Best choice/i).length).toBeGreaterThan(0);
+    // Default windfall 5L @ month 12 -> Loan B saves more, so a recommended marker shows.
+    expect(screen.getAllByText(/Recommended/i).length).toBeGreaterThan(0);
   });
 
   it("shows a month-by-month schedule with opening balances", () => {
@@ -66,7 +66,7 @@ describe("App smoke", () => {
 
   it("renders the HDFC rules panel", () => {
     render(<App />);
-    const riskTabButton = screen.getByText(/Risk & Audits/i);
+    const riskTabButton = screen.getByText(/Risk checks/i);
     fireEvent.click(riskTabButton);
     const panel = screen.getByText(/rules this model enforces/i);
     expect(within(panel.closest(".panel") as HTMLElement).getByText(/Prepayment penalty/i)).toBeTruthy();
@@ -74,15 +74,15 @@ describe("App smoke", () => {
 
   it("renders the milestones panel and displays crossover/payoff marks", () => {
     render(<App />);
-    expect(screen.getAllByText(/Debt-Free Milestones/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Loan payoff milestones/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/50% Debt Cleared/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Principal > Interest/i).length).toBeGreaterThan(0);
   });
 
-  it("renders the windfall optimizer split allocation recommendation", () => {
+  it("renders the windfall split allocation recommendation", () => {
     render(<App />);
-    expect(screen.getAllByText(/Smart Windfall Allocator/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Total Optimized Savings/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Recommended windfall allocation/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Projected interest saved/i).length).toBeGreaterThan(0);
   });
 
   it("renders ruleset selectors and prepayment strategy select dropdowns", () => {

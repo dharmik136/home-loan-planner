@@ -90,7 +90,7 @@ export function DebtStressMeter({ results }: Props) {
       {/* EMI Buffer / Rate Shock */}
       <div style={{ borderTop: "1px dashed var(--line-strong)", paddingTop: "12px" }}>
         <div style={{ fontSize: "0.72rem", letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "600", marginBottom: "8px" }}>
-          ⚠️ Interest Rate Shock Buffer
+          Interest rate shock buffer
         </div>
         
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -105,8 +105,8 @@ export function DebtStressMeter({ results }: Props) {
         </div>
 
         <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "10px", lineHeight: "1.3" }}>
-          💡 Maintain an emergency cash reserve of at least <b>{formatINR(shock2Diff * 6)}</b> (6 months of a 2% rate shock) to cushion against index base rate increases.
-        </div>
+          Maintain an emergency cash reserve of at least <b>{formatINR(shock2Diff * 6)}</b> (6 months of a 2% rate shock) to cushion against base-rate increases.
+      </div>
       </div>
     </div>
   );

@@ -129,7 +129,7 @@ export function BankEMIComparator() {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 Rates as of mid-2025 for salaried borrowers with CIBIL ≥ 750. Actual rates vary by credit profile and property type.
+        Rates shown are indicative for salaried borrowers with CIBIL 750 or higher. Actual rates vary by credit profile and property type.
       </div>
     </div>
   );

@@ -118,8 +118,8 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
         <div className="wf-side win" style={{ maxWidth: '400px', width: '100%' }}>
           <div className="nm">{loan.name}</div>
           <div className="big">{formatCompactINR(effect.interestSaved)}</div>
-          <div className="sm">interest saved · {formatDuration(effect.monthsSaved)} cut</div>
-          <div className="crown">★ Project Savings</div>
+          <div className="sm">interest saved · {formatDuration(effect.monthsSaved)} earlier</div>
+          <div className="crown">Projected savings</div>
         </div>
       </div>
     );
@@ -133,15 +133,15 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
         <div className={`wf-side ${leftWins ? "win" : ""}`}>
           <div className="nm">{left.loan.name}</div>
           <div className="big">{formatCompactINR(left.effect.interestSaved)}</div>
-          <div className="sm">interest saved · {formatDuration(left.effect.monthsSaved)} cut</div>
-          <div className="crown">{leftWins ? "★ Best choice" : ""}</div>
+          <div className="sm">interest saved · {formatDuration(left.effect.monthsSaved)} earlier</div>
+          <div className="crown">{leftWins ? "Recommended" : ""}</div>
         </div>
         <div className="vs">vs</div>
         <div className={`wf-side ${!leftWins ? "win" : ""}`}>
           <div className="nm">{right.loan.name}</div>
           <div className="big">{formatCompactINR(right.effect.interestSaved)}</div>
-          <div className="sm">interest saved · {formatDuration(right.effect.monthsSaved)} cut</div>
-          <div className="crown">{!leftWins ? "★ Best choice" : ""}</div>
+          <div className="sm">interest saved · {formatDuration(right.effect.monthsSaved)} earlier</div>
+          <div className="crown">{!leftWins ? "Recommended" : ""}</div>
         </div>
       </div>
     );
@@ -159,8 +159,8 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
             <div key={loan.id} className={`wf-side ${isBest ? "win" : ""}`}>
               <div className="nm">{loan.name}</div>
               <div className="big">{formatCompactINR(effect.interestSaved)}</div>
-              <div className="sm">interest saved · {formatDuration(effect.monthsSaved)} cut</div>
-              <div className="crown">{isBest ? "★ Best choice" : `Rank #${idx + 1}`}</div>
+              <div className="sm">interest saved · {formatDuration(effect.monthsSaved)} earlier</div>
+              <div className="crown">{isBest ? "Recommended" : `Rank ${idx + 1}`}</div>
             </div>
           );
         })}
@@ -173,13 +173,14 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
 
   return (
     <div className="panel s5">
-      <div className="panel-title"><span className="num">05 / Windfall</span> One lump sum — where does it save more?</div>
+      <div className="panel-title"><span className="num">05 / Windfall</span> Smart Windfall Allocator</div>
 
       <div className="slider-meta" style={{ marginBottom: 2 }}>
         <span>Lump sum</span><span><b>{formatINR(amount)}</b></span>
       </div>
       <input
         type="range"
+        aria-label="Windfall lump sum amount"
         min={0}
         max={sliderMax}
         step={5000}
@@ -196,6 +197,7 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
       </div>
       <input
         type="range"
+        aria-label="Windfall payment month"
         min={2}
         max={maxTenure}
         step={1}
@@ -209,15 +211,15 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
 
       {comparisonElement}
 
-      {/* Smart Windfall Allocator Section */}
+      {/* Windfall allocation section */}
       {loans.length >= 2 && optimalSplit && (
         <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px dashed var(--line-strong)" }}>
           <div style={{ fontSize: "0.74rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "700", marginBottom: "8px" }}>
-            🧠 Smart Windfall Allocator (Optimizer)
+            Recommended windfall allocation
           </div>
           <div style={{ background: "var(--emerald-wash)", border: "1px solid #c4dac9", borderRadius: "3px", padding: "12px 14px" }}>
             <p style={{ fontSize: "0.86rem", marginBottom: "8px", lineHeight: "1.4", color: "var(--ink)" }}>
-              To save the absolute most interest, split your <b>{formatINR(amount)}</b> windfall like this:
+              To reduce interest the most, split your <b>{formatINR(amount)}</b> payment like this:
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
               {loans.map((loan, idx) => {
@@ -233,7 +235,7 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
               })}
             </div>
             <div style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700", borderTop: "1px dashed #c4dac9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
-              <span>Total Optimized Savings:</span>
+              <span>Projected interest saved:</span>
               <span>{formatINR(optimalSplit.interestSaved)}</span>
             </div>
             {onApplySplit && (
@@ -252,7 +254,7 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
                 className="add-btn"
                 style={{ marginTop: "12px", width: "100%", padding: "8px 12px", fontSize: "0.82rem", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
-                Apply Optimized Split Prepayments ✓
+                Apply recommended split
               </button>
             )}
           </div>

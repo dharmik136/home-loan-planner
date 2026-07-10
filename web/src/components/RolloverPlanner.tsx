@@ -86,6 +86,7 @@ export function RolloverPlanner({ loans }: Props) {
             </div>
             <input
               type="range"
+              aria-label="Extra monthly rollover payment"
               min={0}
               max={maxSliderBudget}
               step={1000}
@@ -107,19 +108,19 @@ export function RolloverPlanner({ loans }: Props) {
                 onClick={() => setStrategy("avalanche")}
                 style={{ flex: 1, padding: "8px", fontSize: "0.8rem", height: "auto" }}
               >
-                🗻 Avalanche (Highest Rate First)
+                Avalanche (highest rate first)
               </button>
               <button
                 className={`add-btn ${strategy === "snowball" ? "" : "secondary"}`}
                 onClick={() => setStrategy("snowball")}
                 style={{ flex: 1, padding: "8px", fontSize: "0.8rem", height: "auto" }}
               >
-                ❄️ Snowball (Lowest Balance First)
+                Snowball (lowest balance first)
               </button>
             </div>
             <span style={{ fontSize: "0.66rem", color: "var(--ink-faint)", display: "block", marginTop: "5px", lineHeight: "1.3" }}>
               {strategy === "avalanche"
-                ? "Prioritizes interest rate. Mathematically reduces total interest payout to the absolute minimum."
+                ? "Prioritizes the highest interest rate first to reduce total interest."
                 : "Prioritizes outstanding balance. Closes smaller loans first to free up EMIs and build momentum."}
             </span>
           </div>
@@ -148,8 +149,8 @@ export function RolloverPlanner({ loans }: Props) {
               </div>
             </div>
             <div style={{ fontSize: "0.78rem", borderTop: "1px dashed var(--line)", paddingTop: "10px" }}>
-              • Debt-Free Date: <b>{monthLabel(loans[0]?.startYYYYMM || "2026-07", res.monthsToPayoff)}</b> (Month {res.monthsToPayoff})<br/>
-              • Baseline Debt-Free: <b>{monthLabel(loans[0]?.startYYYYMM || "2026-07", res.baselineMonthsToPayoff)}</b> (Month {res.baselineMonthsToPayoff})
+              Payoff date: <b>{monthLabel(loans[0]?.startYYYYMM || "2026-07", res.monthsToPayoff)}</b> (Month {res.monthsToPayoff})<br/>
+              Baseline payoff: <b>{monthLabel(loans[0]?.startYYYYMM || "2026-07", res.baselineMonthsToPayoff)}</b> (Month {res.baselineMonthsToPayoff})
             </div>
           </div>
 
@@ -166,7 +167,7 @@ export function RolloverPlanner({ loans }: Props) {
               className="add-btn"
               style={{ flex: 1, fontSize: "0.76rem", padding: "6px 12px", height: "30px" }}
             >
-              📥 Export CSV
+              Export CSV
             </button>
           </div>
         </div>
@@ -175,7 +176,7 @@ export function RolloverPlanner({ loans }: Props) {
       {/* Payoff Timeline list */}
       <div style={{ marginTop: "16px" }}>
         <div style={{ fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "700", marginBottom: "8px" }}>
-          🏁 Payoff Sequence & Freed EMIs
+          Payoff sequence and released EMI
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {loans.map((loan) => {

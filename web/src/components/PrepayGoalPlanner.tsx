@@ -109,7 +109,7 @@ export function PrepayGoalPlanner({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>
-        💡 These figures assume the extra monthly amount is added consistently from Month 1. Irregular prepayments will yield slightly different results.
+        These figures assume the extra monthly amount is added consistently from Month 1. Irregular prepayments will yield slightly different results.
       </div>
     </div>
   );

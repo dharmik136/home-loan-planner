@@ -136,7 +136,21 @@ CREATE TABLE public.report_exports (
 );
 
 -- =========================================================================
--- 10. Bank Prepayment Rules Table
+-- 10. Anonymous Lead Captures Table (Free planner save flow)
+-- =========================================================================
+CREATE TABLE public.lead_captures (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    newsletter_subscriber BOOLEAN DEFAULT TRUE NOT NULL,
+    lead_source VARCHAR(100) DEFAULT 'planner_save_flow',
+    calculated_savings NUMERIC(12, 2) DEFAULT 0.00 NOT NULL,
+    portfolio_snapshot JSONB,
+    captured_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- =========================================================================
+-- 11. Bank Prepayment Rules Table
 -- =========================================================================
 CREATE TABLE public.bank_prepayment_rules (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -187,6 +201,11 @@ CREATE TRIGGER update_bank_prepayment_rules_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
+CREATE TRIGGER update_lead_captures_updated_at
+    BEFORE UPDATE ON public.lead_captures
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
 -- =========================================================================
 -- Trigger to automatically create a profile when a new user signs up
 -- =========================================================================
@@ -221,6 +240,7 @@ ALTER TABLE public.windfalls ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.advisor_branding ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.report_exports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lead_captures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bank_prepayment_rules ENABLE ROW LEVEL SECURITY;
 
 -- 1. Profiles RLS
@@ -359,7 +379,16 @@ CREATE POLICY "Report exports manageable by portfolio owner or generator" ON pub
     )
 );
 
--- 10. Bank Prepayment Rules RLS
+-- 10. Anonymous Lead Capture RLS
+CREATE POLICY "Anyone can submit lead captures" ON public.lead_captures
+    FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can read own lead capture" ON public.lead_captures
+    FOR SELECT
+    USING (auth.role() = 'authenticated' AND auth.email() = email);
+
+-- 11. Bank Prepayment Rules RLS
 CREATE POLICY "Bank rules visible to anyone" ON public.bank_prepayment_rules FOR SELECT USING (true);
 
 -- =========================================================================
@@ -374,3 +403,4 @@ CREATE INDEX idx_transactions_profile_id ON public.transactions(profile_id);
 CREATE INDEX idx_advisor_branding_advisor_id ON public.advisor_branding(advisor_id);
 CREATE INDEX idx_report_exports_portfolio_id ON public.report_exports(portfolio_id);
 CREATE INDEX idx_report_exports_generated_by ON public.report_exports(generated_by);
+CREATE INDEX idx_lead_captures_email ON public.lead_captures(email);

@@ -7,16 +7,16 @@ interface Props {
 
 const TIPS = [
   { trigger: "highRate", text: "Your interest rate is above 9%. Even a 0.25% reduction via balance transfer could save lakhs over tenure." },
-  { trigger: "lowPrepay", text: "You have no prepayments configured. Adding even ₹5,000/month from Month 1 can save 2–3 years." },
-  { trigger: "longTenure", text: "Tenure above 20 years means you'll pay more interest than principal. Front-load your EMIs in years 1–5 to dramatically cut total cost." },
-  { trigger: "multiLoan", text: "With multiple loans, use the Avalanche strategy — clear the highest interest rate loan first to minimize total interest." },
+  { trigger: "lowPrepay", text: "You have no prepayments configured. Adding Rs 5,000/month from Month 1 can reduce the payoff timeline." },
+  { trigger: "longTenure", text: "Tenure above 20 years can produce a high interest share. Test extra payments in years 1 to 5." },
+  { trigger: "multiLoan", text: "With multiple loans, compare the avalanche strategy by prioritizing the highest interest rate first." },
   { trigger: "emiTooHigh", text: "Your combined EMI exceeds 40% of a typical income. Consider a windfall prepayment to reduce your monthly obligation." },
   { trigger: "goodSaver", text: "You're on track to save significant interest! Consider using the saved EMI budget to build an emergency fund (6 months of expenses)." },
   { trigger: "taxOptimize", text: "Don't forget Section 24b: claim up to ₹2L of home loan interest as a tax deduction. This lowers your effective interest cost." },
   { trigger: "balanceTransfer", text: "If your existing loan rate is 1%+ above current market rate, a balance transfer to a new lender could be worth exploring." },
 ];
 
-export function SmartTipsPanel({ results }: Props) {
+export function PlanningTipsPanel({ results }: Props) {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   if (results.length === 0) return null;
@@ -47,8 +47,8 @@ export function SmartTipsPanel({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px", borderLeft: "3px solid var(--gold)" }}>
       <div className="panel-title">
-        <span className="num">💡 / Insights</span>
-        Smart Tips for You ({activeTips.length})
+        <span className="num">Insights</span>
+        Planning tips ({activeTips.length})
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {activeTips.map((tip) => (
@@ -57,12 +57,12 @@ export function SmartTipsPanel({ results }: Props) {
             padding: "9px 10px", fontSize: "0.78rem", lineHeight: "1.45",
             display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px"
           }}>
-            <span>💡 {tip.text}</span>
+            <span>{tip.text}</span>
             <button
               onClick={() => setDismissed(new Set([...dismissed, tip.trigger]))}
               style={{ background: "none", border: "none", color: "var(--ink-faint)", cursor: "pointer", fontSize: "0.8rem", flexShrink: 0, padding: "0 2px" }}
               title="Dismiss"
-            >✕</button>
+            >x</button>
           </div>
         ))}
       </div>

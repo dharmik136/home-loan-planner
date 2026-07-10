@@ -1,7 +1,7 @@
 /**
  * TaxSavingsDeductor — Full UI Panel
  * ====================================
- * Feature 10: Tax Savings Deductor (Sec 24b / 80C)
+ * Tax Savings Deductor (Sec 24b / 80C)
  * - Old vs New Tax Regime comparison
  * - Per-year deduction breakdown table
  * - Post-tax effective interest rate
@@ -243,7 +243,7 @@ export function TaxSavingsDeductor({ results }: Props) {
 
       {/* ── Panel header ── */}
       <div className="panel-title">
-        <span className="num">📋 Feature 10</span>
+        <span className="num">Tax planning</span>
         Home Loan Tax Deductor (Sec 24b / 80C)
       </div>
 
@@ -351,12 +351,12 @@ export function TaxSavingsDeductor({ results }: Props) {
       {/* ── New Regime Warning ── */}
       {regime === "new" && (
         <div className="new-regime-notice">
-          <strong>⚠️ No home loan deductions under New Tax Regime.</strong>
+          <strong>No home loan deductions under New Tax Regime.</strong>
           <br />
           Sections 24b and 80C are <strong>not available</strong> under the New Tax Regime (FY 2024-25). Your tax bill is calculated purely on gross income.
           {oldCounterfactual > 0 && (
             <div className="regime-switch-nudge" style={{ marginTop: "10px" }}>
-              💡 If you switched to the <strong>Old Tax Regime</strong>, you would save an estimated{" "}
+              If you switched to the <strong>Old Tax Regime</strong>, you would save an estimated{" "}
               <strong style={{ color: "var(--emerald)" }}>{formatINR(oldCounterfactual)}</strong>{" "}
               in lifetime taxes via Sec 24b + 80C home loan deductions.
             </div>
@@ -484,8 +484,8 @@ export function TaxSavingsDeductor({ results }: Props) {
                             }}
                           >
                             {showAllYears
-                              ? `▲ Show less`
-                              : `▼ Show all ${taxResult.yearRows.length} years`}
+                              ? `Show less`
+                              : `Show all ${taxResult.yearRows.length} years`}
                           </button>
                         </td>
                       </tr>
@@ -508,7 +508,7 @@ export function TaxSavingsDeductor({ results }: Props) {
               lineHeight: 1.5,
               color: "var(--ink)",
             }}>
-              💡 <strong>Regime tip:</strong> With{" "}
+              <strong>Regime note:</strong> With{" "}
               {formatCompactINR(annualIncome)} income, home loan deductions save you{" "}
               <strong style={{ color: "var(--emerald)" }}>
                 {formatCompactINR(taxResult.totalTaxSaved)}

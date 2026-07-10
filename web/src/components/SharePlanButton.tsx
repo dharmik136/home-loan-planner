@@ -18,16 +18,16 @@ export function SharePlanButton({ results }: Props) {
 
   const buildShareText = () => {
     const lines = [
-      `🏠 My Home Loan Prepayment Plan`,
+      `Home loan prepayment plan`,
       ``,
-      `I'm tracking ${loanCount} loan${loanCount > 1 ? "s" : ""} on Prepayment Ledger:`,
-      ...results.map((r) => `  • ${r.loan.name}: ₹${Math.round(r.loan.outstanding / 100_000)}L @ ${r.loan.ratePct}% for ${r.loan.tenureMonths} months`),
+      `Tracking ${loanCount} loan${loanCount > 1 ? "s" : ""}:`,
+      ...results.map((r) => `  - ${r.loan.name}: Rs ${Math.round(r.loan.outstanding / 100_000)}L @ ${r.loan.ratePct}% for ${r.loan.tenureMonths} months`),
       ``,
-      `💰 With prepayments I'll save:`,
-      `  → ${formatINR(Math.round(totalInterestSaved))} in interest`,
-      `  → ${totalMonthsSaved} months off my loan tenure`,
+      `Projected effect with prepayments:`,
+      `  - ${formatINR(Math.round(totalInterestSaved))} in interest saved`,
+      `  - ${totalMonthsSaved} months earlier payoff`,
       ``,
-      `📊 Try the free calculator: https://prepaymentledger.in`,
+      `Calculator: https://prepaymentledger.in`,
     ];
     return lines.join("\n");
   };
@@ -60,7 +60,7 @@ export function SharePlanButton({ results }: Props) {
 
   const handleTwitter = () => {
     const tweet = encodeURIComponent(
-      `I'm saving ${formatINR(Math.round(totalInterestSaved))} in home loan interest by prepaying strategically 🏠💰\n\nFree calculator: https://prepaymentledger.in #HomeLoan #PersonalFinance`
+      `Projected home loan interest saved: ${formatINR(Math.round(totalInterestSaved))}.\n\nCalculator: https://prepaymentledger.in #HomeLoan #PersonalFinance`
     );
     window.open(`https://twitter.com/intent/tweet?text=${tweet}`, "_blank", "noopener");
     trackEvent("plan_shared", { method: "twitter", loanCount });
@@ -73,21 +73,21 @@ export function SharePlanButton({ results }: Props) {
         onClick={handleCopy}
         style={{ fontSize: "0.78rem" }}
       >
-        {copied ? "✅ Copied!" : "📋 Copy Plan"}
+        {copied ? "Copied" : "Copy plan"}
       </button>
       <button
         className="btn ghost"
         onClick={handleWhatsApp}
         style={{ fontSize: "0.78rem", color: "#22c55e", borderColor: "#22c55e" }}
       >
-        📱 Share on WhatsApp
+        Share on WhatsApp
       </button>
       <button
         className="btn ghost"
         onClick={handleTwitter}
         style={{ fontSize: "0.78rem", color: "#1d9bf0", borderColor: "#1d9bf0" }}
       >
-        🐦 Share on X
+        Share on X
       </button>
     </div>
   );

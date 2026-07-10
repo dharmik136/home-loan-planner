@@ -251,14 +251,14 @@ export function BalanceTransferAdvisor({ results }: Props) {
                   </div>
                   
                   <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "6px" }}>
-                    💡 You recover all transfer costs in <b>{a.breakEvenMonths} months</b>. Every month after that adds <b>{formatINR(a.monthlySavings)}</b> in net cash flow.
+                    Transfer costs are recovered in <b>{a.breakEvenMonths} months</b>. Every month after that adds <b>{formatINR(a.monthlySavings)}</b> in estimated net cash flow.
                   </div>
                 </div>
               ) : (
                 <div style={{ fontSize: "0.72rem", color: "var(--clay)", fontWeight: "600" }}>
                   {a.netSavings <= 0
-                    ? "❌ The interest saved does not cover the refinancing charges. Staying with your current lender is advised."
-                    : `⚠️ The rate difference is only ${(a.currentRate - newRate).toFixed(2)}%. Balance transfer typically requires a gap of ≥0.25% to justify the operational hassle.`}
+                    ? "The interest saved does not cover the refinancing charges in this estimate."
+                    : `The rate difference is only ${(a.currentRate - newRate).toFixed(2)}%. Balance transfer usually needs a wider gap to justify the operational effort.`}
                 </div>
               )}
             </div>
@@ -267,7 +267,7 @@ export function BalanceTransferAdvisor({ results }: Props) {
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "14px", lineHeight: "1.4", borderTop: "1px solid var(--line-strong)", paddingTop: "8px" }}>
-        💡 **RBI Guidelines**: Individual floating-rate home loans have zero foreclosure penalties in India. To maximize balance transfer benefits, it is best to switch during the early years (first 1/3 of tenure) where interest components are heavily front-loaded.
+        RBI note: Individual floating-rate home loans generally have no foreclosure penalty in India. Check your loan agreement and current lender process before transferring.
       </div>
     </div>
   );
