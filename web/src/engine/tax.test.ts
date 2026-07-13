@@ -6,6 +6,7 @@ import {
   computeTaxSavings,
   buildYearlyLoanSummaries,
   mergeYearlySummaries,
+  computeRegimeVerdict,
   type LoanYearSummary,
   type OldSlabConfig,
   type NewSlabConfig,
@@ -176,5 +177,42 @@ describe("computeTaxSavings — New Regime", () => {
     const years = makeYears(3, 200_000, 80_000);
     const result = computeTaxSavings(years, newConfig, 8.5);
     expect(result.postTaxEffectiveRate).toBe(result.avgPreTaxRate);
+  });
+});
+
+// ─── computeRegimeVerdict ───────────────────────────────────────────────────
+
+describe("computeRegimeVerdict", () => {
+  const yearsWithHighInterest = makeYears(10, 250_000, 100_000); // 2.5L interest, 100k principal
+  const yearsWithLowInterest = makeYears(10, 10_000, 10_000);
+
+  it("recommends Old Regime when home loan deductions yield massive savings", () => {
+    const verdict = computeRegimeVerdict(yearsWithHighInterest, 900_000, 0, "self");
+    expect(verdict.recommendation).toBe("old");
+    expect(verdict.lifetimeOldTax).toBeLessThan(verdict.lifetimeNewTax);
+    expect(verdict.lifetimeSavings).toBeGreaterThan(0);
+  });
+
+  it("recommends New Regime when deductions are negligible", () => {
+    const verdict = computeRegimeVerdict(yearsWithLowInterest, 1_500_000, 0, "self");
+    expect(verdict.recommendation).toBe("new");
+    expect(verdict.lifetimeNewTax).toBeLessThan(verdict.lifetimeOldTax);
+    expect(verdict.lifetimeSavings).toBeGreaterThan(0);
+  });
+
+  it("calculates crossover year correctly as interest paid decreases", () => {
+    // Interest is high in year 1-3, then drops to zero from year 4 onwards
+    const summaries: LoanYearSummary[] = [
+      { annualInterest: 200_000, annualPrincipal: 50_000 },
+      { annualInterest: 200_000, annualPrincipal: 50_000 },
+      { annualInterest: 200_000, annualPrincipal: 50_000 },
+      { annualInterest: 0, annualPrincipal: 50_000 },
+      { annualInterest: 0, annualPrincipal: 50_000 },
+    ];
+    // Income is 9L
+    const verdict = computeRegimeVerdict(summaries, 900_000, 0, "self");
+    // Year 1-3: Old regime is cheaper. Year 4: deductions are small (0 interest, only 50k principal), so New regime becomes cheaper.
+    // Crossover year should be 4!
+    expect(verdict.crossoverYear).toBe(4);
   });
 });

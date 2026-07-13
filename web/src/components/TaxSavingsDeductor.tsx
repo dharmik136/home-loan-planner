@@ -14,6 +14,7 @@ import {
   computeTaxSavings,
   buildYearlyLoanSummaries,
   mergeYearlySummaries,
+  computeRegimeVerdict,
   type TaxRegime,
   type TaxConfig,
 } from "../engine/tax";
@@ -64,6 +65,11 @@ export function TaxSavingsDeductor({ results }: Props) {
     () => computeTaxSavings(yearlyMerged, config, avgPreTaxRate),
     [yearlyMerged, config, avgPreTaxRate]
   );
+
+  // ─── Regime Verdict calculation ───
+  const verdict = useMemo(() => {
+    return computeRegimeVerdict(yearlyMerged, annualIncome, otherSection80C, propType);
+  }, [yearlyMerged, annualIncome, otherSection80C, propType]);
 
   // ─── Old regime counterfactual (for new regime banner) ───
   const oldCounterfactual = taxResult.oldRegimeCounterfactual;
@@ -239,6 +245,68 @@ export function TaxSavingsDeductor({ results }: Props) {
           color: var(--ink);
           margin-top: 8px;
         }
+
+        /* Regime verdict card styling */
+        .tax-verdict-card {
+          background: var(--paper-raised);
+          border: 1.5px solid var(--line-strong);
+          border-radius: 3px;
+          padding: 14px;
+          margin-top: 14px;
+          margin-bottom: 14px;
+          position: relative;
+        }
+        .tax-verdict-badge {
+          display: inline-block;
+          font-size: 0.62rem;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--paper);
+          background: var(--ink);
+          padding: 3px 7px;
+          border-radius: 2px;
+          margin-bottom: 8px;
+        }
+        .tax-verdict-title {
+          font-family: var(--display);
+          font-size: 1.15rem;
+          font-weight: 900;
+          color: var(--ink);
+          line-height: 1.2;
+          margin-bottom: 4px;
+        }
+        .tax-verdict-description {
+          font-size: 0.8rem;
+          line-height: 1.45;
+          color: var(--ink-soft);
+          margin-bottom: 10px;
+        }
+        .tax-verdict-breakdown {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          border-top: 1px dashed var(--line-strong);
+          padding-top: 8px;
+          margin-top: 8px;
+        }
+        @media (max-width: 480px) {
+          .tax-verdict-breakdown { grid-template-columns: 1fr; }
+        }
+        .tax-verdict-col h5 {
+          font-size: 0.65rem;
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: var(--ink-soft);
+          margin-bottom: 2px;
+        }
+        .tax-verdict-col p {
+          font-family: var(--display);
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: var(--ink);
+        }
       `}</style>
 
       {/* ── Panel header ── */}
@@ -347,6 +415,66 @@ export function TaxSavingsDeductor({ results }: Props) {
           </div>
         </div>
       )}
+
+      {/* ── Regime Auto-Advisor Verdict Card ── */}
+      <div className="tax-verdict-card">
+        <div className="tax-verdict-badge">⚖️ Regime Advisor Verdict</div>
+        {verdict.recommendation === "old" ? (
+          <>
+            <div className="tax-verdict-title" style={{ color: "var(--emerald)" }}>
+              Recommend: Old Tax Regime
+            </div>
+            <div className="tax-verdict-description">
+              Based on your home loan interest deductions (Sec 24b) and principal repayments (Sec 80C), the <strong>Old Tax Regime saves you more money</strong>.
+              {verdict.crossoverYear ? (
+                <span>
+                  {" "}Interest paid declines over time. In <strong>Year {verdict.crossoverYear}</strong>, interest deductions fall enough that the <strong>New Regime becomes cheaper</strong>. Plan to switch your tax selection then.
+                </span>
+              ) : (
+                <span> Deductions make the Old Regime superior for the entire planning timeline.</span>
+              )}
+            </div>
+            <div className="tax-verdict-breakdown">
+              <div className="tax-verdict-col">
+                <h5>First-Year Tax Saved</h5>
+                <p style={{ color: "var(--emerald)" }}>{formatINR(verdict.firstYearSavings)}</p>
+              </div>
+              <div className="tax-verdict-col">
+                <h5>Estimated Lifetime Savings</h5>
+                <p style={{ color: "var(--emerald)" }}>{formatINR(verdict.lifetimeSavings)}</p>
+              </div>
+            </div>
+          </>
+        ) : verdict.recommendation === "new" ? (
+          <>
+            <div className="tax-verdict-title" style={{ color: "var(--clay)" }}>
+              Recommend: New Tax Regime
+            </div>
+            <div className="tax-verdict-description">
+              Due to lower tax brackets, the <strong>New Tax Regime is cheaper</strong>. The tax bracket savings exceed the home loan interest and Section 80C deductions you would get under the Old Regime.
+            </div>
+            <div className="tax-verdict-breakdown">
+              <div className="tax-verdict-col">
+                <h5>First-Year Tax Saved</h5>
+                <p style={{ color: "var(--clay)" }}>{formatINR(verdict.firstYearSavings)}</p>
+              </div>
+              <div className="tax-verdict-col">
+                <h5>Estimated Lifetime Savings</h5>
+                <p style={{ color: "var(--clay)" }}>{formatINR(verdict.lifetimeSavings)}</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="tax-verdict-title">
+              Recommend: Either Regime (Equal)
+            </div>
+            <div className="tax-verdict-description">
+              Both regimes yield identical tax liabilities for your gross income.
+            </div>
+          </>
+        )}
+      </div>
 
       {/* ── New Regime Warning ── */}
       {regime === "new" && (
