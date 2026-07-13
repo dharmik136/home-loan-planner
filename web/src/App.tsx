@@ -655,13 +655,13 @@ export function App() {
                 <span className="num">Saved records</span> Captured plan requests ({leads.length})
               </div>
               <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "14px", lineHeight: "1.4" }}>
-                Stores email opt-ins and calculated savings locally, then syncs to Supabase when configured.
+                Keeps a privacy-safe local save record, then syncs submitted contact details to Supabase when configured.
               </p>
               <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
                   <thead>
                     <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
-                      <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Contact</th>
                       <th style={{ padding: "8px", textAlign: "right" }}>Savings</th>
                       <th style={{ padding: "8px", textAlign: "right" }}>Store</th>
                     </tr>
@@ -683,7 +683,7 @@ export function App() {
                 <button
                   className="btn"
                   onClick={() => {
-                    const headers = ["Email", "Newsletter Opt-In", "Calculated Interest Savings", "Saved To", "Captured At"];
+                    const headers = ["Contact", "Newsletter Opt-In", "Calculated Interest Savings", "Saved To", "Captured At"];
                     const rows = leads.map(l => [l.email, l.newsletter ? "Yes" : "No", l.calculatedSavings, l.savedTo, `"${l.capturedAt}"`]);
                     downloadCSV(headers, rows, "captured-customer-leads.csv");
                   }}

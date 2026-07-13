@@ -2,6 +2,7 @@ import type { Loan, PrepayEntry } from "../engine/planning";
 import { supabasePublicKey, supabaseUrl } from "./supabase";
 
 const LOCAL_LEADS_KEY = "prepayment-ledger-leads";
+const REDACTED_EMAIL = "Not retained locally";
 
 export interface LeadRecord {
   email: string;
@@ -44,12 +45,18 @@ function readJsonList<T>(key: string): T[] {
   }
 }
 
-function writeLeadLocal(record: LeadRecord) {
+function readLocalLeads(): LeadRecord[] {
   const existing = readJsonList<LeadRecord>(LOCAL_LEADS_KEY);
-  const next = [
-    record,
-    ...existing.filter((lead) => lead.email.toLowerCase() !== record.email.toLowerCase()),
-  ];
+  const sanitized = existing.map((lead) => ({ ...lead, email: REDACTED_EMAIL }));
+  if (existing.some((lead) => lead.email !== REDACTED_EMAIL)) {
+    localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(sanitized));
+  }
+  return sanitized;
+}
+
+function writeLeadLocal(record: LeadRecord) {
+  const existing = readLocalLeads();
+  const next = [record, ...existing].slice(0, 50);
   localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(next));
 }
 
@@ -86,7 +93,7 @@ async function saveLeadToSupabase(payload: SavePlanPayload, capturedAtIso: strin
 }
 
 export function loadLocalLeads(): LeadRecord[] {
-  return readJsonList<LeadRecord>(LOCAL_LEADS_KEY);
+  return readLocalLeads();
 }
 
 export function clearLocalLeads() {
@@ -96,7 +103,7 @@ export function clearLocalLeads() {
 export async function savePlanLead(payload: SavePlanPayload): Promise<SavePlanResult> {
   const capturedAt = new Date();
   const baseRecord: LeadRecord = {
-    email: payload.email,
+    email: REDACTED_EMAIL,
     newsletter: payload.newsletter,
     calculatedSavings: payload.calculatedSavings,
     capturedAt: capturedAt.toLocaleString(),
