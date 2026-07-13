@@ -1,4 +1,5 @@
 import type { Loan, PrepayEntry } from "../engine/planning";
+import { supabasePublicKey, supabaseUrl } from "./supabase";
 
 const LOCAL_LEADS_KEY = "prepayment-ledger-leads";
 
@@ -28,6 +29,12 @@ export interface SavePlanResult {
   shareId?: string;
 }
 
+function isSharedPlan(value: unknown): value is { loans: Loan[]; entries: PrepayEntry[] } {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as { loans?: unknown; entries?: unknown };
+  return Array.isArray(candidate.loans) && Array.isArray(candidate.entries);
+}
+
 function readJsonList<T>(key: string): T[] {
   try {
     const raw = localStorage.getItem(key);
@@ -47,36 +54,30 @@ function writeLeadLocal(record: LeadRecord) {
 }
 
 async function saveLeadToSupabase(payload: SavePlanPayload, capturedAtIso: string): Promise<string | null> {
-  const env = (import.meta as ImportMeta & {
-    env?: Record<string, string | undefined>;
-  }).env;
-  const supabaseUrl = env?.VITE_SUPABASE_URL;
-  const anonKey = env?.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !anonKey) return null;
+  if (!supabaseUrl || !supabasePublicKey) return null;
+  const shareId = crypto.randomUUID();
 
   try {
     const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/lead_captures`, {
       method: "POST",
       headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
+        apikey: supabasePublicKey,
         "Content-Type": "application/json",
-        Prefer: "return=representation",
+        Prefer: "return=minimal",
       },
       body: JSON.stringify({
         email: payload.email,
         newsletter_subscriber: payload.newsletter,
         calculated_savings: payload.calculatedSavings,
         portfolio_snapshot: payload.state,
+        share_token: shareId,
         lead_source: "planner_save_flow",
         captured_at: capturedAtIso,
       }),
     });
 
     if (response.ok) {
-      const data = await response.json();
-      return data[0]?.id || null;
+      return shareId;
     }
   } catch {
     // fallback
@@ -129,28 +130,24 @@ export async function savePlanLead(payload: SavePlanPayload): Promise<SavePlanRe
 }
 
 export async function loadSharedPlan(shareId: string): Promise<{ loans: Loan[]; entries: PrepayEntry[] } | null> {
-  const env = (import.meta as ImportMeta & {
-    env?: Record<string, string | undefined>;
-  }).env;
-  const supabaseUrl = env?.VITE_SUPABASE_URL;
-  const anonKey = env?.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !anonKey) return null;
+  if (!supabaseUrl || !supabasePublicKey) return null;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(shareId)) {
+    return null;
+  }
 
   try {
-    const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/lead_captures?id=eq.${shareId}`, {
-      method: "GET",
+    const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/get_shared_plan`, {
+      method: "POST",
       headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
+        apikey: supabasePublicKey,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ p_share_token: shareId }),
     });
 
     if (response.ok) {
-      const data = await response.json();
-      const snapshot = data[0]?.portfolio_snapshot;
-      if (snapshot && Array.isArray(snapshot.loans)) {
+      const snapshot: unknown = await response.json();
+      if (isSharedPlan(snapshot)) {
         return snapshot;
       }
     }

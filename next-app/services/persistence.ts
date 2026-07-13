@@ -1,5 +1,5 @@
 import type { Loan, PrepayEntry } from "../engine/planning";
-import { supabaseUrl, supabaseAnonKey } from "./supabase";
+import { supabasePublicKey, supabaseUrl } from "./supabase";
 
 const LOCAL_LEADS_KEY = "prepayment-ledger-leads";
 
@@ -54,7 +54,7 @@ function writeLeadLocal(record: LeadRecord) {
 }
 
 async function saveLeadToSupabase(payload: SavePlanPayload, capturedAtIso: string): Promise<string | null> {
-  if (!supabaseUrl || !supabaseAnonKey) return null;
+  if (!supabaseUrl || !supabasePublicKey) return null;
 
   const shareId = crypto.randomUUID();
 
@@ -62,8 +62,7 @@ async function saveLeadToSupabase(payload: SavePlanPayload, capturedAtIso: strin
     const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/lead_captures`, {
       method: "POST",
       headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
+        apikey: supabasePublicKey,
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },
@@ -132,7 +131,7 @@ export async function savePlanLead(payload: SavePlanPayload): Promise<SavePlanRe
 }
 
 export async function loadSharedPlan(shareId: string): Promise<{ loans: Loan[]; entries: PrepayEntry[] } | null> {
-  if (!supabaseUrl || !supabaseAnonKey) return null;
+  if (!supabaseUrl || !supabasePublicKey) return null;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(shareId)) {
     return null;
   }
@@ -141,8 +140,7 @@ export async function loadSharedPlan(shareId: string): Promise<{ loans: Loan[]; 
     const response = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/get_shared_plan`, {
       method: "POST",
       headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
+        apikey: supabasePublicKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ p_share_token: shareId }),
