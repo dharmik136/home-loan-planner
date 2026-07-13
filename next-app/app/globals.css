@@ -1,3 +1,19 @@
+/* Tailwind border reset (preflight-equivalent, scoped to borders only).
+   Full preflight is intentionally NOT enabled - the hand-written broadsheet
+   styles below rely on browser defaults. Without this reset, Tailwind's
+   border/border-b/border-t utilities set a width but no style and render
+   nothing. Explicit `border:` rules below still win over this. */
+*, ::before, ::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--color-border, #dde5ef);
+}
+hr {
+  height: 0;
+  color: inherit;
+  border-top-width: 1px;
+}
+
 /* Customized native scrollbars and form controls */
 html, pre, .chart-wrap, table, .table-wrap {
   scrollbar-color: var(--line-strong) var(--panel);
@@ -78,42 +94,48 @@ textarea:focus {
    legacy aliases into the current workspace design system.
    ============================================================ */
 :root {
-  --paper: #f4f0e6;
-  --paper-raised: #fbf8f0;
-  --panel: #efe9da;
-  --ink: #191d26;
-  --ink-soft: #565b66;
-  --ink-faint: #8b8576;
-  --line: #d7cfbc;
-  --line-strong: #b9af98;
+  --paper: #F6EFE1;
+  --paper-raised: #FBF3E5;
+  --panel: #F0E6D2;
+  --ink: #241C14;
+  --ink-soft: #6B5B4A;
+  --ink-faint: #8A7A67;
+  --line: #CBB99A;
+  --line-strong: #B8A47F;
+  --cloth-red: #9E2B25;
 
-  --emerald: #1c7355;       /* money SAVED / kept */
-  --emerald-bright: #2ba074;
-  --emerald-wash: #e2ede4;
-  --clay: #b0542f;          /* interest PAID / cost */
-  --clay-wash: #f0e2d6;
-  --gold: #b88a2a;
-  --gold-wash: #f8f1df;
+  --emerald: #2F6B4A;       /* money SAVED / kept */
+  --emerald-bright: #3A8560;
+  --emerald-wash: #E4ECE3;
+  --clay: #6E5A4D;          /* interest PAID / cost — deliberately NOT red */
+  --clay-wash: #EAE1D6;
+  --gold: #B98A2E;
+  --gold-wash: #F6EDD9;
 
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 32px -16px rgba(25, 29, 38, 0.08), 0 2px 6px rgba(25, 29, 38, 0.03);
-  --display: "Inter", "Segoe UI", system-ui, sans-serif;
-  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 32px -16px rgba(110, 70, 40, 0.28), 0 2px 6px rgba(110, 70, 40, 0.1);
+  --display: var(--font-prata), serif;
+  --body: var(--font-lora), serif;
 }
 
 body.dark {
-  --paper: #11141c;
-  --paper-raised: #181d27;
-  --panel: #202634;
-  --ink: #f4f0e6;
-  --ink-soft: #9c9586;
-  --ink-faint: #6c6657;
-  --line: #292f3d;
-  --line-strong: #3f475a;
-  
-  --emerald-wash: #0e241c;
-  --clay-wash: #281912;
-  --gold-wash: #261e10;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.15);
+  --paper: #241512;
+  --paper-raised: #2E1D17;
+  --panel: #33221B;
+  --ink: #F0E4D3;
+  --ink-soft: #A99783;
+  --ink-faint: #7C6C5A;
+  --line: #4A3830;
+  --line-strong: #5C4740;
+  --cloth-red: #C8543F;
+
+  --emerald: #4E9370;
+  --emerald-bright: #5FAE85;
+  --emerald-wash: #1C2E24;
+  --clay: #A08D7C;
+  --clay-wash: #33241C;
+  --gold: #D9A64E;
+  --gold-wash: #3A2C15;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1816,3 +1838,12 @@ body.dark .sched-table th {
   padding: 0 6px !important;
   line-height: 1 !important;
 }
+
+/* ============================================================
+   Tailwind layers - emitted LAST so utility classes win ties
+   against the hand-written rules above. Marketing components
+   (Header, landing, pricing, sample report) are styled entirely
+   with these utilities; without them they render as raw HTML.
+   ============================================================ */
+@tailwind components;
+@tailwind utilities;
