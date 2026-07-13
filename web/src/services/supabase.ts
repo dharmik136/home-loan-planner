@@ -22,10 +22,13 @@ const env = (import.meta as ImportMeta & {
   env?: Record<string, string | undefined>;
 }).env;
 
-const supabaseUrl = env?.VITE_SUPABASE_URL || "";
-const supabaseAnonKey = env?.VITE_SUPABASE_ANON_KEY || "";
+export const supabaseUrl = env?.VITE_SUPABASE_URL || "";
+export const supabasePublicKey =
+  env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  env?.VITE_SUPABASE_ANON_KEY ||
+  "";
 
-export const supabase = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = supabaseUrl && supabasePublicKey
+  ? createClient(supabaseUrl, supabasePublicKey)
   : null;
-export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+export const isSupabaseConfigured = !!(supabaseUrl && supabasePublicKey);
