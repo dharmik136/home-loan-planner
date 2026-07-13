@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+} from "recharts";
+import { formatINR, formatCompactINR } from '../../engine/format';
 
 // Types definition
 interface LoanData {
@@ -25,8 +29,6 @@ export default function CalculatorPage() {
     ruleset: 'HDFC',
   });
 
-  const [ruleWarning, setRuleWarning] = useState<string | null>(null);
-
   // Math engines
   const emiAndSchedules = useMemo(() => {
     const r = loan.rate / 100 / 12;
@@ -41,6 +43,7 @@ export default function CalculatorPage() {
         interestSaved: 0,
         monthsSaved: 0,
         newPayoffDate: '',
+        warningMsg: null,
       };
     }
 
@@ -73,8 +76,7 @@ export default function CalculatorPage() {
     let balPrepay = loan.principal;
     let interestPrepayTotal = 0;
     const prepaySchedule = [];
-    let warningTriggered = false;
-    let warningMsg = null;
+    let warningMsg: string | null = null;
 
     // Tracker for annual HDFC 75% limit check
     let annualPrepayTotal = 0;
@@ -101,11 +103,12 @@ export default function CalculatorPage() {
         }
         
         if (annualPrepayTotal + prepaymentMade > hdfcMaxAnnualLimit) {
-          warningTriggered = true;
           warningMsg = `HDFC Rule Alert: Prepayment total of ₹${(annualPrepayTotal + prepaymentMade).toLocaleString('en-IN')} exceeds 75% opening principal limit (₹${hdfcMaxAnnualLimit.toLocaleString('en-IN')}) at Month ${month}.`;
           prepaymentMade = Math.max(0, hdfcMaxAnnualLimit - annualPrepayTotal);
         }
         annualPrepayTotal += prepaymentMade;
+      } else if (loan.ruleset === 'RBI_FLOATING') {
+        warningMsg = `RBI Floating Rate Guidelines: Individual floating rate loans have ZERO prepayment penalty or constraints. Prepay as much as you like!`;
       }
 
       let totalPrincipalPaid = regularPrincipal + prepaymentMade;
@@ -147,6 +150,22 @@ export default function CalculatorPage() {
     };
   }, [loan]);
 
+  // Chart Data preparation
+  const { maxLen, chartData } = useMemo(() => {
+    const { baselineSchedule, prepaySchedule } = emiAndSchedules;
+    const len = baselineSchedule.length;
+    const dataList = [];
+    for (let i = 0; i < len; i++) {
+      const year = (i + 1) / 12;
+      dataList.push({
+        year: Number(year.toFixed(2)),
+        baseline: baselineSchedule[i]?.outstanding ?? 0,
+        plan: i < prepaySchedule.length ? prepaySchedule[i].outstanding : 0,
+      });
+    }
+    return { maxLen: len, chartData: dataList };
+  }, [emiAndSchedules]);
+
   // Export to CSV helper
   const handleCSVExport = () => {
     const headers = 'Month,Base EMI,Prepayment Paid,Interest Paid,Outstanding Balance\n';
@@ -167,53 +186,72 @@ export default function CalculatorPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b">
+    <div className="wrap planner-page-container">
+      <div className="rule-row">
+        <span>Single-loan prepayment simulator</span>
+        <span>Conforms to lender regulations</span>
+        <span>No signup required</span>
+      </div>
+
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "3px double var(--line-strong)", paddingBottom: "10px", marginBottom: "15px" }}>
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Single Loan Prepayment Simulator</h1>
-          <p className="text-muted-foreground text-sm">
+          <h1 style={{ margin: 0, fontSize: "1.8rem", fontFamily: "var(--display)", fontWeight: "800" }}>
+            Single Loan Prepayment Simulator
+          </h1>
+          <p style={{ color: "var(--ink-soft)", margin: "4px 0 0 0", fontSize: "0.85rem" }}>
             Model individual loan prepayments conforming to lender regulations.
           </p>
         </div>
         <button
           onClick={handleCSVExport}
-          className="inline-flex items-center justify-center rounded-md text-xs font-semibold border bg-background hover:bg-accent h-8 px-3"
+          className="btn"
+          style={{ height: "36px", minHeight: "36px" }}
         >
-          Export Amortization CSV 📥
+          Export CSV 📥
         </button>
-      </div>
+      </header>
 
-      {/* Rules warning Banner */}
+      {/* Warning Banner */}
       {emiAndSchedules.warningMsg && (
-        <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 p-4 rounded-md text-xs font-medium">
+        <div style={{
+          background: "var(--gold-wash)",
+          border: "1px solid var(--gold)",
+          color: "var(--ink)",
+          padding: "12px 16px",
+          borderRadius: "4px",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          marginBottom: "20px"
+        }}>
           ⚠️ {emiAndSchedules.warningMsg}
         </div>
       )}
 
-      {/* Main Workspace Layout */}
-      <div className="grid lg:grid-cols-12 gap-8">
+      <div className="grid">
         {/* Left Column: Form Controls */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="border rounded-lg p-6 bg-card space-y-4 shadow-sm">
-            <h3 className="font-bold text-base border-b pb-2">Loan Details</h3>
+        <aside className="col-left">
+          <div className="panel s2">
+            <div className="panel-title">
+              <span className="num">01</span>
+              Loan details
+            </div>
             
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  Loan Amount (₹)
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div className="input-group">
+                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
+                  Loan Amount (Principal)
                 </label>
                 <input
                   type="number"
                   value={loan.principal}
                   onChange={(e) => setLoan({ ...loan, principal: Number(e.target.value) })}
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div className="input-group">
+                  <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
                     Interest Rate (%)
                   </label>
                   <input
@@ -221,49 +259,57 @@ export default function CalculatorPage() {
                     step="0.01"
                     value={loan.rate}
                     onChange={(e) => setLoan({ ...loan, rate: Number(e.target.value) })}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
+                <div className="input-group">
+                  <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
                     Tenure (Years)
                   </label>
                   <input
                     type="number"
                     value={loan.tenureYears}
                     onChange={(e) => setLoan({ ...loan, tenureYears: Number(e.target.value) })}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border rounded-lg p-6 bg-card space-y-4 shadow-sm">
-            <h3 className="font-bold text-base border-b pb-2">Prepayment Parameters</h3>
+          <div className="panel s3" style={{ marginTop: "16px" }}>
+            <div className="panel-title">
+              <span className="num">02</span>
+              Prepayment Parameters
+            </div>
             
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div className="input-group">
+                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
                   Lender Ruleset
                 </label>
                 <select
                   value={loan.ruleset}
                   onChange={(e) => setLoan({ ...loan, ruleset: e.target.value as LoanData['ruleset'] })}
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                 >
                   <option value="NONE">No Constraints (Theoretical)</option>
-                  <option value="RBI_FLOATING">RBI Floating Rate Rules</option>
-                  <option value="HDFC">HDFC Bank rules (75% Cap)</option>
+                  <option value="RBI_FLOATING">RBI Floating Rate Rules (No penalty)</option>
+                  <option value="HDFC">HDFC Bank rules (75% Annual Cap)</option>
                   <option value="CUSTOM">Custom restrictions</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  Scheduled Monthly Prepayment (₹)
-                </label>
-                <div className="flex gap-4 items-center">
+              <div className="input-group">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
+                    Monthly Prepayment
+                  </label>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--emerald)" }}>
+                    {formatINR(loan.monthlyPrepay)}
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                   <input
                     type="range"
                     min="0"
@@ -271,127 +317,133 @@ export default function CalculatorPage() {
                     step="1000"
                     value={loan.monthlyPrepay}
                     onChange={(e) => setLoan({ ...loan, monthlyPrepay: Number(e.target.value) })}
-                    className="flex-1"
-                  />
-                  <input
-                    type="number"
-                    value={loan.monthlyPrepay}
-                    onChange={(e) => setLoan({ ...loan, monthlyPrepay: Number(e.target.value) })}
-                    className="w-24 border rounded px-2 py-1 text-sm bg-background text-right"
+                    style={{ flex: 1 }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 border-t pt-3 mt-3">
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                    Lump Sum Prepay (₹)
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", borderTop: "1px dashed var(--line)", paddingTop: "12px" }}>
+                <div className="input-group">
+                  <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
+                    Lump Sum Prepay
                   </label>
                   <input
                     type="number"
                     value={loan.lumpSum}
                     onChange={(e) => setLoan({ ...loan, lumpSum: Number(e.target.value) })}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
+                <div className="input-group">
+                  <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: "4px" }}>
                     Target Month
                   </label>
                   <input
                     type="number"
                     value={loan.lumpSumMonth}
                     onChange={(e) => setLoan({ ...loan, lumpSumMonth: Number(e.target.value) })}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
                   />
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* Right Column: Visuals & Metrics */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="border rounded-lg p-4 bg-primary/5 text-center shadow-sm">
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Interest Saved</p>
-              <p className="text-lg md:text-xl font-bold text-primary mt-1">
-                ₹{emiAndSchedules.interestSaved.toLocaleString('en-IN')}
-              </p>
+        <main className="col-main">
+          {/* Summary Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "15px", marginBottom: "20px" }}>
+            <div className="panel s2" style={{ textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", padding: "15px" }}>
+              <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)" }}>Interest Saved</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--emerald)", marginTop: "6px" }}>
+                {formatCompactINR(emiAndSchedules.interestSaved)}
+              </div>
             </div>
-            <div className="border rounded-lg p-4 bg-primary/5 text-center shadow-sm">
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Months Saved</p>
-              <p className="text-lg md:text-xl font-bold text-primary mt-1">
+            <div className="panel s3" style={{ textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", padding: "15px" }}>
+              <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)" }}>Time Saved</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--emerald)", marginTop: "6px" }}>
                 {emiAndSchedules.monthsSaved} Months
-              </p>
+              </div>
             </div>
-            <div className="border rounded-lg p-4 bg-primary/5 text-center shadow-sm">
-              <p className="text-xs font-semibold text-muted-foreground uppercase">New Payoff Date</p>
-              <p className="text-lg md:text-xl font-bold text-primary mt-1 truncate">
+            <div className="panel s4" style={{ textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", padding: "15px" }}>
+              <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-soft)" }}>New Payoff Date</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--emerald)", marginTop: "6px" }}>
                 {emiAndSchedules.newPayoffDate}
-              </p>
-            </div>
-          </div>
-
-          {/* Simple ASCII Amortization Curve Chart Mock */}
-          <div className="border rounded-lg p-6 bg-card space-y-4 shadow-sm">
-            <h3 className="font-bold text-sm">Outstanding Balance Projection</h3>
-            <div className="relative border rounded p-4 bg-muted/10 h-48 flex items-end justify-between font-mono text-[9px] text-muted-foreground">
-              {/* Grid Lines */}
-              <div className="absolute inset-0 flex flex-col justify-between p-4 pointer-events-none border-b">
-                <div className="border-t w-full border-muted/20"></div>
-                <div className="border-t w-full border-muted/20"></div>
-                <div className="border-t w-full border-muted/20"></div>
-              </div>
-
-              {/* Bar charts or charts mock */}
-              <div className="w-full flex justify-around items-end h-full z-10">
-                <div className="flex flex-col items-center gap-1 w-1/3">
-                  <div className="w-12 bg-muted-foreground/30 h-32 rounded-t"></div>
-                  <span className="text-[10px]">Baseline ({loan.tenureYears * 12} mo)</span>
-                </div>
-                <div className="flex flex-col items-center gap-1 w-1/3">
-                  <div className="w-12 bg-primary/80 h-20 rounded-t"></div>
-                  <span className="text-[10px] text-primary font-bold">
-                    Prepay ({emiAndSchedules.prepaySchedule.length} mo)
-                  </span>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Table container */}
-          <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
-            <div className="p-4 border-b">
-              <h3 className="font-bold text-sm">Detail Ledger Schedule (First 6 Months)</h3>
+          {/* Balance Chart (Recharts!) */}
+          <div className="panel s4" style={{ marginBottom: "20px" }}>
+            <div className="panel-title">
+              <span className="num">03</span>
+              Balance Projection
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
+            <div className="legend" style={{ display: "flex", gap: "15px", fontSize: "0.75rem", margin: "10px 0" }}>
+              <span><i style={{ display: "inline-block", width: "10px", height: "10px", background: "var(--clay)", marginRight: "5px", borderRadius: "2px" }} />Paying minimum (baseline)</span>
+              <span><i style={{ display: "inline-block", width: "10px", height: "10px", background: "var(--emerald)", marginRight: "5px", borderRadius: "2px" }} />With your prepayments</span>
+            </div>
+            <div className="chart-wrap" style={{ height: "260px", width: "100%" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 8, right: 10, left: 4, bottom: 4 }}>
+                  <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
+                  <XAxis
+                    dataKey="year"
+                    type="number"
+                    domain={[0, Math.ceil(maxLen / 12)]}
+                    tickCount={Math.ceil(maxLen / 12) + 1}
+                    stroke="var(--line-strong)"
+                    tickLine={false}
+                    label={{ value: "year", position: "insideBottomRight", offset: -2, fontSize: 11, fill: "var(--ink-faint)" }}
+                  />
+                  <YAxis
+                    stroke="var(--line-strong)"
+                    tickLine={false}
+                    width={54}
+                    tickFormatter={(v) => (v >= 1e5 ? (v / 1e5).toFixed(0) + "L" : String(v))}
+                  />
+                  <Tooltip content={<ChartTip />} />
+                  <Line type="monotone" dataKey="baseline" stroke="var(--clay)" strokeWidth={2} dot={false} strokeDasharray="5 4" />
+                  <Line type="monotone" dataKey="plan" stroke="var(--emerald)" strokeWidth={2.5} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Ledger Table */}
+          <div className="panel s2">
+            <div className="panel-title">
+              <span className="num">04</span>
+              Amortization Schedule Ledger (First 12 Months)
+            </div>
+            <div className="table-wrap" style={{ overflowX: "auto", marginTop: "10px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
                 <thead>
-                  <tr className="bg-muted/50 border-b">
-                    <th className="p-3">Month</th>
-                    <th className="p-3">Base EMI</th>
-                    <th className="p-3">Prepayment Paid</th>
-                    <th className="p-3">Interest Paid</th>
-                    <th className="p-3">Outstanding Bal</th>
+                  <tr style={{ borderBottom: "2px solid var(--line-strong)", background: "var(--panel)" }}>
+                    <th style={{ padding: "8px", textAlign: "left" }}>Month</th>
+                    <th style={{ padding: "8px", textAlign: "right" }}>Base EMI</th>
+                    <th style={{ padding: "8px", textAlign: "right" }}>Prepayment</th>
+                    <th style={{ padding: "8px", textAlign: "right" }}>Interest Paid</th>
+                    <th style={{ padding: "8px", textAlign: "right" }}>Outstanding Bal</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {emiAndSchedules.prepaySchedule.slice(0, 6).map((m) => (
-                    <tr key={m.month} className="border-b hover:bg-muted/10">
-                      <td className="p-3 font-semibold">{String(m.month).padStart(3, '0')}</td>
-                      <td className="p-3">₹{Math.round(m.emi).toLocaleString('en-IN')}</td>
-                      <td className="p-3 text-emerald-600 dark:text-emerald-400 font-medium">
-                        {m.prepay > 0 ? `₹${Math.round(m.prepay).toLocaleString('en-IN')}` : '-'}
+                  {emiAndSchedules.prepaySchedule.slice(0, 12).map((m: any) => (
+                    <tr key={m.month} style={{ borderBottom: "1px solid var(--line)" }} className="hover:bg-muted/10">
+                      <td style={{ padding: "8px" }}>Month {m.month}</td>
+                      <td style={{ padding: "8px", textAlign: "right" }}>{formatINR(m.emi)}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 600 }}>
+                        {m.prepay > 0 ? formatINR(m.prepay) : "-"}
                       </td>
-                      <td className="p-3">₹{Math.round(m.interest).toLocaleString('en-IN')}</td>
-                      <td className="p-3 font-mono">₹{Math.round(m.outstanding).toLocaleString('en-IN')}</td>
+                      <td style={{ padding: "8px", textAlign: "right" }}>{formatINR(m.interest)}</td>
+                      <td style={{ padding: "8px", textAlign: "right", fontFamily: "monospace" }}>{formatINR(m.outstanding)}</td>
                     </tr>
                   ))}
-                  {emiAndSchedules.prepaySchedule.length > 6 && (
-                    <tr className="bg-muted/10">
-                      <td colSpan={5} className="p-3 text-center text-muted-foreground italic">
-                        ... {emiAndSchedules.prepaySchedule.length - 6} more months in amortization schedule
+                  {emiAndSchedules.prepaySchedule.length > 12 && (
+                    <tr style={{ background: "var(--panel)" }}>
+                      <td colSpan={5} style={{ padding: "10px", textAlign: "center", color: "var(--ink-soft)", fontStyle: "italic" }}>
+                        ... and {emiAndSchedules.prepaySchedule.length - 12} more months in amortization schedule. Click Export CSV to download full ledger.
                       </td>
                     </tr>
                   )}
@@ -399,8 +451,21 @@ export default function CalculatorPage() {
               </table>
             </div>
           </div>
-        </div>
+        </main>
       </div>
+    </div>
+  );
+}
+
+function ChartTip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const base = payload.find((p: any) => p.dataKey === "baseline")?.value ?? 0;
+  const plan = payload.find((p: any) => p.dataKey === "plan")?.value ?? 0;
+  return (
+    <div className="tooltip">
+      <div className="tt-h">Year {Number(label).toFixed(1)}</div>
+      <div className="tt-c">Baseline: {formatCompactINR(base as number)}</div>
+      <div className="tt-b">Your plan: {formatCompactINR(plan as number)}</div>
     </div>
   );
 }

@@ -21,6 +21,9 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <Link href="/calculator" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Single Simulator
+          </Link>
           <Link href="/pricing" className="transition-colors hover:text-foreground/80 text-foreground/60">
             Pricing
           </Link>
@@ -85,6 +88,9 @@ export default function Header() {
       {/* Mobile Navigation Dropdown */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t bg-background px-4 py-3 space-y-3">
+          <Link href="/calculator" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
+            Single Simulator
+          </Link>
           <Link href="/pricing" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
             Pricing
           </Link>
