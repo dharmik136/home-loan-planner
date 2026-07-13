@@ -84,7 +84,7 @@ export default function AboutPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Dharma"
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                   required
                 />
               </div>
@@ -97,7 +97,7 @@ export default function AboutPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. name@example.com"
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                   required
                 />
               </div>
@@ -110,7 +110,7 @@ export default function AboutPage() {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Write your feedback..."
                   rows={4}
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background resize-none"
+                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none resize-none"
                   required
                 />
               </div>

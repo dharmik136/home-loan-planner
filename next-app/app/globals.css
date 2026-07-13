@@ -66,7 +66,7 @@ textarea {
   min-height: 44px;
 }
 
-/* Global input focus glows */
+/* Global input focus: ruled-line thickening, no box glow */
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="number"]:focus,
@@ -74,9 +74,9 @@ input[type="month"]:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--emerald) !important;
-  box-shadow: 0 0 0 3px rgba(28, 115, 85, 0.15) !important;
-  background: var(--paper-raised) !important;
+  border-color: var(--cloth-red) !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* Slider label value micro-interactions */
@@ -400,14 +400,14 @@ body {
 }
 .field input {
   width: 100%; font-family: var(--body); font-size: 0.98rem; font-weight: 600;
-  color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong);
-  border-radius: 2px; padding: 9px 11px; transition: border-color 0.15s, box-shadow 0.15s;
+  color: var(--ink); background: transparent; border: none;
+  border-bottom: 1.5px solid var(--line); border-radius: 0;
+  padding: 9px 2px; transition: border-color 0.15s, border-bottom-width 0.15s;
 }
 .field input:focus {
   outline: none;
-  border-color: var(--emerald);
-  box-shadow: 0 0 0 1px var(--emerald), 0 4px 12px -4px rgba(28, 115, 85, 0.12);
-  background: var(--paper-raised);
+  border-bottom: 2.5px solid var(--cloth-red);
+  background: transparent;
 }
 .field.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .emi-line {
@@ -827,7 +827,7 @@ input[type="month"]:focus,
 select:focus,
 textarea:focus {
   border-color: var(--input-focus-border) !important;
-  box-shadow: 0 0 0 3px rgba(158, 43, 37, 0.16) !important;
+  box-shadow: none !important;
   background: var(--input-bg) !important;
 }
 

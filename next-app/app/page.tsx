@@ -90,7 +90,7 @@ export default function Homepage() {
                   type="number"
                   value={principal}
                   onChange={(e) => setPrincipal(Number(e.target.value))}
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -103,7 +103,7 @@ export default function Homepage() {
                     step="0.05"
                     value={interestRate}
                     onChange={(e) => setInterestRate(Number(e.target.value))}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                   />
                 </div>
                 <div>
@@ -114,7 +114,7 @@ export default function Homepage() {
                     type="number"
                     value={tenureYears}
                     onChange={(e) => setTenureYears(Number(e.target.value))}
-                    className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                    className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function Homepage() {
                   type="number"
                   value={extraMonthly}
                   onChange={(e) => setExtraMonthly(Number(e.target.value))}
-                  className="w-full border rounded px-3 py-1.5 text-sm bg-background"
+                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
