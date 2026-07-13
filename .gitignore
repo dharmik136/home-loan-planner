@@ -52,6 +52,9 @@ next-app/.next/
 next-app/next-env.d.ts
 *.tsbuildinfo
 
+# Brainstorming visual companion session data
+.superpowers/
+
 # Test outputs
 test-results/
 playwright-report/
