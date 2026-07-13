@@ -800,6 +800,22 @@ body.dark {
   --color-red-50: #33241C;
   --ink-faint: #7C6C5A;
   --shadow-md: 0 18px 44px -26px rgba(0, 0, 0, 0.75);
+
+  /* Re-anchor derived component tokens that reference color primitives via
+     var(). A custom property's var() indirection resolves against the
+     element where the PROPERTY ITSELF is declared, not where it's finally
+     used — since these are declared once on :root (the <html> element,
+     which never gets the "dark" class, only <body> does), without a
+     redeclaration here they permanently resolve against :root's light
+     primitives no matter how correctly body.dark overrides those
+     primitives elsewhere. Redeclaring them here re-resolves them against
+     body.dark's own values. */
+  --input-border: var(--color-border-strong);
+  --input-focus-border: var(--color-primary);
+  --card-bg: var(--color-card);
+  --card-border: var(--color-border);
+  --button-fg: var(--color-primary);
+  --button-hover-bg: var(--color-primary);
 }
 
 body {
