@@ -27,7 +27,7 @@ import { clearLocalLeads, loadLocalLeads, savePlanLead, loadSharedPlan, type Lea
 
 // Component imports
 import { SummaryCards } from "../../components/SummaryCards";
-import { DebtFreeCelebration } from "../../components/DebtFreeCelebration";
+import { MilestoneStamp } from "../../components/MilestoneStamp";
 import { DebtFreeCountdown } from "../../components/DebtFreeCountdown";
 import { SavingsValueWidget } from "../../components/SavingsValueWidget";
 import { PrepaymentControls } from "../../components/PrepaymentControls";
@@ -382,7 +382,7 @@ export default function PlannerPage() {
             <SummaryCards results={results} />
           </section>
 
-          {loans.length >= 1 && <DebtFreeCelebration results={results} />}
+          {loans.length >= 1 && <MilestoneStamp results={results} />}
 
           {loans.length >= 1 && <DebtFreeCountdown results={results} />}
 
