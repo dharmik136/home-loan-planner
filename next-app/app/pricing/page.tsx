@@ -7,27 +7,27 @@ export default function PricingPage() {
 
   const pricingTiers = [
     {
-      name: 'FREE BASIC',
+      name: 'THE LEDGER, FREE',
       price: currency === 'INR' ? '₹0' : '$0',
       period: 'forever',
       features: ['Model 2 Loans', 'Basic Schedules', 'Lender Rule checks', 'Local browser storage sync'],
-      ctaText: 'Get Started',
+      ctaText: 'Open a Free Ledger',
       isPopular: false,
     },
     {
-      name: 'PREMIUM SOLO',
+      name: 'THE LEDGER, KEPT',
       price: currency === 'INR' ? '₹999' : '$19',
       period: 'one-time purchase',
       features: ['Model Unlimited Loans', 'Avalanche Rollovers', 'Windfall Optimizer', 'Detailed PDF Report Downloads', 'Priority email support'],
-      ctaText: 'Buy Premium Now',
+      ctaText: 'Keep the Full Ledger',
       isPopular: true,
     },
     {
-      name: 'PROFESSIONAL SaaS',
+      name: 'THE ADVISOR\'S LEDGER',
       price: currency === 'INR' ? '₹2,499' : '$49',
       period: 'monthly billing',
       features: ['Unlimited client logs', 'Custom Branded PDFs (White-Label)', 'Advisor Portal Access', 'Client CSV bulk uploads', 'Dedicated accounts support'],
-      ctaText: 'Try Advisor Plan Free',
+      ctaText: 'Start the Advisor Plan',
       isPopular: false,
     },
   ];
@@ -37,9 +37,9 @@ export default function PricingPage() {
       {/* Pricing Hero */}
       <section className="py-12 md:py-16 text-center bg-muted/30 border-b">
         <div className="container px-4 md:px-8 mx-auto space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">UPGRADE YOUR DEBT FREEDOM PLAN</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight font-display">CHOOSE YOUR LEDGER</h1>
           <p className="text-muted-foreground text-sm max-w-xl mx-auto">
-            Start for free, then unlock advanced multi-loan analysis and white-labeled report outputs when you are ready.
+            Start with a free ledger, then unlock advanced multi-loan analysis and white-labeled report outputs when you are ready.
           </p>
           <div className="pt-2">
             <span className="text-xs text-muted-foreground font-semibold mr-2">CURRENCY:</span>

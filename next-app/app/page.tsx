@@ -62,18 +62,18 @@ export default function Homepage() {
       <section className="py-12 md:py-20 bg-gradient-to-b from-muted/50 to-background border-b">
         <div className="container px-4 md:px-8 mx-auto grid md:grid-cols-12 gap-8 items-center">
           <div className="md:col-span-7 space-y-6">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              BECOME DEBT-FREE YEARS FASTER.
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-display">
+              EVERY RUPEE OF YOUR LOAN, ACCOUNTED FOR.
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl">
-              Don&apos;t let banks compound your mortgage. Track, optimize, and roll over your loans. Break free from the interest trap.
+              No compounding left unexamined, no prepayment left unweighed. Open a ledger for your mortgage and see, in ink, exactly when it closes.
             </p>
             <div className="flex gap-4">
               <Link
                 href="/planner"
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-11 px-6"
               >
-                Try Free Multi-Loan Planner ➔
+                Open the Ledger ➔
               </Link>
             </div>
           </div>
