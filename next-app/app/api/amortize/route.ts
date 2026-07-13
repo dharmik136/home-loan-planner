@@ -159,7 +159,7 @@ export async function POST(request: Request) {
         closingBalance: row.closing,
       })),
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: "Failed to compute amortization schedule.", details: error.message || error }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Failed to compute amortization schedule." }, { status: 500 });
   }
 }
