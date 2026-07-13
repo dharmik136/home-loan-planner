@@ -42,7 +42,7 @@ import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./eng
 import { downloadScheduleCSV, downloadCSV } from "./engine/csv";
 import { formatINR } from "./engine/format";
 import { trackEvent } from "./engine/analytics";
-import { clearLocalLeads, loadLocalLeads, savePlanLead, type LeadRecord } from "./services/persistence";
+import { clearLocalLeads, loadLocalLeads, savePlanLead, loadSharedPlan, type LeadRecord } from "./services/persistence";
 
 const STORAGE_KEY = "prepayment-ledger-v1";
 
@@ -128,6 +128,28 @@ export function App() {
   });
 
   const [leads, setLeads] = useState<LeadRecord[]>(loadLocalLeads);
+
+  const [sharedPlanLoading, setSharedPlanLoading] = useState(false);
+  const [sharedPlanError, setSharedPlanError] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareId = params.get("share");
+    if (shareId) {
+      setSharedPlanLoading(true);
+      setSharedPlanError("");
+      loadSharedPlan(shareId).then((sharedState) => {
+        setSharedPlanLoading(false);
+        if (sharedState) {
+          setState(sharedState);
+          setView("app");
+          trackEvent("shared_plan_loaded", { shareId });
+        } else {
+          setSharedPlanError("Could not load the shared plan or link has expired.");
+        }
+      });
+    }
+  }, []);
 
   const handleCaptureLead = async (email: string, newsletter: boolean) => {
     const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
@@ -435,6 +457,17 @@ export function App() {
 
   return (
     <div className="wrap">
+      {sharedPlanLoading && (
+        <div className="loading-banner">
+          Loading shared prepayment plan from cloud...
+        </div>
+      )}
+      {sharedPlanError && (
+        <div className="error-banner">
+          <span>{sharedPlanError}</span>
+          <button onClick={() => setSharedPlanError("")}>&times;</button>
+        </div>
+      )}
       <header className="masthead">
         <div>
           <div className="kicker">Loan Plan Workspace</div>

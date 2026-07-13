@@ -384,9 +384,9 @@ CREATE POLICY "Anyone can submit lead captures" ON public.lead_captures
     FOR INSERT
     WITH CHECK (true);
 
-CREATE POLICY "Authenticated users can read own lead capture" ON public.lead_captures
+CREATE POLICY "Anyone can read lead captures by ID" ON public.lead_captures
     FOR SELECT
-    USING (auth.role() = 'authenticated' AND auth.email() = email);
+    USING (true);
 
 -- 11. Bank Prepayment Rules RLS
 CREATE POLICY "Bank rules visible to anyone" ON public.bank_prepayment_rules FOR SELECT USING (true);

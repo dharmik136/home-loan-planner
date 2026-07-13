@@ -17,6 +17,28 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  const [copiedLink, setCopiedLink] = useState(false);
+  const shareLink = saveResult?.shareId
+    ? window.location.origin + window.location.pathname + "?share=" + saveResult.shareId
+    : "";
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = shareLink;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -198,6 +220,29 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
           <p style={{ fontSize: "0.76rem", color: "var(--ink-faint)", marginBottom: "20px", lineHeight: "1.4" }}>
             {saveResult?.message || "Saved locally in this browser."}
           </p>
+          {shareLink && (
+            <div style={{ background: "var(--amber-wash)", border: "1px solid var(--line-strong)", padding: "10px", margin: "14px 0", borderRadius: "2px", textAlign: "left" }}>
+              <label style={{ fontSize: "0.68rem", fontWeight: "600", display: "block", marginBottom: "4px", color: "var(--ink-soft)" }}>
+                SHAREABLE PLAN LINK:
+              </label>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={shareLink}
+                  style={{ flex: 1, fontSize: "0.76rem", padding: "4px 6px", border: "1px solid var(--line)", background: "var(--paper)", color: "var(--ink)", width: "0" }}
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="add-btn"
+                  style={{ padding: "4px 8px", fontSize: "0.72rem", height: "auto" }}
+                >
+                  {copiedLink ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+          )}
           <button
             onClick={onClose}
             className="add-btn secondary"

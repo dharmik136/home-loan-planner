@@ -1775,3 +1775,44 @@ body.dark .sched-table th {
   border: 1px solid var(--line-strong) !important;
   border-radius: 2px !important;
 }
+
+/* ─── Shared Plan Loading & Error Banners ─── */
+.loading-banner {
+  background: var(--amber-wash) !important;
+  color: var(--ink) !important;
+  padding: 10px 16px !important;
+  text-align: center !important;
+  font-family: var(--display) !important;
+  font-weight: bold !important;
+  font-size: 0.88rem !important;
+  border-bottom: 1.5px solid var(--line-strong) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.error-banner {
+  background: var(--clay-wash) !important;
+  color: var(--clay) !important;
+  padding: 10px 16px !important;
+  text-align: center !important;
+  font-family: var(--display) !important;
+  font-weight: bold !important;
+  font-size: 0.88rem !important;
+  border-bottom: 1.5px solid var(--clay) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.error-banner button {
+  background: none !important;
+  border: none !important;
+  font-family: var(--body) !important;
+  font-size: 1.1rem !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  color: var(--clay) !important;
+  padding: 0 6px !important;
+  line-height: 1 !important;
+}
