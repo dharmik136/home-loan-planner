@@ -35,7 +35,6 @@ import { InterestShockVisualizer } from "./components/InterestShockVisualizer";
 import { SavingsValueWidget } from "./components/SavingsValueWidget";
 import { DebtFreeCelebration } from "./components/DebtFreeCelebration";
 import { DebtFreeCountdown } from "./components/DebtFreeCountdown";
-import { OnboardingTour } from "./components/OnboardingTour";
 import { LettersToEditor } from "./components/LettersToEditor";
 import { PartPaymentPlanner } from "./components/PartPaymentPlanner";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "./engine/planning";
@@ -200,104 +199,7 @@ export function App() {
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
   const [yearlyView, setYearlyView] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isTourActive, setIsTourActive] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>("simulators");
-
-  const applyScenario = (scenario: string) => {
-    if (scenario === "prepayment_optimizer") {
-      setState({
-        loans: [
-          {
-            id: "A",
-            name: "Home Loan (SBI)",
-            outstanding: 4500000,
-            ratePct: 8.25,
-            tenureMonths: 240,
-            startYYYYMM: "2026-07",
-            preEmiInterest: 0,
-            ruleset: "hdfc",
-            rateChanges: [],
-            extraEmiPerYear: true,
-            biWeekly: false,
-            stepUpPct: 5,
-            interestMethod: "monthlyReducing",
-            prepayBehavior: "reduceTenure",
-          }
-        ],
-        entries: [
-          { id: "pp-opt-1", loanId: "A", type: "oneTime", amount: 300000, monthIndex: 24 }
-        ]
-      });
-      setActiveLoanId("A");
-    } else if (scenario === "balance_transfer") {
-      setState({
-        loans: [
-          {
-            id: "A",
-            name: "High Interest Loan",
-            outstanding: 6000000,
-            ratePct: 9.1,
-            tenureMonths: 180,
-            startYYYYMM: "2026-07",
-            preEmiInterest: 0,
-            ruleset: "hdfc",
-            rateChanges: [],
-            interestMethod: "monthlyReducing",
-            prepayBehavior: "reduceTenure",
-          }
-        ],
-        entries: []
-      });
-      setActiveLoanId("A");
-    } else if (scenario === "rate_shock") {
-      setState({
-        loans: [
-          {
-            id: "A",
-            name: "Floating Rate Loan",
-            outstanding: 5000000,
-            ratePct: 7.5,
-            tenureMonths: 240,
-            startYYYYMM: "2026-07",
-            preEmiInterest: 0,
-            ruleset: "hdfc",
-            rateChanges: [
-              { id: "rc-1", monthIndex: 12, newRatePct: 8.25 },
-              { id: "rc-2", monthIndex: 24, newRatePct: 9.0 }
-            ],
-            moratoriumStart: 36,
-            moratoriumDuration: 6,
-            moratoriumType: "interestOnly",
-            interestMethod: "dailyReducing",
-            prepayBehavior: "reduceTenure",
-          }
-        ],
-        entries: []
-      });
-      setActiveLoanId("A");
-    } else if (scenario === "tax_optimizer") {
-      setState({
-        loans: [
-          {
-            id: "A",
-            name: "Tax Saver Loan",
-            outstanding: 3500000,
-            ratePct: 8.5,
-            tenureMonths: 180,
-            startYYYYMM: "2026-07",
-            preEmiInterest: 0,
-            ruleset: "hdfc",
-            rateChanges: [],
-            interestMethod: "monthlyReducing",
-            prepayBehavior: "reduceTenure",
-          }
-        ],
-        entries: []
-      });
-      setActiveLoanId("A");
-    }
-    trackEvent("onboarding_scenario_applied", { scenario });
-  };
 
   const handleApplyWindfallSplit = (allocations: { loanId: string; amount: number; monthIndex: number }[]) => {
     setState((s) => {
@@ -514,27 +416,6 @@ export function App() {
           >
             {darkMode ? "Light" : "Dark"}
           </button>
-          <button
-            onClick={() => setIsTourActive(true)}
-            className="theme-btn"
-            style={{
-              background: "none",
-              border: "1px solid var(--line-strong)",
-              borderRadius: "50%",
-              width: "36px",
-              height: "36px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "var(--ink)",
-              fontSize: "1.1rem",
-              transition: "all 0.2s"
-            }}
-            title="Start Onboarding Tour"
-          >
-            Help
-          </button>
           <div className="edition">
             Interactive home loan planner<br />
             Local calculations and export-ready plans<br />
@@ -559,9 +440,6 @@ export function App() {
             </span>
           </button>
         ))}
-        <button type="button" className="workflow-tour" onClick={() => setIsTourActive(true)}>
-          Guided setup
-        </button>
       </nav>
 
       <div className="grid">
@@ -867,7 +745,6 @@ export function App() {
       )}
 
       <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
-      <OnboardingTour forceOpen={isTourActive} onClose={() => setIsTourActive(false)} onApplyScenario={applyScenario} />
     </div>
   );
 }

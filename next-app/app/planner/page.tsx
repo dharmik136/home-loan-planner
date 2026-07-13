@@ -1,427 +1,601 @@
+/*
+ * Home Loan Prepayment Planner
+ * Copyright (C) 2026 Dharmik Shingala
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
+import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "../../engine/planning";
+import { downloadScheduleCSV } from "../../engine/csv";
+import { formatINR } from "../../engine/format";
+import { trackEvent } from "../../engine/analytics";
+import { clearLocalLeads, loadLocalLeads, savePlanLead, loadSharedPlan, type LeadRecord } from "../../services/persistence";
 
-interface Loan {
-  id: string;
-  name: string;
-  balance: number;
-  rate: number;
-  tenureMonths: number;
+// Component imports
+import { SummaryCards } from "../../components/SummaryCards";
+import { DebtFreeCelebration } from "../../components/DebtFreeCelebration";
+import { DebtFreeCountdown } from "../../components/DebtFreeCountdown";
+import { SavingsValueWidget } from "../../components/SavingsValueWidget";
+import { PrepaymentControls } from "../../components/PrepaymentControls";
+import { PortfolioBalanceChart } from "../../components/PortfolioBalanceChart";
+import { BalanceChart } from "../../components/BalanceChart";
+import { ScheduleTable } from "../../components/ScheduleTable";
+import { YearlyScheduleTable } from "../../components/YearlyScheduleTable";
+import { RolloverPlanner } from "../../components/RolloverPlanner";
+import { DebtMilestones } from "../../components/DebtMilestones";
+import { PlanningTipsPanel } from "../../components/PlanningTipsPanel";
+import { PrepaymentScenarios } from "../../components/PrepaymentScenarios";
+import { SharePlanButton } from "../../components/SharePlanButton";
+import { WindfallSimulator } from "../../components/WindfallSimulator";
+import { BonusWindfallPlanner } from "../../components/BonusWindfallPlanner";
+import { PartPaymentPlanner } from "../../components/PartPaymentPlanner";
+import { InvestmentVsPrepay } from "../../components/InvestmentVsPrepay";
+import { SIPCorpusSimulator } from "../../components/SIPCorpusSimulator";
+import { DebtStressMeter } from "../../components/DebtStressMeter";
+import { InterestShockVisualizer } from "../../components/InterestShockVisualizer";
+import { BalanceTransferAdvisor } from "../../components/BalanceTransferAdvisor";
+import { RulesPanel } from "../../components/RulesPanel";
+import { TaxSavingsDeductor } from "../../components/TaxSavingsDeductor";
+import { PrepayGoalPlanner } from "../../components/PrepayGoalPlanner";
+import { MonthlyBudgetPlanner } from "../../components/MonthlyBudgetPlanner";
+import { ForeclosureCalculator } from "../../components/ForeclosureCalculator";
+import { LoanEligibilityChecker } from "../../components/LoanEligibilityChecker";
+import { BankEMIComparator } from "../../components/BankEMIComparator";
+import { StampDutyCalculator } from "../../components/StampDutyCalculator";
+import { RentVsBuyCalculator } from "../../components/RentVsBuyCalculator";
+import { InflationAdjustedView } from "../../components/InflationAdjustedView";
+import { NetWorthProjector } from "../../components/NetWorthProjector";
+import { AchievementBadges } from "../../components/AchievementBadges";
+import { LettersToEditor } from "../../components/LettersToEditor";
+import { LoanCard } from "../../components/LoanCard";
+import { PaywallModal } from "../../components/PaywallModal";
+
+const STORAGE_KEY = "prepayment-ledger-v1";
+
+const DEFAULT_LOANS: Loan[] = [
+  { id: "A", name: "Loan A", outstanding: 3_500_000, ratePct: 7.25, tenureMonths: 180, startYYYYMM: "2026-07", preEmiInterest: 17877, ruleset: "hdfc", rateChanges: [] },
+  { id: "B", name: "Loan B", outstanding: 5_000_000, ratePct: 7.5, tenureMonths: 180, startYYYYMM: "2026-07", preEmiInterest: 0, ruleset: "hdfc", rateChanges: [] },
+];
+
+interface State {
+  loans: Loan[];
+  entries: PrepayEntry[];
 }
 
+function load(): State {
+  if (typeof window === "undefined") return { loans: DEFAULT_LOANS, entries: [] };
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.loans && !Array.isArray(parsed.loans)) {
+        parsed.loans = Object.values(parsed.loans);
+      }
+      if (Array.isArray(parsed.loans)) {
+        parsed.loans = parsed.loans.map((l: Partial<Loan>) => ({
+          ...l,
+          preEmiInterest: l.preEmiInterest ?? 0,
+          ruleset: l.ruleset ?? "hdfc",
+          rateChanges: l.rateChanges ?? [],
+        }));
+      }
+      return parsed as State;
+    }
+  } catch { /* ignore */ }
+  return { loans: structuredClone(DEFAULT_LOANS), entries: [] };
+}
+
+let idSeq = 1;
+const newId = () => `pp-${Date.now()}-${idSeq++}`;
+
+type RightTab = "simulators" | "risk" | "tax" | "tools" | "guidance";
+
+const WORKFLOW_STEPS = [
+  { id: "loan-setup", label: "Setup", detail: "Loan inputs" },
+  { id: "results", label: "Results", detail: "Savings impact" },
+  { id: "prepayments", label: "Prepay", detail: "Extra payments" },
+  { id: "schedule", label: "Schedule", detail: "Charts and table" },
+  { id: "tools", label: "Tools", detail: "Advanced checks" },
+  { id: "save-plan", label: "Save", detail: "Export or sync" },
+] as const;
+
+const TOOL_TABS: Record<RightTab, { title: string; detail: string }> = {
+  simulators: {
+    title: "Payment simulators",
+    detail: "Windfall, bonus, part-payment, SIP comparison, and corpus checks.",
+  },
+  risk: {
+    title: "Risk checks",
+    detail: "Debt load, rate shock, transfer break-even, and lender rules.",
+  },
+  tax: {
+    title: "Tax and budget",
+    detail: "Section 24/80C, prepayment goals, monthly budget, and foreclosure estimate.",
+  },
+  tools: {
+    title: "Reference tools",
+    detail: "Eligibility, EMI comparison, stamp duty, rent vs buy, inflation, and net worth.",
+  },
+  guidance: {
+    title: "Guidance",
+    detail: "Progress badges and practical borrower questions.",
+  },
+};
+
 export default function PlannerPage() {
-  // Initial default loans
-  const [loans, setLoans] = useState<Loan[]>([
-    { id: '1', name: 'Home Mortgage', balance: 7500000, rate: 8.5, tenureMonths: 240 },
-    { id: '2', name: 'Auto Car Loan', balance: 850000, rate: 9.2, tenureMonths: 60 },
-  ]);
+  const [state, setState] = useState<State>(load);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [leads, setLeads] = useState<LeadRecord[]>([]);
 
-  const [extraBudget, setExtraBudget] = useState(25000);
-  const [strategy, setStrategy] = useState<'AVALANCHE' | 'SNOWBALL'>('AVALANCHE');
+  useEffect(() => {
+    setLeads(loadLocalLeads());
+  }, []);
 
-  // Add new loan handler
-  const addLoan = () => {
-    const newId = String(Date.now());
-    setLoans([
-      ...loans,
-      { id: newId, name: `New Loan #${loans.length + 1}`, balance: 500000, rate: 9.0, tenureMonths: 120 },
-    ]);
-  };
+  const [sharedPlanLoading, setSharedPlanLoading] = useState(false);
+  const [sharedPlanError, setSharedPlanError] = useState("");
 
-  // Update loan field handler
-  const updateLoan = (id: string, updatedFields: Partial<Loan>) => {
-    setLoans(loans.map((loan) => (loan.id === id ? { ...loan, ...updatedFields } : loan)));
-  };
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareId = params.get("share");
+    if (shareId) {
+      setSharedPlanLoading(true);
+      setSharedPlanError("");
+      loadSharedPlan(shareId).then((sharedState) => {
+        setSharedPlanLoading(false);
+        if (sharedState) {
+          setState(sharedState);
+          trackEvent("shared_plan_loaded", { shareId });
+        } else {
+          setSharedPlanError("Could not load the shared plan or link has expired.");
+        }
+      });
+    }
+  }, []);
 
-  // Delete loan handler
-  const deleteLoan = (id: string) => {
-    setLoans(loans.filter((loan) => loan.id !== id));
-  };
+  const { loans, entries } = state;
 
-  // Portfolio calculations
-  const portfolioSummary = useMemo(() => {
-    // 1. Calculate base EMIs and monthly obligations
-    let totalMonthlyBasePayment = 0;
-    const loansWithEMI = loans.map((loan) => {
-      const r = loan.rate / 100 / 12;
-      const n = loan.tenureMonths;
-      const emi = (loan.balance * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-      const validEMI = isNaN(emi) || emi <= 0 ? 0 : emi;
-      totalMonthlyBasePayment += validEMI;
-      return { ...loan, emi: validEMI };
+  const results: LoanResult[] = useMemo(() => {
+    return loans.map((loan) => {
+      const loanEntries = entries.filter((e) => e.loanId === loan.id);
+      return computeLoan(loan, loanEntries);
     });
+  }, [loans, entries]);
 
-    if (loans.length === 0) {
-      return {
-        combinedSavings: 0,
-        originalPayoffMonths: 0,
-        optimizedPayoffMonths: 0,
-        crossoverMonth: 0,
-        combinedSchedule: [],
-      };
+  const handleCaptureLead = async (email: string, newsletter: boolean) => {
+    const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
+    const result = await savePlanLead({
+      email,
+      newsletter,
+      calculatedSavings: totalSavings,
+      state,
+    });
+    setLeads(loadLocalLeads());
+    return result;
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
+  }, [state]);
 
-    // 2. Base Amortization without prepayment
-    let baseBalances = loans.map(l => l.balance);
-    let baseMonths = 0;
-    let baseInterestPaid = 0;
-    const maxSafetyMonths = 600; // 50 years cap
+  const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
+  const [yearlyView, setYearlyView] = useState(false);
+  const [rightTab, setRightTab] = useState<RightTab>("simulators");
 
-    while (baseBalances.some(bal => bal > 0) && baseMonths < maxSafetyMonths) {
-      baseMonths++;
-      for (let i = 0; i < loansWithEMI.length; i++) {
-        if (baseBalances[i] <= 0) continue;
-        const r = loansWithEMI[i].rate / 100 / 12;
-        const interest = baseBalances[i] * r;
-        let principalPaid = loansWithEMI[i].emi - interest;
-        if (principalPaid > baseBalances[i]) principalPaid = baseBalances[i];
-        baseInterestPaid += interest;
-        baseBalances[i] -= principalPaid;
-      }
-    }
-
-    // 3. Prepay Amortization with Rollover (Avalanche vs Snowball)
-    let activeBalances = loansWithEMI.map(l => ({ ...l, currentBalance: l.balance }));
-    let prepayMonths = 0;
-    let prepayInterestPaid = 0;
-    const combinedSchedule = [];
-
-    while (activeBalances.some(l => l.currentBalance > 0) && prepayMonths < maxSafetyMonths) {
-      prepayMonths++;
-
-      // Sort loans according to strategy
-      // Avalanche: Highest Rate first
-      // Snowball: Smallest Current Balance first
-      const sortedActiveLoans = [...activeBalances]
-        .filter(l => l.currentBalance > 0)
-        .sort((a, b) => {
-          if (strategy === 'AVALANCHE') {
-            return b.rate - a.rate; // High rate first
-          } else {
-            return a.currentBalance - b.currentBalance; // Low balance first
-          }
-        });
-
-      // Pay standard minimum EMIs
-      let monthlyRolloverPool = extraBudget;
-      const monthlyInterests = activeBalances.map((l) => {
-        if (l.currentBalance <= 0) return 0;
-        return l.currentBalance * (l.rate / 100 / 12);
-      });
-
-      // Track how much principal is paid in this cycle
-      const principalPaidThisMonth = activeBalances.map(() => 0);
-
-      // Pay standard minimum principal first
-      activeBalances.forEach((l, index) => {
-        if (l.currentBalance <= 0) return;
-        const interest = monthlyInterests[index];
-        let principal = l.emi - interest;
-        if (principal > l.currentBalance) {
-          // Loan fully paid by minimum EMI
-          const unusedEmi = l.emi - l.currentBalance - interest;
-          monthlyRolloverPool += unusedEmi; // Roll over unused EMI to the pool
-          principal = l.currentBalance;
-        }
-        principalPaidThisMonth[index] += principal;
-        prepayInterestPaid += interest;
-      });
-
-      // Apply prepayment pool to the target loan(s)
-      for (const targetLoan of sortedActiveLoans) {
-        if (monthlyRolloverPool <= 0) break;
-        const origIdx = activeBalances.findIndex(l => l.id === targetLoan.id);
-        const currentBalAfterMin = activeBalances[origIdx].currentBalance - principalPaidThisMonth[origIdx];
-        
-        if (currentBalAfterMin > 0) {
-          if (monthlyRolloverPool >= currentBalAfterMin) {
-            principalPaidThisMonth[origIdx] += currentBalAfterMin;
-            monthlyRolloverPool -= currentBalAfterMin;
-          } else {
-            principalPaidThisMonth[origIdx] += monthlyRolloverPool;
-            monthlyRolloverPool = 0;
-          }
+  const handleApplyWindfallSplit = (allocations: { loanId: string; amount: number; monthIndex: number }[]) => {
+    setState((s) => {
+      const newEntries = [...s.entries];
+      for (const alloc of allocations) {
+        if (alloc.amount > 0) {
+          newEntries.push({
+            id: `pp-${Date.now()}-${Math.random()}`,
+            loanId: alloc.loanId,
+            type: "oneTime",
+            amount: alloc.amount,
+            monthIndex: alloc.monthIndex,
+          });
         }
       }
+      return { ...s, entries: newEntries };
+    });
+    trackEvent("windfall_split_applied", { count: allocations.length });
+  };
 
-      // Commit changes to current balances
-      let totalRemainingBalance = 0;
-      activeBalances.forEach((l, index) => {
-        if (l.currentBalance <= 0) return;
-        l.currentBalance = Math.max(0, l.currentBalance - principalPaidThisMonth[index]);
-        totalRemainingBalance += l.currentBalance;
-      });
+  const scrollToWorkflowStep = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
-      combinedSchedule.push({
-        month: prepayMonths,
-        outstanding: totalRemainingBalance,
-        interestPaid: monthlyInterests.reduce((a, b) => a + b, 0),
-        rolloverApplied: extraBudget + (loansWithEMI.reduce((a,b) => a + b.emi, 0) - activeBalances.reduce((acc, curr) => acc + (curr.currentBalance > 0 ? curr.emi : 0), 0)),
+  const sortLoans = (criteria: "rate" | "balance" | "name") => {
+    setState((s) => {
+      const sorted = [...s.loans].sort((a, b) => {
+        if (criteria === "rate") return b.ratePct - a.ratePct;
+        if (criteria === "balance") return b.outstanding - a.outstanding;
+        return a.name.localeCompare(b.name);
       });
+      return { ...s, loans: sorted };
+    });
+    trackEvent("loans_sorted", { criteria });
+  };
+
+  useEffect(() => {
+    if (loans.length > 0 && !loans.some((l) => l.id === activeLoanId)) {
+      setActiveLoanId(loans[0].id);
     }
+  }, [loans, activeLoanId]);
 
-    const combinedSavings = Math.max(0, baseInterestPaid - prepayInterestPaid);
-    const crossoverMonth = Math.round(prepayMonths * 0.4); // Crossover estimation for visual purposes
+  const setLoan = (id: string, patch: Partial<Loan>) =>
+    setState((s) => ({
+      ...s,
+      loans: s.loans.map((l) => (l.id === id ? { ...l, ...patch } : l)),
+    }));
 
-    return {
-      combinedSavings,
-      originalPayoffMonths: baseMonths,
-      optimizedPayoffMonths: prepayMonths,
-      crossoverMonth,
-      combinedSchedule,
+  const addLoan = () => {
+    const nextLetter = String.fromCharCode(65 + loans.length);
+    const name = `Loan ${nextLetter}`;
+    const id = `loan-${Date.now()}-${idSeq++}`;
+    setState((s) => ({
+      ...s,
+      loans: [
+        ...s.loans,
+        { id, name, outstanding: 3_000_000, ratePct: 8.5, tenureMonths: 180, startYYYYMM: "2026-07", preEmiInterest: 0, ruleset: "none", rateChanges: [] },
+      ],
+    }));
+    trackEvent("loan_created", { loanId: id, name });
+  };
+
+  const removeLoan = (id: string) => {
+    setState((s) => ({
+      ...s,
+      loans: s.loans.filter((l) => l.id !== id),
+      entries: s.entries.filter((e) => e.loanId !== id),
+    }));
+  };
+
+  const addEntry = (loanId: string) =>
+    setState((s) => ({
+      ...s,
+      entries: [...s.entries, { id: newId(), loanId, type: "oneTime", amount: 200_000, monthIndex: 12 }],
+    }));
+
+  const changeEntry = (id: string, patch: Partial<PrepayEntry>) =>
+    setState((s) => ({ ...s, entries: s.entries.map((e) => (e.id === id ? { ...e, ...patch } : e)) }));
+
+  const removeEntry = (id: string) =>
+    setState((s) => ({ ...s, entries: s.entries.filter((e) => e.id !== id) }));
+
+  const reset = () => setState({ loans: structuredClone(DEFAULT_LOANS), entries: [] });
+
+  const exportWorkspaceJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `prepayment-ledger-workspace-${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    trackEvent("workspace_exported", { loanCount: state.loans.length });
+  };
+
+  const importWorkspaceJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    fileReader.readAsText(files[0], "UTF-8");
+    fileReader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (parsed && Array.isArray(parsed.loans) && Array.isArray(parsed.entries)) {
+          setState(parsed);
+          trackEvent("workspace_imported", { loanCount: parsed.loans.length });
+        } else {
+          alert("Invalid workspace backup file format.");
+        }
+      } catch (err) {
+        alert("Failed to parse workspace backup file.");
+      }
     };
-  }, [loans, extraBudget, strategy]);
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Dashboard Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Multi-Loan Portfolio Planner</h1>
-          <p className="text-muted-foreground text-sm">
-            Model rollovers, interest avalanche paths, and aggregate dynamic payoffs.
-          </p>
+    <div className="wrap planner-page-container">
+      {sharedPlanLoading && (
+        <div className="loading-banner">
+          Loading shared prepayment plan from cloud...
         </div>
-        <div className="bg-primary/10 border border-primary/20 rounded px-4 py-2 text-right">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground">Portfolio Stats</span>
-          <p className="text-sm font-bold text-primary">
-            {loans.length} Active Loans | Payoff: {Math.floor(portfolioSummary.optimizedPayoffMonths / 12)} Yrs
-          </p>
+      )}
+      {sharedPlanError && (
+        <div className="error-banner">
+          <span>{sharedPlanError}</span>
+          <button onClick={() => setSharedPlanError("")}>&times;</button>
         </div>
+      )}
+      
+      <div className="rule-row">
+        <span>{loans.length} loan{loans.length !== 1 ? 's' : ''} configured</span>
+        <span>Tenure-reduction model</span>
+        <span><b>Adjust inputs</b> and compare payoff dates</span>
+        <span>Everything stays in your browser</span>
       </div>
 
-      {/* Loans Grid */}
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-lg">Portfolio Loans</h3>
-          <button
-            onClick={addLoan}
-            className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3"
-          >
-            ➕ Add Loan
+      <nav className="workflow-nav" aria-label="Planner workflow">
+        {WORKFLOW_STEPS.map((step, index) => (
+          <button key={step.id} type="button" onClick={() => scrollToWorkflowStep(step.id)}>
+            <span className="workflow-index">{String(index + 1).padStart(2, "0")}</span>
+            <span>
+              <b>{step.label}</b>
+              <small>{step.detail}</small>
+            </span>
           </button>
-        </div>
+        ))}
+      </nav>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loans.map((loan) => (
-            <div key={loan.id} className="border rounded-lg p-5 bg-card space-y-4 shadow-sm relative">
-              <button
-                onClick={() => deleteLoan(loan.id)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-destructive text-sm"
-                title="Remove Loan"
-              >
-                🗑️
-              </button>
-              
-              <div className="space-y-1">
-                <input
-                  type="text"
-                  value={loan.name}
-                  onChange={(e) => updateLoan(loan.id, { name: e.target.value })}
-                  className="font-bold text-base bg-transparent border-b border-transparent hover:border-muted-foreground/30 focus:border-primary focus:outline-none w-44"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-[10px] font-semibold text-muted-foreground uppercase">
-                    Balance (₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={loan.balance}
-                    onChange={(e) => updateLoan(loan.id, { balance: Number(e.target.value) })}
-                    className="w-full border rounded px-2.5 py-1 text-sm bg-background mt-0.5"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[10px] font-semibold text-muted-foreground uppercase">
-                      Rate (%)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={loan.rate}
-                      onChange={(e) => updateLoan(loan.id, { rate: Number(e.target.value) })}
-                      className="w-full border rounded px-2.5 py-1 text-sm bg-background mt-0.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-muted-foreground uppercase">
-                      Months
-                    </label>
-                    <input
-                      type="number"
-                      value={loan.tenureMonths}
-                      onChange={(e) => updateLoan(loan.id, { tenureMonths: Number(e.target.value) })}
-                      className="w-full border rounded px-2.5 py-1 text-sm bg-background mt-0.5"
-                    />
-                  </div>
-                </div>
+      <div className="grid">
+        <aside className="col-left" id="loan-setup">
+          {loans.length > 1 && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", fontSize: "0.74rem", color: "var(--ink-soft)" }}>
+              <span>Sort priority:</span>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <button className="btn ghost" onClick={() => sortLoans("rate")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Rate</button>
+                <button className="btn ghost" onClick={() => sortLoans("balance")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Balance</button>
+                <button className="btn ghost" onClick={() => sortLoans("name")} style={{ fontSize: "0.68rem", padding: "2px 6px" }}>By Name</button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Rollover Budget Panel */}
-      <div className="border rounded-lg p-6 bg-card shadow-sm grid md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <h3 className="font-bold text-base border-b pb-2">Portfolio Rollover Configuration</h3>
-          <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-              Extra Monthly Prepayment Budget (₹)
-            </label>
-            <div className="flex gap-4 items-center">
-              <input
-                type="range"
-                min="0"
-                max="100000"
-                step="5000"
-                value={extraBudget}
-                onChange={(e) => setExtraBudget(Number(e.target.value))}
-                className="flex-1"
+          )}
+          {loans.map((loan, idx) => {
+            const res = results[idx];
+            if (!res) return null;
+            return (
+              <LoanCard
+                key={loan.id}
+                loan={loan}
+                emi={res.emi}
+                delay={`s${Math.min(idx + 2, 4)}`}
+                onChange={(p) => setLoan(loan.id, p)}
+                onDelete={loans.length > 1 ? () => removeLoan(loan.id) : undefined}
+                result={res}
               />
-              <span className="font-bold text-sm bg-muted px-2.5 py-1 rounded">
-                ₹{extraBudget.toLocaleString('en-IN')}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-bold text-base border-b pb-2">Payment Priority Strategy</h3>
-          <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase mb-2">
-              Select strategy
-            </label>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setStrategy('AVALANCHE')}
-                className={`flex-1 py-2 px-4 border rounded text-xs font-bold transition-all ${
-                  strategy === 'AVALANCHE'
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-background hover:bg-muted text-foreground'
-                }`}
-              >
-                🏔️ Debt Avalanche (Highest Rate)
-              </button>
-              <button
-                onClick={() => setStrategy('SNOWBALL')}
-                className={`flex-1 py-2 px-4 border rounded text-xs font-bold transition-all ${
-                  strategy === 'SNOWBALL'
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-background hover:bg-muted text-foreground'
-                }`}
-              >
-                ❄️ Debt Snowball (Smallest Balance)
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Metrics and Visualizations */}
-      <div className="grid lg:grid-cols-12 gap-8">
-        {/* Left Card: Summary */}
-        <div className="lg:col-span-4 border rounded-lg p-6 bg-primary/5 space-y-4 shadow-sm flex flex-col justify-between">
-          <h3 className="font-bold text-sm text-foreground">Combined Portfolio Savings</h3>
-          <div className="space-y-3">
-            <div>
-              <span className="text-xs text-muted-foreground font-medium">Interest Saved</span>
-              <p className="text-2xl md:text-3xl font-extrabold text-primary">
-                ₹{portfolioSummary.combinedSavings.toLocaleString('en-IN')}
-              </p>
-            </div>
-            <div>
-              <span className="text-xs text-muted-foreground font-medium">Debt-Free Sooner</span>
-              <p className="text-lg font-bold text-foreground">
-                {Math.max(
-                  0,
-                  Math.round((portfolioSummary.originalPayoffMonths - portfolioSummary.optimizedPayoffMonths) / 12 * 10) / 10
-                )}{' '}
-                Years Saved
-              </p>
-            </div>
-          </div>
-          <div className="text-[10px] text-muted-foreground border-t pt-2 mt-2">
-            Base Payoff: {Math.floor(portfolioSummary.originalPayoffMonths / 12)} Yrs | Optimized Payoff:{' '}
-            {Math.floor(portfolioSummary.optimizedPayoffMonths / 12)} Yrs
-          </div>
-        </div>
-
-        {/* Right Card: Graph */}
-        <div className="lg:col-span-8 border rounded-lg p-6 bg-card space-y-4 shadow-sm">
-          <h3 className="font-bold text-sm">Portfolio Outstanding Debt Curve</h3>
-          <div className="relative border rounded p-4 bg-muted/10 h-44 flex items-end justify-between font-mono text-[9px] text-muted-foreground">
-            <div className="absolute inset-0 flex flex-col justify-between p-4 pointer-events-none border-b">
-              <div className="border-t w-full border-muted/20"></div>
-              <div className="border-t w-full border-muted/20"></div>
-              <div className="border-t w-full border-muted/20"></div>
-            </div>
-
-            <div className="w-full flex justify-around items-end h-full z-10">
-              <div className="flex flex-col items-center gap-1 w-1/3">
-                <div className="w-16 bg-muted-foreground/30 h-28 rounded-t"></div>
-                <span className="text-[9px]">Original ({Math.floor(portfolioSummary.originalPayoffMonths / 12)} yrs)</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 w-1/3">
-                <div className="w-16 bg-primary/80 h-16 rounded-t"></div>
-                <span className="text-[9px] text-primary font-bold">
-                  Rollover ({Math.floor(portfolioSummary.optimizedPayoffMonths / 12)} yrs)
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Consolidated Schedule Table */}
-      <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h3 className="font-bold text-sm">Combined Payoff Ledger Schedule</h3>
-          <button
-            onClick={() => alert('Combined CSV exported successfully!')}
-            className="text-xs text-primary hover:underline font-semibold"
-          >
-            Export Combined Schedule CSV
+            );
+          })}
+          <button className="add-btn" onClick={addLoan} style={{ marginTop: 8 }}>
+            + Add another loan
           </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-muted/50 border-b">
-                <th className="p-3">Month</th>
-                <th className="p-3">Outstanding Portfolio Debt</th>
-                <th className="p-3">Total Monthly Interest</th>
-                <th className="p-3">Extra Budget Applied (Rollover)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {portfolioSummary.combinedSchedule.slice(0, 6).map((m) => (
-                <tr key={m.month} className="border-b hover:bg-muted/10">
-                  <td className="p-3 font-semibold">{String(m.month).padStart(3, '0')}</td>
-                  <td className="p-3 font-mono">₹{Math.round(m.outstanding).toLocaleString('en-IN')}</td>
-                  <td className="p-3">₹{Math.round(m.interestPaid).toLocaleString('en-IN')}</td>
-                  <td className="p-3 text-emerald-600 dark:text-emerald-400 font-medium">
-                    ₹{Math.round(m.rolloverApplied).toLocaleString('en-IN')}
-                  </td>
-                </tr>
+        </aside>
+
+        <main className="col-mid">
+          <section id="results" className="workflow-section">
+            <SummaryCards results={results} />
+          </section>
+
+          {loans.length >= 1 && <DebtFreeCelebration results={results} />}
+
+          {loans.length >= 1 && <DebtFreeCountdown results={results} />}
+
+          {loans.length >= 1 && <SavingsValueWidget results={results} />}
+
+          {loans.length > 0 && (
+            <div className="panel s3" id="prepayments">
+              <div className="panel-title"><span className="num">02 / Your moves</span> Plan extra payments</div>
+              {loans.map((loan) => (
+                <PrepaymentControls
+                  key={loan.id}
+                  loan={loan}
+                  entries={entries.filter((e) => e.loanId === loan.id)}
+                  onAdd={() => addEntry(loan.id)}
+                  onChange={changeEntry}
+                  onRemove={removeEntry}
+                />
               ))}
-              {portfolioSummary.combinedSchedule.length > 6 && (
-                <tr className="bg-muted/10">
-                  <td colSpan={4} className="p-3 text-center text-muted-foreground italic">
-                    ... {portfolioSummary.combinedSchedule.length - 6} more months in amortization schedule
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          )}
+
+          {loans.length >= 1 && <PortfolioBalanceChart results={results} />}
+
+          {loans.length > 0 && (
+            <div className="panel s4" id="schedule">
+              <div className="panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                <span>
+                  <span className="num">04 / Detailed Analysis</span> Schedules & Charts
+                </span>
+                <div className="seg">
+                  {loans.map((loan) => (
+                    <button
+                      key={loan.id}
+                      className={activeLoanId === loan.id ? "active" : ""}
+                      onClick={() => setActiveLoanId(loan.id)}
+                    >
+                      {loan.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {results.filter((r) => r.loan.id === activeLoanId).map((res, idx) => {
+                const loanIndex = loans.findIndex((l) => l.id === res.loan.id);
+                return (
+                  <div key={res.loan.id}>
+                    <BalanceChart result={res} index={loanIndex >= 0 ? loanIndex : idx} />
+                    <div style={{ display: "flex", gap: "6px", marginBottom: "8px", marginTop: "8px" }}>
+                      <button
+                        className={`btn ghost${!yearlyView ? " active" : ""}`}
+                        style={{ fontSize: "0.75rem", padding: "4px 10px" }}
+                        onClick={() => setYearlyView(false)}
+                      >Monthly</button>
+                      <button
+                        className={`btn ghost${yearlyView ? " active" : ""}`}
+                        style={{ fontSize: "0.75rem", padding: "4px 10px" }}
+                        onClick={() => setYearlyView(true)}
+                      >Yearly Summary</button>
+                    </div>
+                    {yearlyView
+                      ? <YearlyScheduleTable result={res} />
+                      : <ScheduleTable result={res} />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {loans.length >= 1 && <RolloverPlanner loans={loans} />}
+
+          <DebtMilestones results={results} />
+
+          {loans.length >= 1 && <PlanningTipsPanel results={results} />}
+
+          {loans.length >= 1 && <PrepaymentScenarios results={results} />}
+
+          <div className="actions" id="save-plan" style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            <button className="btn" onClick={() => {
+              const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
+              trackEvent("save_plan_cta_clicked", { savings: totalSavings });
+              setIsPaywallOpen(true);
+            }}>Save Plan & Get PDF (Free)</button>
+            <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>Download CSV</button>
+            <button className="btn ghost" onClick={exportWorkspaceJSON}>Export JSON</button>
+            <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>Import JSON</button>
+            <input type="file" id="import-json-file" accept=".json" onChange={importWorkspaceJSON} style={{ display: "none" }} />
+            <button className="btn ghost" onClick={reset}>Reset to defaults</button>
+          </div>
+
+          {loans.length >= 1 && (
+            <div style={{ marginTop: "8px" }}>
+              <SharePlanButton results={results} />
+            </div>
+          )}
+        </main>
+
+        <aside className="col-right" id="tools">
+          {loans.length >= 1 && (
+            <div className="panel tool-switcher" style={{ marginBottom: "16px" }}>
+              <div className="tool-switcher-head">
+                <span className="num">Tool groups</span>
+                <h4>Planning workspace</h4>
+              </div>
+              <div className="tool-tabs">
+                {(Object.keys(TOOL_TABS) as RightTab[]).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    className="directory-tab"
+                    aria-pressed={rightTab === tab}
+                    onClick={() => setRightTab(tab)}
+                  >
+                    <span>
+                      <b>{TOOL_TABS[tab].title}</b>
+                      <small>{TOOL_TABS[tab].detail}</small>
+                    </span>
+                    {rightTab === tab && <em>Active</em>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {loans.length >= 1 && rightTab === "simulators" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <WindfallSimulator loans={loans} onApplySplit={handleApplyWindfallSplit} />
+              <BonusWindfallPlanner results={results} />
+              <PartPaymentPlanner />
+              <InvestmentVsPrepay results={results} />
+              <SIPCorpusSimulator results={results} />
+            </div>
+          )}
+
+          {loans.length >= 1 && rightTab === "risk" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <DebtStressMeter results={results} />
+              <InterestShockVisualizer results={results} />
+              <BalanceTransferAdvisor results={results} />
+              <RulesPanel />
+            </div>
+          )}
+
+          {loans.length >= 1 && rightTab === "tax" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <TaxSavingsDeductor results={results} />
+              <PrepayGoalPlanner results={results} />
+              <MonthlyBudgetPlanner results={results} />
+              <ForeclosureCalculator results={results} />
+            </div>
+          )}
+
+          {loans.length >= 1 && rightTab === "tools" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <LoanEligibilityChecker />
+              <BankEMIComparator />
+              <StampDutyCalculator />
+              <RentVsBuyCalculator />
+              <InflationAdjustedView results={results} />
+              <NetWorthProjector results={results} />
+            </div>
+          )}
+
+          {loans.length >= 1 && rightTab === "guidance" && (
+            <div className="entry-animated" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <PlanningTipsPanel results={results} />
+              <AchievementBadges results={results} />
+              <LettersToEditor results={results} />
+            </div>
+          )}
+
+          {leads.length > 0 && (
+            <div className="panel s6" style={{ borderLeft: "4px solid var(--emerald)", width: "100%" }}>
+              <div className="panel-title">
+                <span className="num">Saved records</span> Captured plan requests ({leads.length})
+              </div>
+              <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "14px", lineHeight: "1.4" }}>
+                Stores email opt-ins and calculated savings locally, then syncs to Supabase when configured.
+              </p>
+              <div style={{ maxHeight: "250px", overflowY: "auto", border: "1px solid var(--line)", borderRadius: "3px", marginBottom: "14px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
+                  <thead>
+                    <tr style={{ background: "var(--ink)", color: "var(--paper)" }}>
+                      <th style={{ padding: "8px", textAlign: "left" }}>Email</th>
+                      <th style={{ padding: "8px", textAlign: "right" }}>Savings</th>
+                      <th style={{ padding: "8px", textAlign: "right" }}>Store</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map((l, index) => (
+                      <tr key={index} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "8px", fontWeight: "bold", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "160px" }} title={l.email}>{l.email}</td>
+                        <td style={{ padding: "8px", textAlign: "right", color: "var(--emerald)", fontWeight: 700 }}>
+                          {formatINR(l.calculatedSavings)}
+                        </td>
+                        <td style={{ padding: "8px", textAlign: "right", textTransform: "capitalize" }}>{l.savedTo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </aside>
       </div>
+
+      <footer className="foot">
+        <b>How to read this:</b> "Baseline" = paying only the EMI. "Your plan" = baseline plus the extra payments above.
+        Prepaying early saves the most because early EMIs are almost all interest. Figures use a reducing-balance,
+        tenure-reduction model and match a standard Excel reducing balance sheet to the rupee.<br />
+        Set your real outstanding balances, rates and start months in the loan cards.
+        Not financial advice; confirm current terms with your lender.
+      </footer>
+
+      <PaywallModal isOpen={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} onCapture={handleCaptureLead} />
     </div>
   );
 }

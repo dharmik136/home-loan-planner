@@ -1,0 +1,226 @@
+/*
+ * Home Loan Prepayment Planner
+ * Copyright (C) 2026 Dharmik Shingala
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Turns the user's prepayment entries into the {month: amount} map the
+// amortization engine consumes, and bundles baseline-vs-plan results per loan.
+
+import { buildSchedule, compare, monthlyEmi, type ScheduleResult, type Comparison } from "./amortization";
+
+export type LoanId = string;
+export type PrepayType = "oneTime" | "yearly";
+
+export interface RateChangeEntry {
+  id: string;
+  monthIndex: number;
+  newRatePct: number;
+}
+
+export type LenderRuleset = "hdfc" | "rbi" | "custom" | "none";
+
+export interface Loan {
+  id: LoanId;
+  name: string;
+  outstanding: number;
+  ratePct: number;
+  tenureMonths: number;
+  startYYYYMM: string;
+  prepayBehavior?: "reduceTenure" | "reduceEmi";
+  preEmiInterest?: number;
+  ruleset?: LenderRuleset;
+  customMinPrepay?: number;
+  rateChanges?: RateChangeEntry[];
+  extraEmiPerYear?: boolean;
+  stepUpPct?: number;
+  biWeekly?: boolean;
+  moratoriumStart?: number;
+  moratoriumDuration?: number;
+  moratoriumType?: "interestOnly" | "fullHoliday";
+  balloonPayments?: BalloonPaymentEntry[];
+  interestMethod?: "monthlyReducing" | "dailyReducing";
+}
+
+export interface BalloonPaymentEntry {
+  id: string;
+  yearIndex: number;
+  amount: number;
+}
+
+export interface PrepayEntry {
+  id: string;
+  loanId: LoanId;
+  type: PrepayType;
+  amount: number;
+  monthIndex: number; // oneTime: the month; yearly: first month, then every 12
+}
+
+/** Aggregate a loan's entries into a {month: total} prepayment map. */
+export function buildPrepayments(
+  entries: PrepayEntry[],
+  tenure: number,
+  extraEmiPerYear = false,
+  baseEmi = 0,
+  biWeekly = false,
+  balloonPayments?: BalloonPaymentEntry[]
+): Record<number, number> {
+  const map: Record<number, number> = {};
+
+  if (extraEmiPerYear && baseEmi > 0) {
+    for (let m = 12; m <= tenure; m += 12) {
+      map[m] = (map[m] ?? 0) + baseEmi;
+    }
+  }
+
+  if (biWeekly && baseEmi > 0) {
+    for (let m = 6; m <= tenure; m += 6) {
+      map[m] = (map[m] ?? 0) + baseEmi / 2;
+    }
+  }
+
+  if (balloonPayments) {
+    for (const bp of balloonPayments) {
+      if (bp.amount > 0 && bp.yearIndex > 0) {
+        const m = bp.yearIndex * 12;
+        if (m <= tenure) {
+          map[m] = (map[m] ?? 0) + bp.amount;
+        }
+      }
+    }
+  }
+
+  for (const e of entries) {
+    if (e.amount <= 0) continue;
+    if (e.type === "oneTime") {
+      map[e.monthIndex] = (map[e.monthIndex] ?? 0) + e.amount;
+    } else {
+      for (let m = e.monthIndex; m <= tenure; m += 12) {
+        map[m] = (map[m] ?? 0) + e.amount;
+      }
+    }
+  }
+  return map;
+}
+
+export interface LoanResult {
+  loan: Loan;
+  emi: number;
+  baseline: ScheduleResult;
+  plan: ScheduleResult;
+  comparison: Comparison;
+}
+
+function getRateChangesMap(loan: Loan): Record<number, number> {
+  const map: Record<number, number> = {};
+  if (loan.rateChanges) {
+    for (const rc of loan.rateChanges) {
+      if (rc.newRatePct > 0 && rc.monthIndex > 0) {
+        map[rc.monthIndex] = rc.newRatePct;
+      }
+    }
+  }
+  return map;
+}
+
+export function computeLoan(loan: Loan, entries: PrepayEntry[]): LoanResult {
+  const emi = loan.outstanding <= 0 ? 0 : monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
+  const prepayments = loan.outstanding <= 0 ? {} : buildPrepayments(entries, loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly, loan.balloonPayments);
+  const behavior = loan.prepayBehavior ?? "reduceTenure";
+  const rateChangesMap = getRateChangesMap(loan);
+  
+  const emptySchedule: ScheduleResult = { rows: [], totalInterest: 0, totalPaid: 0, monthsToPayoff: 0 };
+  const baseline = loan.outstanding <= 0 
+    ? emptySchedule 
+    : buildSchedule(
+        loan.outstanding,
+        loan.ratePct,
+        loan.tenureMonths,
+        emi,
+        {},
+        "reduceTenure",
+        rateChangesMap,
+        loan.stepUpPct,
+        loan.moratoriumStart,
+        loan.moratoriumDuration,
+        loan.moratoriumType,
+        loan.interestMethod,
+        loan.startYYYYMM
+      );
+  
+  const plan = loan.outstanding <= 0 
+    ? emptySchedule 
+    : buildSchedule(
+        loan.outstanding,
+        loan.ratePct,
+        loan.tenureMonths,
+        emi,
+        prepayments,
+        behavior,
+        rateChangesMap,
+        loan.stepUpPct,
+        loan.moratoriumStart,
+        loan.moratoriumDuration,
+        loan.moratoriumType,
+        loan.interestMethod,
+        loan.startYYYYMM
+      );
+
+  return { loan, emi, baseline, plan, comparison: compare(baseline, plan) };
+}
+
+/** Effect of a single lump sum on a loan, vs its own baseline. */
+export function windfallEffect(loan: Loan, amount: number, monthIndex: number): Comparison {
+  const emptyComparison = { interestSaved: 0, monthsSaved: 0, baselineInterest: 0, planInterest: 0, baselineMonths: 0, planMonths: 0 };
+  if (loan.outstanding <= 0) return emptyComparison;
+
+  const emi = monthlyEmi(loan.outstanding, loan.ratePct, loan.tenureMonths);
+  const behavior = loan.prepayBehavior ?? "reduceTenure";
+  const rateChangesMap = getRateChangesMap(loan);
+  const prepayments = buildPrepayments([], loan.tenureMonths, loan.extraEmiPerYear, emi, loan.biWeekly, loan.balloonPayments);
+  prepayments[monthIndex] = (prepayments[monthIndex] ?? 0) + amount;
+  
+  const baseline = buildSchedule(
+    loan.outstanding,
+    loan.ratePct,
+    loan.tenureMonths,
+    emi,
+    {},
+    "reduceTenure",
+    rateChangesMap,
+    loan.stepUpPct,
+    loan.moratoriumStart,
+    loan.moratoriumDuration,
+    loan.moratoriumType,
+    loan.interestMethod,
+    loan.startYYYYMM
+  );
+  const plan = buildSchedule(
+    loan.outstanding,
+    loan.ratePct,
+    loan.tenureMonths,
+    emi,
+    prepayments,
+    behavior,
+    rateChangesMap,
+    loan.stepUpPct,
+    loan.moratoriumStart,
+    loan.moratoriumDuration,
+    loan.moratoriumType,
+    loan.interestMethod,
+    loan.startYYYYMM
+  );
+  return compare(baseline, plan);
+}
