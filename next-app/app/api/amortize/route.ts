@@ -19,9 +19,63 @@
 import { NextResponse } from "next/server";
 import { buildSchedule, compare, monthlyEmi } from "../engine/amortization";
 
+const MAX_TENURE_MONTHS = 600;
+const MAX_PRINCIPAL = 1_000_000_000;
+const MAX_RATE_PCT = 100;
+const MAX_STEP_UP_PCT = 100;
+const MAX_SCHEDULE_ENTRIES = 600;
+
+type NumericMap = Record<number, number>;
+
+function isFiniteNumber(value: unknown, min: number, max: number): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
+}
+
+function isValidMonth(value: unknown): value is number {
+  return Number.isInteger(value) && isFiniteNumber(value, 1, MAX_TENURE_MONTHS);
+}
+
+function parseNumericMap(value: unknown, valueName: "amount" | "rate", maxValue: number): NumericMap | null {
+  const result: NumericMap = {};
+  const addEntry = (month: unknown, amount: unknown): boolean => {
+    if (!isValidMonth(month) || !isFiniteNumber(amount, 0, maxValue)) return false;
+    result[month] = amount;
+    return true;
+  };
+
+  if (Array.isArray(value)) {
+    if (value.length > MAX_SCHEDULE_ENTRIES) return null;
+    for (const item of value) {
+      if (!item || typeof item !== "object") return null;
+      const entry = item as Record<string, unknown>;
+      if (!addEntry(entry.month, entry[valueName])) return null;
+    }
+    return result;
+  }
+
+  if (!value || typeof value !== "object") return null;
+  const entries = Object.entries(value);
+  if (entries.length > MAX_SCHEDULE_ENTRIES) return null;
+  for (const [month, amount] of entries) {
+    const numericMonth = Number(month);
+    if (!Number.isInteger(numericMonth) || !addEntry(numericMonth, amount)) return null;
+  }
+  return result;
+}
+
+function isValidStartMonth(value: unknown): value is string | undefined {
+  if (value === undefined) return true;
+  if (typeof value !== "string") return false;
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  return !!match && Number(match[2]) >= 1 && Number(match[2]) <= 12;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body: unknown = await request.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Request body must be a JSON object." }, { status: 400 });
+    }
 
     const {
       principal,
@@ -36,51 +90,36 @@ export async function POST(request: Request) {
       moraType,
       interestMethod = "monthlyReducing",
       startYYYYMM,
-    } = body;
+    } = body as Record<string, unknown>;
 
-    // Validate required fields
-    if (typeof principal !== "number" || principal <= 0) {
+    if (!isFiniteNumber(principal, 1, MAX_PRINCIPAL)) {
       return NextResponse.json({ error: "Invalid or missing 'principal'. Must be a positive number." }, { status: 400 });
     }
-    if (typeof ratePct !== "number" || ratePct < 0) {
+    if (!isFiniteNumber(ratePct, 0, MAX_RATE_PCT)) {
       return NextResponse.json({ error: "Invalid or missing 'ratePct'. Must be a non-negative number." }, { status: 400 });
     }
-    if (typeof tenureMonths !== "number" || tenureMonths <= 0) {
+    if (!Number.isInteger(tenureMonths) || !isFiniteNumber(tenureMonths, 1, MAX_TENURE_MONTHS)) {
       return NextResponse.json({ error: "Invalid or missing 'tenureMonths'. Must be a positive number." }, { status: 400 });
     }
-
-    // Standardize prepayments record
-    const prepaymentsMap: Record<number, number> = {};
-    if (Array.isArray(prepayments)) {
-      prepayments.forEach((p: { month: number; amount: number }) => {
-        if (typeof p.month === "number" && typeof p.amount === "number") {
-          prepaymentsMap[p.month] = p.amount;
-        }
-      });
-    } else if (typeof prepayments === "object" && prepayments !== null) {
-      Object.entries(prepayments).forEach(([k, v]) => {
-        const monthNum = parseInt(k);
-        if (!isNaN(monthNum) && typeof v === "number") {
-          prepaymentsMap[monthNum] = v;
-        }
-      });
+    if (prepayBehavior !== "reduceTenure" && prepayBehavior !== "reduceEmi") {
+      return NextResponse.json({ error: "Invalid 'prepayBehavior'." }, { status: 400 });
+    }
+    if (!isFiniteNumber(stepUpPct, 0, MAX_STEP_UP_PCT)) {
+      return NextResponse.json({ error: "Invalid 'stepUpPct'." }, { status: 400 });
+    }
+    if ((moraStart !== undefined && !isValidMonth(moraStart)) ||
+      (moraDuration !== undefined && !Number.isInteger(moraDuration)) ||
+      (moraDuration !== undefined && !isFiniteNumber(moraDuration, 1, MAX_TENURE_MONTHS)) ||
+      (moraType !== undefined && moraType !== "interestOnly" && moraType !== "fullHoliday") ||
+      (interestMethod !== "monthlyReducing" && interestMethod !== "dailyReducing") ||
+      !isValidStartMonth(startYYYYMM)) {
+      return NextResponse.json({ error: "Invalid optional schedule settings." }, { status: 400 });
     }
 
-    // Standardize rateChanges record
-    const rateChangesMap: Record<number, number> = {};
-    if (Array.isArray(rateChanges)) {
-      rateChanges.forEach((rc: { month: number; rate: number }) => {
-        if (typeof rc.month === "number" && typeof rc.rate === "number") {
-          rateChangesMap[rc.month] = rc.rate;
-        }
-      });
-    } else if (typeof rateChanges === "object" && rateChanges !== null) {
-      Object.entries(rateChanges).forEach(([k, v]) => {
-        const monthNum = parseInt(k);
-        if (!isNaN(monthNum) && typeof v === "number") {
-          rateChangesMap[monthNum] = v;
-        }
-      });
+    const prepaymentsMap = parseNumericMap(prepayments, "amount", principal);
+    const rateChangesMap = parseNumericMap(rateChanges, "rate", MAX_RATE_PCT);
+    if (!prepaymentsMap || !rateChangesMap) {
+      return NextResponse.json({ error: "Invalid prepayments or rate changes." }, { status: 400 });
     }
 
     // Compute standard monthly EMI
