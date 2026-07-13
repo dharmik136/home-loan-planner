@@ -294,3 +294,77 @@ export function mergeYearlySummaries(allSummaries: LoanYearSummary[][]): LoanYea
   }
   return merged;
 }
+
+export interface RegimeVerdict {
+  recommendation: "old" | "new" | "equal";
+  firstYearSavings: number;
+  lifetimeSavings: number;
+  crossoverYear: number | null;
+  firstYearOldTax: number;
+  firstYearNewTax: number;
+  lifetimeOldTax: number;
+  lifetimeNewTax: number;
+}
+
+export function computeRegimeVerdict(
+  yearlyLoanSummaries: LoanYearSummary[],
+  income: number,
+  otherSection80C: number,
+  propertyType: "self" | "let"
+): RegimeVerdict {
+  const stdDeduction = income > 0 ? 50_000 : 0;
+  const interestCap = propertyType === "self" ? 200_000 : Infinity;
+  const remaining80C = Math.max(0, 150_000 - otherSection80C);
+
+  // Compute New Regime tax (constant each year since income is constant)
+  const netTaxableNew = Math.max(0, income - stdDeduction);
+  const taxNewPerYear = totalTax(netTaxableNew, NEW_SLABS, NEW_87A_LIMIT);
+
+  let totalTaxOld = 0;
+  let totalTaxNew = 0;
+  let firstYearOldTax = 0;
+  let firstYearNewTax = taxNewPerYear;
+
+  let crossoverYear: number | null = null;
+
+  yearlyLoanSummaries.forEach((yr, idx) => {
+    const year = idx + 1;
+    const deductibleInterest = Math.min(yr.annualInterest, interestCap);
+    const deductiblePrincipal = Math.min(yr.annualPrincipal, remaining80C);
+
+    const netTaxableOld = Math.max(0, income - stdDeduction - deductibleInterest - deductiblePrincipal);
+    const taxOldThisYear = totalTax(netTaxableOld, OLD_SLABS, OLD_87A_LIMIT);
+
+    totalTaxOld += taxOldThisYear;
+    totalTaxNew += taxNewPerYear;
+
+    if (year === 1) {
+      firstYearOldTax = taxOldThisYear;
+    }
+
+    if (crossoverYear === null && taxOldThisYear > taxNewPerYear) {
+      crossoverYear = year;
+    }
+  });
+
+  const firstYearSavings = Math.abs(firstYearNewTax - firstYearOldTax);
+  const lifetimeSavings = Math.abs(totalTaxNew - totalTaxOld);
+
+  let recommendation: "old" | "new" | "equal" = "equal";
+  if (firstYearOldTax < firstYearNewTax) {
+    recommendation = "old";
+  } else if (firstYearNewTax < firstYearOldTax) {
+    recommendation = "new";
+  }
+
+  return {
+    recommendation,
+    firstYearSavings,
+    lifetimeSavings,
+    crossoverYear,
+    firstYearOldTax,
+    firstYearNewTax,
+    lifetimeOldTax: totalTaxOld,
+    lifetimeNewTax: totalTaxNew,
+  };
+}
