@@ -107,7 +107,7 @@ export default function PricingPage() {
                   onClick={() => alert(`Redirecting to checkout for ${tier.name}`)}
                   className={`w-full inline-flex items-center justify-center rounded-md font-bold text-sm h-10 px-4 transition-all ${
                     tier.isPopular
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                      ? 'border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground'
                       : 'border border-input bg-background hover:bg-accent text-foreground'
                   }`}
                 >

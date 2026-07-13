@@ -117,7 +117,7 @@ export default function AboutPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full inline-flex items-center justify-center rounded-md font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 disabled:opacity-55"
+                className="w-full inline-flex items-center justify-center rounded-md font-bold text-sm border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-10 px-4 disabled:opacity-55"
               >
                 {submitting ? 'Submitting...' : 'Send Message'}
               </button>

@@ -163,7 +163,7 @@ export default function SampleReportPage() {
             <div className="pt-4 border-t space-y-3">
               <button
                 onClick={() => alert('PDF report generating stream initialized. Check downloads.')}
-                className="w-full inline-flex items-center justify-center rounded-md font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4"
+                className="w-full inline-flex items-center justify-center rounded-md font-bold text-sm border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4"
               >
                 Download Sample PDF Document 📥
               </button>

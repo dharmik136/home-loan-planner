@@ -48,7 +48,7 @@ export default function Header() {
             {isLoggedIn ? (
               <Link 
                 href="/planner" 
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4 py-2"
               >
                 Go to Dashboard
               </Link>
@@ -106,7 +106,7 @@ export default function Header() {
               <Link 
                 href="/planner" 
                 onClick={toggleMobileMenu}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4 py-2"
               >
                 Go to Dashboard
               </Link>

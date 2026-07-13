@@ -71,7 +71,7 @@ export default function Homepage() {
             <div className="flex gap-4">
               <Link
                 href="/planner"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-6"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-11 px-6"
               >
                 Try Free Multi-Loan Planner ➔
               </Link>
