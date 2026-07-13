@@ -310,7 +310,11 @@ body {
   gap: 20px;
   align-items: start;
 }
-.col-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.col-left {
+  display: flex; flex-direction: column; gap: 16px; min-width: 0;
+  border-right: 1px solid var(--line);
+  padding-right: 20px;
+}
 .col-mid { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .col-right { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 
@@ -329,6 +333,12 @@ body {
 @container workspace (max-width: 940px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+  .col-left {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
   }
   .col-right {
     grid-column: span 1;
