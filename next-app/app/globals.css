@@ -165,7 +165,7 @@ body {
 
 /* ---------- Masthead ---------- */
 .masthead {
-  border-bottom: 3px double var(--ink);
+  border-bottom: 4px double var(--cloth-red);
   padding-bottom: 10px;
   margin-bottom: 6px;
   display: flex;
