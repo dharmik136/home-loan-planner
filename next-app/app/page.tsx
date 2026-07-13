@@ -131,10 +131,10 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded p-4 text-center">
+            <div className="bg-muted border border-border rounded p-4 text-center">
               <p className="text-xs text-muted-foreground font-medium uppercase">YOUR RESULTS</p>
               <div className="mt-1 space-y-1">
-                <p className="text-lg font-bold text-primary">
+                <p className="text-lg font-bold" style={{ color: 'var(--emerald)' }}>
                   Interest Saved: ₹{interestSaved.toLocaleString('en-IN')}
                 </p>
                 <p className="text-sm font-semibold text-foreground">

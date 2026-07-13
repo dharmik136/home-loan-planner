@@ -681,22 +681,22 @@ p, li {
    ============================================================ */
 :root {
   /* Primitive tokens */
-  --color-gray-50: #f7f9fc;
-  --color-gray-100: #eef2f7;
-  --color-gray-200: #dde5ef;
-  --color-gray-300: #c8d3e0;
-  --color-gray-500: #667085;
-  --color-gray-700: #344054;
-  --color-gray-900: #172033;
-  --color-blue-50: #eaf3ff;
-  --color-blue-600: #1769e0;
-  --color-blue-700: #1254b3;
-  --color-green-50: #e9f7ef;
-  --color-green-600: #13795b;
-  --color-amber-50: #fff5df;
-  --color-amber-600: #b76e00;
-  --color-red-50: #fff0eb;
-  --color-red-600: #c2410c;
+  --color-gray-50: #F6EFE1;
+  --color-gray-100: #F0E6D2;
+  --color-gray-200: #CBB99A;
+  --color-gray-300: #B8A47F;
+  --color-gray-500: #6B5B4A;
+  --color-gray-700: #4A3B2E;
+  --color-gray-900: #241C14;
+  --color-blue-50: #F0DCD6;
+  --color-blue-600: #9E2B25;
+  --color-blue-700: #7F2019;
+  --color-green-50: #E4ECE3;
+  --color-green-600: #2F6B4A;
+  --color-amber-50: #F6EDD9;
+  --color-amber-600: #B98A2E;
+  --color-red-50: #F3E2DA;
+  --color-red-600: #A8531F;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -706,16 +706,16 @@ p, li {
   --space-6: 1.5rem;
   --space-8: 2rem;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --shadow-sm: 0 1px 2px rgba(23, 32, 51, 0.06);
-  --shadow-md: 0 16px 40px -28px rgba(23, 32, 51, 0.45);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --shadow-sm: 0 1px 2px rgba(110, 70, 40, 0.10);
+  --shadow-md: 0 16px 40px -28px rgba(110, 70, 40, 0.35);
   --duration-fast: 150ms;
 
   /* Semantic tokens */
   --color-background: var(--color-gray-50);
   --color-foreground: var(--color-gray-900);
-  --color-card: #ffffff;
+  --color-card: #FBF3E5;
   --color-card-foreground: var(--color-gray-900);
   --color-muted: var(--color-gray-100);
   --color-muted-foreground: var(--color-gray-500);
@@ -723,7 +723,7 @@ p, li {
   --color-border-strong: var(--color-gray-300);
   --color-primary: var(--color-blue-600);
   --color-primary-hover: var(--color-blue-700);
-  --color-primary-foreground: #ffffff;
+  --color-primary-foreground: var(--color-gray-50);
   --color-success: var(--color-green-600);
   --color-warning: var(--color-amber-600);
   --color-error: var(--color-red-600);
@@ -735,30 +735,33 @@ p, li {
   --panel: var(--color-muted);
   --ink: var(--color-foreground);
   --ink-soft: var(--color-gray-500);
-  --ink-faint: #8a98aa;
+  --ink-faint: #8A7A67;
   --line: var(--color-border);
   --line-strong: var(--color-border-strong);
+  --cloth-red: var(--color-primary);
   --emerald: var(--color-success);
-  --emerald-bright: #18a46f;
+  --emerald-bright: #3A8560;
   --emerald-wash: var(--color-green-50);
-  --clay: var(--color-error);
-  --clay-wash: var(--color-red-50);
+  --clay: #6E5A4D;
+  /* --clay-wash intentionally not redeclared here — the Fresh Khata brown-tinted
+     wash set in the earlier :root block (Task 3) should win; clay/cost must not
+     inherit color-error's rust tint. */
   --gold: var(--color-warning);
   --gold-wash: var(--color-amber-50);
   --shadow: var(--shadow-sm);
-  --display: "Inter", "Segoe UI", system-ui, sans-serif;
-  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --display: var(--font-prata), serif;
+  --body: var(--font-lora), serif;
 
   /* Component tokens */
-  --button-bg: var(--color-primary);
-  --button-fg: var(--color-primary-foreground);
-  --button-hover-bg: var(--color-primary-hover);
+  --button-bg: transparent;
+  --button-fg: var(--color-primary);
+  --button-hover-bg: var(--color-primary);
   --button-radius: var(--radius-md);
   --button-padding-x: var(--space-4);
   --button-padding-y: 0.62rem;
-  --input-bg: var(--color-card);
+  --input-bg: transparent;
   --input-border: var(--color-border-strong);
-  --input-focus-border: var(--color-ring);
+  --input-focus-border: var(--color-primary);
   --card-bg: var(--color-card);
   --card-border: var(--color-border);
   --card-radius: var(--radius-md);
@@ -766,34 +769,34 @@ p, li {
 }
 
 body.dark {
-  --color-background: #101725;
-  --color-foreground: #f4f7fb;
-  --color-card: #151e2e;
-  --color-card-foreground: #f4f7fb;
-  --color-muted: #1c2638;
-  --color-muted-foreground: #a5b2c4;
-  --color-border: #283447;
-  --color-border-strong: #3a4960;
-  --color-primary: #5b9dff;
-  --color-primary-hover: #82b7ff;
-  --color-primary-foreground: #061224;
-  --color-success: #35c48b;
-  --color-warning: #f0b04f;
-  --color-error: #ff815f;
-  --color-ring: #82b7ff;
-  --color-blue-50: #11284a;
-  --color-green-50: #0f2c22;
-  --color-amber-50: #33250c;
-  --color-red-50: #37190f;
-  --ink-faint: #718098;
-  --shadow-md: 0 18px 44px -26px rgba(0, 0, 0, 0.8);
+  --color-background: #241512;
+  --color-foreground: #F0E4D3;
+  --color-card: #2E1D17;
+  --color-card-foreground: #F0E4D3;
+  --color-muted: #33221B;
+  --color-muted-foreground: #A99783;
+  --color-border: #4A3830;
+  --color-border-strong: #5C4740;
+  --color-primary: #C8543F;
+  --color-primary-hover: #DE6A54;
+  --color-primary-foreground: #241512;
+  --color-success: #4E9370;
+  --color-warning: #D9A64E;
+  --color-error: #C97A45;
+  --color-ring: #C8543F;
+  --color-blue-50: #3A241F;
+  --color-green-50: #1C2E24;
+  --color-amber-50: #3A2C15;
+  --color-red-50: #33241C;
+  --ink-faint: #7C6C5A;
+  --shadow-md: 0 18px 44px -26px rgba(0, 0, 0, 0.75);
 }
 
 body {
   background:
-    linear-gradient(180deg, rgba(23, 105, 224, 0.05), transparent 360px),
+    linear-gradient(180deg, rgba(158, 43, 37, 0.05), transparent 360px),
     var(--color-background);
-  background-image: linear-gradient(180deg, rgba(23, 105, 224, 0.05), transparent 360px);
+  background-image: linear-gradient(180deg, rgba(158, 43, 37, 0.05), transparent 360px);
   color: var(--color-foreground);
   letter-spacing: 0;
 }
@@ -824,7 +827,7 @@ input[type="month"]:focus,
 select:focus,
 textarea:focus {
   border-color: var(--input-focus-border) !important;
-  box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.16) !important;
+  box-shadow: 0 0 0 3px rgba(158, 43, 37, 0.16) !important;
   background: var(--input-bg) !important;
 }
 
@@ -970,7 +973,7 @@ input[type="range"] {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background:
-    linear-gradient(135deg, rgba(23, 105, 224, 0.08), transparent 52%),
+    linear-gradient(135deg, rgba(158, 43, 37, 0.08), transparent 52%),
     var(--color-background);
   padding: var(--space-5);
   display: flex;
@@ -1223,7 +1226,7 @@ body.dark .bar-row div {
 
 .workflow-nav button:hover {
   background: var(--color-blue-50);
-  border-color: rgba(23, 105, 224, 0.35);
+  border-color: rgba(158, 43, 37, 0.35);
 }
 
 .workflow-nav b {
@@ -1310,7 +1313,7 @@ body.dark .bar-row div {
 .recommend {
   border-radius: var(--radius-md);
   background: var(--color-blue-50);
-  border: 1px solid rgba(23, 105, 224, 0.18);
+  border: 1px solid rgba(158, 43, 37, 0.18);
 }
 
 .seg {
@@ -1359,7 +1362,7 @@ body.dark .bar-row div {
 }
 
 .btn {
-  border-color: var(--button-bg);
+  border-color: var(--color-primary);
   background: var(--button-bg);
   color: var(--button-fg);
 }
@@ -1367,6 +1370,7 @@ body.dark .bar-row div {
 .btn:hover {
   background: var(--button-hover-bg);
   border-color: var(--button-hover-bg);
+  color: var(--color-primary-foreground);
 }
 
 .btn.ghost {
@@ -1378,13 +1382,13 @@ body.dark .bar-row div {
 .btn.ghost:hover {
   background: var(--color-blue-50);
   color: var(--color-primary);
-  border-color: rgba(23, 105, 224, 0.35);
+  border-color: rgba(158, 43, 37, 0.35);
 }
 
 .add-btn {
   background: var(--color-card);
   color: var(--color-primary);
-  border: 1px dashed rgba(23, 105, 224, 0.45);
+  border: 1px dashed rgba(158, 43, 37, 0.45);
 }
 
 .add-btn:hover {
@@ -1429,7 +1433,7 @@ body.dark .bar-row div {
 
 .directory-tab:hover,
 .directory-tab[aria-pressed="true"] {
-  border-color: rgba(23, 105, 224, 0.45);
+  border-color: rgba(158, 43, 37, 0.45);
   background: var(--color-blue-50);
 }
 
@@ -1484,7 +1488,7 @@ body.dark .sched-table th {
 
 .wf-side.win {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.12);
+  box-shadow: 0 0 0 3px rgba(158, 43, 37, 0.12);
 }
 
 .foot {
