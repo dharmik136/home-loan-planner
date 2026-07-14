@@ -43,7 +43,7 @@ export function InvestmentVsPrepay({ results }: Props) {
   const prepayWins = difference < 0;
 
   return (
-    <div className="panel s7" style={{ marginTop: "16px" }}>
+    <div className="panel s7" style={{ marginTop: "16px", fontVariantNumeric: "tabular-nums" }}>
       <div className="panel-title">
         <span className="num">Opportunity cost</span>
         Prepay Loan vs. Invest in Mutual Funds

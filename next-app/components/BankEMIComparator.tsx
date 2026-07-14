@@ -84,7 +84,7 @@ export function BankEMIComparator() {
       </div>
 
       <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.76rem" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.76rem", fontVariantNumeric: "tabular-nums" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--line-strong)", background: "var(--panel)" }}>
               <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--ink-soft)" }}>Bank</th>

@@ -17,7 +17,7 @@ export default function Header() {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-4 border-double border-primary bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b-4 border-double border-primary bg-background">
       <div className="container flex h-14 items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <div className="flex items-center gap-2">
@@ -28,16 +28,16 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link href="/calculator" className="transition-colors hover:text-foreground/80 text-foreground/60">
+          <Link href="/calculator" className="transition-colors hover:text-foreground text-muted-foreground">
             Single Simulator
           </Link>
-          <Link href="/pricing" className="transition-colors hover:text-foreground/80 text-foreground/60">
+          <Link href="/pricing" className="transition-colors hover:text-foreground text-muted-foreground">
             Pricing
           </Link>
-          <Link href="/sample-report" className="transition-colors hover:text-foreground/80 text-foreground/60">
+          <Link href="/sample-report" className="transition-colors hover:text-foreground text-muted-foreground">
             Sample Report
           </Link>
-          <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
+          <Link href="/about" className="transition-colors hover:text-foreground text-muted-foreground">
             About
           </Link>
         </nav>
@@ -104,16 +104,16 @@ export default function Header() {
       {/* Mobile Navigation Dropdown */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t bg-background px-4 py-3 space-y-3">
-          <Link href="/calculator" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
+          <Link href="/calculator" onClick={toggleMobileMenu} className="block text-sm font-medium text-muted-foreground hover:text-foreground">
             Single Simulator
           </Link>
-          <Link href="/pricing" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
+          <Link href="/pricing" onClick={toggleMobileMenu} className="block text-sm font-medium text-muted-foreground hover:text-foreground">
             Pricing
           </Link>
-          <Link href="/sample-report" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
+          <Link href="/sample-report" onClick={toggleMobileMenu} className="block text-sm font-medium text-muted-foreground hover:text-foreground">
             Sample Report
           </Link>
-          <Link href="/about" onClick={toggleMobileMenu} className="block text-sm font-medium text-foreground/80 hover:text-foreground">
+          <Link href="/about" onClick={toggleMobileMenu} className="block text-sm font-medium text-muted-foreground hover:text-foreground">
             About
           </Link>
           <hr />

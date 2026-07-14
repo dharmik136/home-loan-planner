@@ -45,7 +45,7 @@ export function SIPCorpusSimulator({ results }: Props) {
   }, [monthlySIP, monthlyReturn]);
 
   return (
-    <div className="panel" style={{ marginTop: "16px" }}>
+    <div className="panel" style={{ marginTop: "16px", fontVariantNumeric: "tabular-nums" }}>
       <div className="panel-title">
         <span className="num">SIP</span>
         SIP Corpus Simulator — What your savings become

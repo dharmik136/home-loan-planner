@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Loan, LoanResult, LenderRuleset } from "../engine/planning";
 import { formatINR } from "../engine/format";
+import { Callout } from "./Callout";
 
 interface Props {
   loan: Loan;
@@ -38,7 +39,10 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             : `EMI (₹${Math.round(emi).toLocaleString("en-IN")}) must exceed first month interest (₹${firstMonthInterest.toLocaleString("en-IN")})`)
         : null);
 
-  const hasErrors = outstandingError || rateError || rateWarning || tenureError || emiError;
+  const hardErrors = [outstandingError, rateError, tenureError, emiError].filter(
+    (msg): msg is string => Boolean(msg)
+  );
+  const softWarnings = [rateWarning].filter((msg): msg is string => Boolean(msg));
 
   return (
     <div className={`panel loan-card ${delay}`} style={{ paddingTop: '28px' }}>
@@ -102,7 +106,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       </div>
 
       {isCollapsed && (
-        <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "-6px", marginBottom: "8px" }}>
+        <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "-6px", marginBottom: "8px", fontVariantNumeric: "tabular-nums" }}>
           {formatINR(loan.outstanding)} @ {loan.ratePct}% - {loan.tenureMonths} mos
         </div>
       )}
@@ -111,7 +115,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         <div style={{ marginBottom: "14px", marginTop: isCollapsed ? "0" : "8px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "var(--ink-soft)", marginBottom: "4px" }}>
             <span>Payoff Speedup:</span>
-            <span style={{ color: "var(--emerald)", fontWeight: "bold" }}>
+            <span style={{ color: "var(--emerald)", fontWeight: "bold", fontVariantNumeric: "tabular-nums" }}>
               -{result.comparison.monthsSaved} months ({((result.comparison.monthsSaved / result.baseline.monthsToPayoff) * 100).toFixed(0)}% faster)
             </span>
           </div>
@@ -489,14 +493,19 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
       </div>
       </>)}
 
-      {hasErrors && (
-        <div className="callout-warning-pulse" style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
-          {outstandingError && <span className="error-principal">- {outstandingError}</span>}
-          {rateError && <span className="error-rate">- {rateError}</span>}
-          {rateWarning && <span className="warning-rate" style={{ color: "var(--warn)" }}>- {rateWarning}</span>}
-          {tenureError && <span className="error-tenure">- {tenureError}</span>}
-          {emiError && <span className="error-emi">- {emiError}</span>}
-        </div>
+      {hardErrors.length > 0 && (
+        <Callout variant="error">
+          {hardErrors.map((msg) => (
+            <span key={msg} style={{ fontVariantNumeric: "tabular-nums" }}>{msg}</span>
+          ))}
+        </Callout>
+      )}
+      {softWarnings.length > 0 && (
+        <Callout variant="warning">
+          {softWarnings.map((msg) => (
+            <span key={msg} style={{ fontVariantNumeric: "tabular-nums" }}>{msg}</span>
+          ))}
+        </Callout>
       )}
 
       <div className="emi-line">

@@ -415,11 +415,19 @@ body {
   color: var(--ink); background: transparent; border: none;
   border-bottom: 1.5px solid var(--line); border-radius: 0;
   padding: 9px 2px; transition: border-color 0.15s, border-bottom-width 0.15s;
+  font-variant-numeric: tabular-nums;
 }
 .field input:focus {
   outline: none;
   border-bottom: 2.5px solid var(--cloth-red);
   background: transparent;
+}
+.field input:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .field.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .emi-line {
@@ -427,7 +435,7 @@ body {
   display: flex; justify-content: space-between; align-items: baseline;
 }
 .emi-line span { font-size: 0.7rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
-.emi-line b { font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
+.emi-line b { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ---------- Summary headline cards ---------- */
 .headline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
@@ -525,6 +533,21 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius
 .add-btn:hover { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-wash); }
 .add-btn:active { transform: scale(0.98); }
 
+.btn:disabled,
+.add-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn:disabled,
+.btn:disabled:hover,
+.add-btn:disabled,
+.add-btn:disabled:hover {
+  background: var(--panel);
+  border-color: var(--line);
+  color: var(--ink-faint);
+  transform: none;
+}
+
 h1, h2, h3, h4, .hero-title, .panel-title {
   text-wrap: balance;
 }
@@ -614,7 +637,7 @@ p, li {
 .legend { display: flex; gap: 20px; font-size: 0.76rem; color: var(--ink-soft); margin: 4px 0 2px; flex-wrap: wrap; }
 .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 .recharts-cartesian-axis-tick text { font-family: var(--body); font-size: 11px; fill: var(--ink-faint); }
-.tooltip { background: var(--ink); color: var(--paper); padding: 9px 12px; border-radius: 3px; font-size: 0.8rem; line-height: 1.6; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+.tooltip { background: var(--ink); color: var(--paper); padding: 9px 12px; border-radius: 3px; font-size: 0.8rem; line-height: 1.6; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); font-variant-numeric: tabular-nums; }
 .tooltip .tt-h { font-family: var(--display); font-weight: 700; margin-bottom: 3px; }
 .tooltip .tt-b { color: var(--emerald-bright); }
 .tooltip .tt-c { color: #e8a07e; }
@@ -952,7 +975,7 @@ input[type="range"] {
   font-size: 2.65rem;
   line-height: 1.04;
   font-weight: 800;
-  letter-spacing: 0;
+  letter-spacing: -0.015em;
 }
 
 .product-intro p,
@@ -1114,7 +1137,7 @@ body.dark .bar-row div {
 .workflow-cards h3,
 .product-section h2 {
   margin-top: var(--space-2);
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
 }
 
 .workflow-cards p {
@@ -1179,7 +1202,7 @@ body.dark .bar-row div {
   font-size: 2rem;
   line-height: 1.1;
   font-family: var(--display);
-  letter-spacing: 0;
+  letter-spacing: -0.015em;
 }
 
 .masthead h1 em {
@@ -1294,7 +1317,7 @@ body.dark .bar-row div {
   font-family: var(--body);
   font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
 }
 
 .panel-title .num {
@@ -1869,6 +1892,14 @@ body.dark .sched-table th {
   color: var(--clay) !important;
   padding: 0 6px !important;
   line-height: 1 !important;
+}
+
+/* Display-type tracking: nine of the ten SaaS references studied for the
+   polish pass tighten headline tracking; serifs need less than the sans
+   faces those systems use, so this stays gentle. An explicit Tailwind
+   tracking-* utility in markup still wins (utilities layer below). */
+.font-display {
+  letter-spacing: -0.015em;
 }
 
 /* ============================================================
