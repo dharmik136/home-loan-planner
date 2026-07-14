@@ -674,7 +674,7 @@ p, li {
 .sched-table td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); color: var(--ink-soft); white-space: nowrap; }
 .sched-table td:nth-child(1) { color: var(--ink-faint); }
 .sched-table td:nth-child(2) { text-align: left; color: var(--ink); font-weight: 500; }
-.sched-table tbody tr:nth-child(12n) td { border-bottom: 1px solid var(--line-strong); }
+.sched-table tr.year-end td { border-bottom: 1px solid var(--line-strong); }
 .sched-table tbody tr:hover td { background: var(--panel); }
 .sched-table tr.has-prepay td { background: var(--emerald-wash); color: var(--ink); font-weight: 600; }
 .sched-note { font-size: 0.74rem; color: var(--ink-faint); margin-top: 8px; }
