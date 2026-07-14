@@ -3,11 +3,12 @@
 [![CI Build & Test Check](https://github.com/dharmik136/home-loan-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/dharmik136/home-loan-planner/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A premium, interactive web application and live Excel workbook to simulate, optimize, and plan prepayments for floating-rate Indian home loans. Designed with a custom physical broadsheet editorial look and backed by a rigorous math core verifying 57 unit tests.
+A premium, interactive web application and live Excel workbook to simulate, optimize, and plan prepayments for floating-rate Indian home loans, backed by a rigorous math core verifying 57+ unit tests.
 
-### 🌐 Live Application
-You can access the live, fully interactive prepayment calculator dashboard here:
-👉 **[dharmik136.github.io/home-loan-planner](https://dharmik136.github.io/home-loan-planner/)**
+### 🌐 Live Applications
+
+*   **[home-loan-planner-neon.vercel.app](https://home-loan-planner-neon.vercel.app/)** — the current app: a Next.js + Supabase multi-loan planner with saved plans, "Fresh Khata" ledger-themed UI (Day and Lamplight modes), and the full workflow (setup → prepayments → schedule → tools → save).
+*   **[dharmik136.github.io/home-loan-planner](https://dharmik136.github.io/home-loan-planner/)** — the original single-file dashboard (no account needed, everything stays in your browser). Still maintained, functionally simpler.
 
 ---
 
@@ -26,20 +27,31 @@ You can access the live, fully interactive prepayment calculator dashboard here:
 
 ## 📂 Repository Layout
 
-*   `index.html` — The compiled, self-contained single-file production build of the React web app. Serves directly to GitHub Pages.
+*   `next-app/` — The current Next.js 16 application (deployed to Vercel), backed by Supabase for accounts and saved plans. Styled with the "Fresh Khata" design system (see [`DESIGN.md`](DESIGN.md)).
+*   `supabase/` — Supabase migrations (schema, RLS policies) for `next-app`'s backend.
+*   `index.html` — The compiled, self-contained single-file production build of the original React web app. Serves directly to GitHub Pages.
 *   `Home-Loan-Prepayment-Planner.xlsx` — The live Excel workbook counterpart with in-built formula calculations.
-*   `web/` — The React & Vite web application source code.
+*   `web/` — The original React & Vite web application source code (single-file, no backend).
     *   `web/src/engine/` — Pure calculation engines (amortization, tax, rollover, formatters).
-    *   `web/src/components/` — Broadsheets theme React components (Moratorium, Tax panel, Windfall, Charts).
+    *   `web/src/components/` — Broadsheet-theme React components (Moratorium, Tax panel, Windfall, Charts).
     *   `web/e2e-trust-flows.e2e.ts` — Playwright browser E2E test suite.
     *   `web/src/engine/math_trust.test.ts` — Vitest unit tests verifying mathematical correctness.
-*   `docs/` — Architecture design specifications, product proposals, and compliance status reports.
+*   `docs/` — Architecture design specs and implementation plans.
 
 ---
 
 ## 🛠️ Local Development
 
-### 1. Excel Core & Python Workbook Generator
+### 1. Next.js App (current)
+Requires a Supabase project (see `supabase/migrations/` for schema) and its URL/publishable key in `next-app/.env.local`:
+```bash
+cd next-app
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+```
+
+### 2. Excel Core & Python Workbook Generator
 Requires Python 3.10+ and standard dependencies:
 ```bash
 pip install -r requirements.txt
@@ -47,8 +59,8 @@ python src/build_workbook.py        # Rebuild the .xlsx spreadsheet
 python src/verify_workbook.py       # Recalculate workbook formulas and cross-verify with engine
 ```
 
-### 2. React Web Dashboard
-To run, edit, or test the React web client:
+### 3. Original React Web Dashboard (single-file, no backend)
+To run, edit, or test the original web client:
 ```bash
 cd web
 npm install
@@ -66,7 +78,7 @@ npx playwright test
 npm run build    
 ```
 
-### 3. Root Script Shortcuts
+### 4. Root Script Shortcuts
 For convenience, you can manage both development and test suites from the root directory using:
 ```bash
 npm run web:install    # Install web dashboard dependencies

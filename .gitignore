@@ -61,3 +61,13 @@ playwright-report/
 web/test-results/
 web/playwright-report/
 htmlreport/
+.playwright-mcp/
+next-app/.playwright-mcp/
+
+# Local agent/MCP tooling config — machine-specific, not project source
+.agents/
+.mcp.json
+skills-lock.json
+
+# Raw AI session transcripts — internal working data, never project docs
+docs/conversation-archive/
