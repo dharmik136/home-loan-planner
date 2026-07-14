@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { formatINR } from "../engine/format";
 import type { LoanResult } from "../engine/planning";
+import { Target } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -62,7 +63,7 @@ export function PrepayGoalPlanner({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🎯 / Goal</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Target size={13} /> / Goal</span>
         Prepayment Goal Planner — What to pay to finish by target year
       </div>
 

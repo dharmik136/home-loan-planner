@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { buildSchedule, monthlyEmi } from '../../../engine/amortization';
 import { Loan, PrepayEntry } from '../../../engine/planning';
 import { formatINR, formatCompactINR } from '../../../engine/format';
+import { ArrowRight, Lightbulb, Zap } from 'lucide-react';
 
 const STORAGE_KEY = "prepayment-ledger-v1";
 
@@ -235,8 +236,8 @@ export default function WindfallOptimizerPage() {
             Configure lump-sum windfalls (bonuses, stock sales) to see where they work hardest across your loans.
           </p>
         </div>
-        <Link href="/planner" className="btn ghost" style={{ height: "36px", minHeight: "36px", lineHeight: "34px", padding: "0 12px" }}>
-          Back to Planner ➔
+        <Link href="/planner" className="btn ghost" style={{ height: "36px", minHeight: "36px", padding: "0 12px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+          Back to Planner <ArrowRight size={14} />
         </Link>
       </header>
 
@@ -254,7 +255,7 @@ export default function WindfallOptimizerPage() {
           justifyContent: "space-between",
           alignItems: "center"
         }}>
-          <span>💡 Currently using a Demo Portfolio. Setup your own loans in the main planner.</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Lightbulb size={15} style={{ color: "var(--gold)" }} /> Currently using a Demo Portfolio. Setup your own loans in the main planner.</span>
           <button className="btn" onClick={handleRestoreDefaultPortfolio} style={{ minHeight: "28px", minWidth: "80px", fontSize: "0.7rem", padding: "2px 8px" }}>Reset Demo</button>
         </div>
       )}
@@ -479,9 +480,9 @@ export default function WindfallOptimizerPage() {
             <button
               onClick={handleApplySplit}
               className="btn"
-              style={{ padding: "0 24px", height: "44px" }}
+              style={{ padding: "0 24px", height: "44px", display: "inline-flex", alignItems: "center", gap: "6px" }}
             >
-              Apply Split to My Planner Portfolio ⚡
+              Apply Split to My Planner Portfolio <Zap size={15} />
             </button>
           </div>
         </main>

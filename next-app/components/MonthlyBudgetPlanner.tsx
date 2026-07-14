@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { formatINR } from "../engine/format";
 import type { LoanResult } from "../engine/planning";
+import { Briefcase } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -53,7 +54,7 @@ export function MonthlyBudgetPlanner({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">💼 / Budget</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Briefcase size={13} /> / Budget</span>
         Monthly Budget Planner
       </div>
 

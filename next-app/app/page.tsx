@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { Scale, RefreshCw, Zap, ArrowRight, ChevronDown } from 'lucide-react';
 
 export default function Homepage() {
   // QuickTeaserCalculator state
@@ -71,9 +72,9 @@ export default function Homepage() {
             <div className="flex gap-4">
               <Link
                 href="/planner"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-11 px-6"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-11 px-6"
               >
-                Open the Ledger ➔
+                Open the Ledger <ArrowRight size={16} strokeWidth={2} />
               </Link>
             </div>
           </div>
@@ -157,21 +158,21 @@ export default function Homepage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="border rounded-lg p-6 space-y-2">
-              <div className="text-3xl">⚖️</div>
+              <Scale size={28} strokeWidth={1.75} style={{ color: 'var(--clay)' }} />
               <h3 className="font-bold text-lg">Asymmetry Exposed</h3>
               <p className="text-sm text-muted-foreground">
                 Banks hide the impact of compounding early payments. We map out the exact interest savings line-by-line.
               </p>
             </div>
             <div className="border rounded-lg p-6 space-y-2">
-              <div className="text-3xl">🔄</div>
+              <RefreshCw size={28} strokeWidth={1.75} style={{ color: 'var(--emerald)' }} />
               <h3 className="font-bold text-lg">Portfolio Rollover</h3>
               <p className="text-sm text-muted-foreground">
                 Automatically roll over closed EMIs into your remaining loans to accelerate debt payoff without raising monthly budget.
               </p>
             </div>
             <div className="border rounded-lg p-6 space-y-2">
-              <div className="text-3xl">⚡</div>
+              <Zap size={28} strokeWidth={1.75} style={{ color: 'var(--gold)' }} />
               <h3 className="font-bold text-lg">Windfall Optimizer</h3>
               <p className="text-sm text-muted-foreground">
                 Allocate bonuses, stock sales, or inheritance across multiple loans mathematically to maximize your interest reduction.
@@ -189,7 +190,7 @@ export default function Homepage() {
             <details className="group border rounded-lg bg-background p-4" open>
               <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
                 <span>Does prepaying home loans attract additional charges?</span>
-                <span className="transition group-open:rotate-180">👇</span>
+                <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
               </summary>
               <p className="text-sm text-muted-foreground mt-2">
                 Under RBI rules, individual borrowers with floating-rate home loans do not face prepayment charges. Non-individual borrowers or fixed-rate structures might attract penalties, which our platform flags automatically.
@@ -198,7 +199,7 @@ export default function Homepage() {
             <details className="group border rounded-lg bg-background p-4">
               <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
                 <span>What is the difference between Avalanche & Snowball strategies?</span>
-                <span className="transition group-open:rotate-180">👇</span>
+                <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
               </summary>
               <p className="text-sm text-muted-foreground mt-2">
                 The Avalanche method targets loans with the highest interest rates first, saving the most money. The Snowball method targets the smallest loan balances first, providing quick psychological wins as you clear accounts.

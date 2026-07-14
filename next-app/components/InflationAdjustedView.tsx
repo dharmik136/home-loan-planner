@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatINR } from "../engine/format";
+import { TrendingDown } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -33,7 +34,7 @@ export function InflationAdjustedView({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📉 / Real Cost</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><TrendingDown size={13} /> / Real Cost</span>
         Inflation-Adjusted Loan Cost
       </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatINR } from "../engine/format";
+import { House, Building2 } from "lucide-react";
 
 
 function monthlyEmiCalc(principal: number, annualRate: number, months: number): number {
@@ -108,11 +109,13 @@ export function RentVsBuyCalculator() {
       <div style={{
         background: buyWinsAt ? "var(--emerald-wash)" : "var(--clay-wash)",
         border: `1px solid ${buyWinsAt ? "var(--emerald)" : "var(--clay)"}`,
-        borderRadius: "3px", padding: "10px 12px", fontSize: "0.8rem", fontWeight: "600", textAlign: "center"
+        borderRadius: "3px", padding: "10px 12px", fontSize: "0.8rem", fontWeight: "600", textAlign: "center",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
       }}>
+        {buyWinsAt ? <House size={15} className="shrink-0" /> : <Building2 size={15} className="shrink-0" />}
         {buyWinsAt
-          ? `🏡 Buying becomes cheaper after Year ${buyWinsAt} — property appreciation pays off.`
-          : `🏢 Renting is cheaper over 30 years at these parameters.`}
+          ? `Buying becomes cheaper after Year ${buyWinsAt} — property appreciation pays off.`
+          : `Renting is cheaper over 30 years at these parameters.`}
       </div>
 
       <div style={{ fontSize: "0.68rem", color: "var(--ink-faint)", marginTop: "8px", lineHeight: "1.3" }}>

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatINR } from "../engine/format";
+import { Siren } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -71,8 +72,9 @@ export function InterestShockVisualizer({ results }: Props) {
             </div>
 
             {d.ratioInterest > 50 && (
-              <div style={{ fontSize: "0.74rem", color: "var(--clay)", marginTop: "10px", fontWeight: "500" }}>
-                🚨 Warning: Over 50% of your payments in the first 5 years goes purely to bank interest, not paying down your home! Prepaying early breaks this trap.
+              <div style={{ fontSize: "0.74rem", color: "var(--clay)", marginTop: "10px", fontWeight: "500", display: "flex", alignItems: "flex-start", gap: "6px" }}>
+                <Siren size={14} className="shrink-0" style={{ marginTop: "1px" }} />
+                Warning: Over 50% of your payments in the first 5 years goes purely to bank interest, not paying down your home! Prepaying early breaks this trap.
               </div>
             )}
           </div>

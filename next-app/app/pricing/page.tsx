@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
 
 export default function PricingPage() {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
@@ -95,7 +96,7 @@ export default function PricingPage() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   {tier.features.map((feat) => (
                     <li key={feat} className="flex gap-2 items-start">
-                      <span className="text-primary font-bold text-xs">✓</span>
+                      <Check size={15} strokeWidth={2.5} className="text-primary shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -163,7 +164,7 @@ export default function PricingPage() {
           <details className="group border rounded-lg bg-card p-4">
             <summary className="font-semibold cursor-pointer list-none flex justify-between items-center text-sm">
               <span>Is there a monthly subscription fee for Premium Solo?</span>
-              <span className="transition group-open:rotate-180">👇</span>
+              <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
             </summary>
             <p className="text-xs text-muted-foreground mt-2">
               No. Premium Solo is a one-time lifetime license purchase. You get full access to unlimited loan calculations, optimizers, and PDF downloads forever.
@@ -172,7 +173,7 @@ export default function PricingPage() {
           <details className="group border rounded-lg bg-card p-4">
             <summary className="font-semibold cursor-pointer list-none flex justify-between items-center text-sm">
               <span>Can I upgrade from Premium to Professional Advisor?</span>
-              <span className="transition group-open:rotate-180">👇</span>
+              <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
             </summary>
             <p className="text-xs text-muted-foreground mt-2">
               Yes, you can upgrade at any time from your account settings page. We will prorate any payment you have already made.

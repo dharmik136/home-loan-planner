@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { formatINR } from "../engine/format";
+import { Landmark, Trophy } from "lucide-react";
 
 interface EMIRow {
   banks: string;
@@ -54,7 +55,7 @@ export function BankEMIComparator() {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🏦 / Compare</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Landmark size={13} /> / Compare</span>
         Bank EMI Comparator — Find the cheapest lender
       </div>
 
@@ -108,7 +109,7 @@ export function BankEMIComparator() {
                   }}
                 >
                   <td style={{ padding: "7px 8px", fontWeight: isBest || isCustom ? "700" : "400" }}>
-                    {isBest && <span style={{ color: "var(--emerald)", marginRight: "4px" }}>🏆</span>}
+                    {isBest && <Trophy size={13} style={{ color: "var(--emerald)", marginRight: "4px", verticalAlign: "-2px" }} />}
                     {row.banks}
                   </td>
                   <td style={{ padding: "7px 8px", textAlign: "right" }}>{row.rate.toFixed(2)}%</td>

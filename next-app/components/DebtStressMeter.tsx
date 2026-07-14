@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatINR } from "../engine/format";
 import { monthlyEmi } from "../engine/amortization";
+import { Shield } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -52,7 +53,7 @@ export function DebtStressMeter({ results }: Props) {
   return (
     <div className="panel s8" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🛡️ / Risk Audit</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Shield size={13} /> / Risk Audit</span>
         Debt Stress Gauge & Rate Shock buffer
       </div>
 

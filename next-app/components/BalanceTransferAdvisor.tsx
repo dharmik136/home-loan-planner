@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { formatINR } from "../engine/format";
 import type { LoanResult } from "../engine/planning";
+import { RefreshCw, Check } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -74,7 +75,7 @@ export function BalanceTransferAdvisor({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🔄</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center" }}><RefreshCw size={13} /></span>
         Balance Transfer Evaluator (Sec 5)
       </div>
 
@@ -200,9 +201,10 @@ export function BalanceTransferAdvisor({ results }: Props) {
                 <span style={{
                   fontSize: "0.65rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: "800", padding: "3px 8px", borderRadius: "2px",
                   background: a.worthSwitching ? "var(--emerald)" : "var(--clay)",
-                  color: "white"
+                  color: "white", display: "inline-flex", alignItems: "center", gap: "4px"
                 }}>
-                  {a.worthSwitching ? "✓ Switch Recommended" : "Stay Put"}
+                  {a.worthSwitching && <Check size={11} strokeWidth={3} />}
+                  {a.worthSwitching ? "Switch Recommended" : "Stay Put"}
                 </span>
               </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatINR } from "../engine/format";
+import { Landmark } from "lucide-react";
 
 type LoanType = "home" | "car" | "personal" | "education" | "lap";
 
@@ -49,7 +50,7 @@ export function LoanEligibilityChecker() {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🏦 / Eligibility</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Landmark size={13} /> / Eligibility</span>
         Loan Eligibility Checker
       </div>
 

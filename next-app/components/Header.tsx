@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentTheme, subscribeToThemeChange, toggleTheme, type Theme } from '../services/theme';
+import { Sun, Moon } from 'lucide-react';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -90,7 +91,7 @@ export default function Header() {
             title={theme === 'dark' ? 'Switch to Day' : 'Switch to Lamplight'}
             aria-label="Toggle theme"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           {/* Mobile Menu Button */}

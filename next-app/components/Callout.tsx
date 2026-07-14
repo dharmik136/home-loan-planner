@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { X, TriangleAlert } from "lucide-react";
 
 interface CalloutProps {
   variant: "error" | "warning";
@@ -25,8 +26,8 @@ export function Callout({ variant, children }: CalloutProps) {
         lineHeight: 1.4,
       }}
     >
-      <span style={{ fontWeight: 700, color: isError ? "var(--warn)" : "var(--gold)", flex: "none" }}>
-        {isError ? "✕" : "!"}
+      <span style={{ color: isError ? "var(--warn)" : "var(--gold)", flex: "none", display: "flex" }}>
+        {isError ? <X size={14} strokeWidth={2.5} /> : <TriangleAlert size={14} strokeWidth={2.25} />}
       </span>
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>{children}</div>
     </div>

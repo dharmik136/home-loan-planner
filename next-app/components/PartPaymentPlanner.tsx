@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Calendar, Target } from "lucide-react";
 
 type BankName = "sbi" | "hdfc" | "icici" | "lic";
 
@@ -33,7 +34,7 @@ export function PartPaymentPlanner() {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📅 / Calendar</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Calendar size={13} /> / Calendar</span>
         Part-Payment Timing Planner
       </div>
       
@@ -67,8 +68,8 @@ export function PartPaymentPlanner() {
       </div>
 
       <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: "3px", padding: "12px" }}>
-        <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "var(--ink)", marginBottom: "6px" }}>
-          🎯 Optimum Window:
+        <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "var(--ink)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "5px" }}>
+          <Target size={14} /> Optimum Window:
         </div>
         <div style={{ fontSize: "0.86rem", color: "var(--gold)", fontWeight: "700", marginBottom: "8px" }}>
           {guide.timing}

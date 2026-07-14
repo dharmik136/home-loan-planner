@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { formatINR } from "../engine/format";
 import type { LoanResult } from "../engine/planning";
+import { Target } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -40,7 +41,7 @@ export function BonusWindfallPlanner({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🎯 / Windfall</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Target size={13} /> / Windfall</span>
         Bonus &amp; Windfall Planner
       </div>
 

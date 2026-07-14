@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentTheme, subscribeToThemeChange, toggleTheme, type Theme } from '../services/theme';
+import { Calculator, ClipboardList, Zap, IndianRupee, Info, ChevronRight, ChevronLeft, Sun, Moon } from 'lucide-react';
 
 interface WorkspaceSidebarProps {
   collapsed: boolean;
@@ -22,11 +23,11 @@ export default function WorkspaceSidebar({
     return subscribeToThemeChange(setTheme);
   }, []);
   const menuItems = [
-    { name: 'Calculator', path: '/calculator', icon: '🧮' },
-    { name: 'Portfolio Planner', path: '/planner', icon: '📋' },
-    { name: 'Windfall Optimizer', path: '/planner/optimizer', icon: '⚡' },
-    { name: 'Pricing', path: '/pricing', icon: '💰' },
-    { name: 'About', path: '/about', icon: 'ℹ️' },
+    { name: 'Calculator', path: '/calculator', icon: Calculator },
+    { name: 'Portfolio Planner', path: '/planner', icon: ClipboardList },
+    { name: 'Windfall Optimizer', path: '/planner/optimizer', icon: Zap },
+    { name: 'Pricing', path: '/pricing', icon: IndianRupee },
+    { name: 'About', path: '/about', icon: Info },
   ];
 
   return (
@@ -47,7 +48,7 @@ export default function WorkspaceSidebar({
           className="p-1.5 rounded-md hover:bg-muted-foreground/15 text-muted-foreground hover:text-foreground ml-auto"
           title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
-          {collapsed ? '➡️' : '⬅️'}
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
@@ -65,9 +66,7 @@ export default function WorkspaceSidebar({
                   : 'text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground'
               }`}
             >
-              <span className="text-base" role="img" aria-label={item.name}>
-                {item.icon}
-              </span>
+              <item.icon size={17} className="shrink-0" aria-hidden="true" />
               {!collapsed && <span className="truncate">{item.name}</span>}
             </Link>
           );
@@ -83,10 +82,11 @@ export default function WorkspaceSidebar({
         )}
         <button
           onClick={() => setTheme(toggleTheme())}
-          className="flex items-center justify-center w-full py-1.5 text-xs border rounded hover:bg-accent text-accent-foreground font-medium"
+          className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs border rounded hover:bg-accent text-accent-foreground font-medium"
           title={theme === 'dark' ? 'Switch to Day' : 'Switch to Lamplight'}
         >
-          {theme === 'dark' ? (collapsed ? '☀️' : '☀️ Day Mode') : (collapsed ? '🌙' : '🌙 Lamplight')}
+          {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+          {!collapsed && (theme === 'dark' ? 'Day Mode' : 'Lamplight')}
         </button>
       </div>
     </aside>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatINR } from "../engine/format";
+import { Lock } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -38,7 +39,7 @@ export function ForeclosureCalculator({ results }: Props) {
   return (
     <div className="panel s9" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">🔐 / Close Early</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Lock size={13} /> / Close Early</span>
         Foreclosure Cost Calculator
       </div>
 

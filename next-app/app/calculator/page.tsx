@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { formatINR, formatCompactINR } from '../../engine/format';
+import { Download, TriangleAlert } from 'lucide-react';
 
 // Types definition
 interface LoanData {
@@ -205,9 +206,9 @@ export default function CalculatorPage() {
         <button
           onClick={handleCSVExport}
           className="btn"
-          style={{ height: "36px", minHeight: "36px" }}
+          style={{ height: "36px", minHeight: "36px", display: "inline-flex", alignItems: "center", gap: "6px" }}
         >
-          Export CSV 📥
+          Export CSV <Download size={15} />
         </button>
       </header>
 
@@ -221,9 +222,13 @@ export default function CalculatorPage() {
           borderRadius: "4px",
           fontSize: "0.8rem",
           fontWeight: 600,
-          marginBottom: "20px"
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "8px"
         }}>
-          ⚠️ {emiAndSchedules.warningMsg}
+          <TriangleAlert size={16} className="shrink-0" style={{ color: "var(--gold)" }} />
+          {emiAndSchedules.warningMsg}
         </div>
       )}
 

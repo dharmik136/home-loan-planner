@@ -1,5 +1,6 @@
 import type { LoanResult } from "../engine/planning";
 import { monthLabel } from "../engine/format";
+import { CalendarDays } from "lucide-react";
 
 const n = (v: number) => Math.round(v).toLocaleString("en-IN");
 
@@ -45,7 +46,7 @@ export function YearlyScheduleTable({ result }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📆 / Annual View</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><CalendarDays size={13} /> / Annual View</span>
         {loan.name}: Year-by-Year Summary
       </div>
       <div className="sched-scroll">

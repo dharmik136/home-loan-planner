@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { formatINR } from "../engine/format";
 import type { LoanResult } from "../engine/planning";
+import { Ruler } from "lucide-react";
 
 interface Props {
   results: LoanResult[];
@@ -62,7 +63,7 @@ export function PrepaymentScenarios({ results }: Props) {
   return (
     <div className="panel" style={{ marginTop: "16px" }}>
       <div className="panel-title">
-        <span className="num">📐 / Scenarios</span>
+        <span className="num" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Ruler size={13} /> / Scenarios</span>
         Prepayment Scenario Comparison
       </div>
 

@@ -10,6 +10,7 @@
 import { useState, useMemo } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatINR, formatCompactINR } from "../engine/format";
+import { Scale, ArrowUp } from "lucide-react";
 import {
   computeTaxSavings,
   buildYearlyLoanSummaries,
@@ -423,7 +424,7 @@ export function TaxSavingsDeductor({ results }: Props) {
 
       {/* ── Regime Auto-Advisor Verdict Card ── */}
       <div className="tax-verdict-card">
-        <div className="tax-verdict-badge">⚖️ Regime Advisor Verdict</div>
+        <div className="tax-verdict-badge" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Scale size={15} /> Regime Advisor Verdict</div>
         {verdict.recommendation === "old" ? (
           <>
             <div className="tax-verdict-title" style={{ color: "var(--emerald)" }}>
@@ -590,7 +591,7 @@ export function TaxSavingsDeductor({ results }: Props) {
                         <td style={{ color: row.deductibleInterest < row.annualInterest ? "var(--clay)" : "inherit" }}>
                           {formatCompactINR(row.deductibleInterest)}
                           {row.deductibleInterest < row.annualInterest && (
-                            <span title="Capped at ₹2L (self-occupied)"> ⬆ capped</span>
+                            <span title="Capped at ₹2L (self-occupied)" style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}> <ArrowUp size={11} /> capped</span>
                           )}
                         </td>
                         <td>{formatCompactINR(row.annualPrincipal)}</td>

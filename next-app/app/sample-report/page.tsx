@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { Check, Download } from 'lucide-react';
 
 export default function SampleReportPage() {
   const [clientName, setClientName] = useState('Mr. & Mrs. Sharma');
@@ -144,28 +145,28 @@ export default function SampleReportPage() {
             <h3 className="font-bold text-lg border-b pb-2">Why Advisors Use These Reports</h3>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex gap-2">
-                <span className="text-emerald-500 font-bold">✓</span>
+                <Check size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" style={{ color: 'var(--emerald)' }} />
                 <span><strong>Build Instant Authority:</strong> Deliver beautifully styled PDFs under your own brand name.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-emerald-500 font-bold">✓</span>
+                <Check size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" style={{ color: 'var(--emerald)' }} />
                 <span><strong>Explain Jargon Visually:</strong> Break down complex compounding structures in easy-to-read ledgers.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-emerald-500 font-bold">✓</span>
+                <Check size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" style={{ color: 'var(--emerald)' }} />
                 <span><strong>Clear Interest Comparisons:</strong> Show clients exactly how much money they save on interest.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-emerald-500 font-bold">✓</span>
+                <Check size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" style={{ color: 'var(--emerald)' }} />
                 <span><strong>Actionable Guides:</strong> Create printable calendar schedules for monthly prepayment transactions.</span>
               </li>
             </ul>
             <div className="pt-4 border-t space-y-3">
               <button
                 onClick={() => alert('PDF report generating stream initialized. Check downloads.')}
-                className="w-full inline-flex items-center justify-center rounded-md font-bold text-sm border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4"
+                className="w-full inline-flex items-center justify-center gap-1.5 rounded-md font-bold text-sm border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4"
               >
-                Download Sample PDF Document 📥
+                Download Sample PDF Document <Download size={14} />
               </button>
               <Link
                 href="/pricing"
