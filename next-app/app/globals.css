@@ -221,14 +221,34 @@ body {
   top: 0;
   z-index: 50;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 1px;
   margin: 0 0 18px;
   border: 1px solid var(--line-strong);
   background: var(--line-strong);
   box-shadow: var(--shadow);
 }
+.step-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.workflow-progress-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.workflow-progress-fill {
+  height: 100%;
+  background: var(--emerald);
+  transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .workflow-nav button {
+  position: relative;
   border: 0;
   background: var(--paper-raised);
   color: var(--ink);
@@ -1258,7 +1278,7 @@ body.dark .bar-row div {
 }
 
 .workflow-nav {
-  grid-template-columns: repeat(7, minmax(132px, 1fr));
+  grid-template-columns: repeat(6, minmax(132px, 1fr));
   gap: var(--space-2);
   border: 0;
   background: transparent;

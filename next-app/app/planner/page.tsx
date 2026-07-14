@@ -19,6 +19,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
+import { Check } from "lucide-react";
 import { computeLoan, type Loan, type PrepayEntry, type LoanResult } from "../../engine/planning";
 import { downloadScheduleCSV } from "../../engine/csv";
 import { formatINR } from "../../engine/format";
@@ -196,6 +197,26 @@ export default function PlannerPage() {
   const [activeLoanId, setActiveLoanId] = useState<string>(() => loans[0]?.id || "");
   const [yearlyView, setYearlyView] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>("simulators");
+  const [toolsVisited, setToolsVisited] = useState(false);
+  const [planActionTaken, setPlanActionTaken] = useState(false);
+
+  // Real, data-derived progress for the workflow-nav stepper — not a linear
+  // gate (this is a free-scroll workspace, not a wizard), just an honest
+  // "have you actually done this" signal per section.
+  const isSetupValid =
+    loans.length > 0 &&
+    loans.every(
+      (l) => l.outstanding > 0 && l.ratePct > 0 && l.ratePct <= 100 && l.tenureMonths > 0 && l.tenureMonths <= 600
+    );
+  const stepComplete: Record<string, boolean> = {
+    "loan-setup": isSetupValid,
+    "results": isSetupValid,
+    "prepayments": entries.length > 0,
+    "schedule": isSetupValid,
+    "tools": toolsVisited,
+    "save-plan": planActionTaken,
+  };
+  const completedStepCount = WORKFLOW_STEPS.filter((step) => stepComplete[step.id]).length;
 
   const handleApplyWindfallSplit = (allocations: { loanId: string; amount: number; monthIndex: number }[]) => {
     setState((s) => {
@@ -334,15 +355,27 @@ export default function PlannerPage() {
       </div>
 
       <nav className="workflow-nav" aria-label="Planner workflow">
-        {WORKFLOW_STEPS.map((step, index) => (
-          <button key={step.id} type="button" onClick={() => scrollToWorkflowStep(step.id)}>
-            <span className="workflow-index">{String(index + 1).padStart(2, "0")}</span>
-            <span>
-              <b>{step.label}</b>
-              <small>{step.detail}</small>
-            </span>
-          </button>
-        ))}
+        {WORKFLOW_STEPS.map((step, index) => {
+          const done = stepComplete[step.id];
+          return (
+            <button key={step.id} type="button" onClick={() => scrollToWorkflowStep(step.id)} className={done ? "step-complete" : undefined}>
+              <span className="workflow-index" style={done ? { color: "var(--emerald)" } : undefined}>
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span>
+                <b>{step.label}</b>
+                <small>{step.detail}</small>
+              </span>
+              {done && <Check size={13} className="step-check" style={{ color: "var(--emerald)" }} />}
+            </button>
+          );
+        })}
+        <div className="workflow-progress-track">
+          <div
+            className="workflow-progress-fill"
+            style={{ width: `${(completedStepCount / WORKFLOW_STEPS.length) * 100}%` }}
+          />
+        </div>
       </nav>
 
       <div className="grid">
@@ -463,11 +496,12 @@ export default function PlannerPage() {
               const totalSavings = results.reduce((sum, res) => sum + res.comparison.interestSaved, 0);
               trackEvent("save_plan_cta_clicked", { savings: totalSavings });
               setIsPaywallOpen(true);
+              setPlanActionTaken(true);
             }}>Save Plan & Get PDF (Free)</button>
-            <button className="btn ghost" onClick={() => downloadScheduleCSV(results)}>Download CSV</button>
-            <button className="btn ghost" onClick={exportWorkspaceJSON}>Export JSON</button>
+            <button className="btn ghost" onClick={() => { downloadScheduleCSV(results); setPlanActionTaken(true); }}>Download CSV</button>
+            <button className="btn ghost" onClick={() => { exportWorkspaceJSON(); setPlanActionTaken(true); }}>Export JSON</button>
             <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>Import JSON</button>
-            <input type="file" id="import-json-file" accept=".json" onChange={importWorkspaceJSON} style={{ display: "none" }} />
+            <input type="file" id="import-json-file" accept=".json" onChange={(e) => { importWorkspaceJSON(e); setPlanActionTaken(true); }} style={{ display: "none" }} />
             <button className="btn ghost" onClick={reset}>Reset to defaults</button>
           </div>
 
@@ -492,7 +526,7 @@ export default function PlannerPage() {
                     type="button"
                     className="directory-tab"
                     aria-pressed={rightTab === tab}
-                    onClick={() => setRightTab(tab)}
+                    onClick={() => { setRightTab(tab); setToolsVisited(true); }}
                   >
                     <span>
                       <b>{TOOL_TABS[tab].title}</b>
