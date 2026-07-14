@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getCurrentTheme, subscribeToThemeChange, toggleTheme, type Theme } from '../services/theme';
 
 interface WorkspaceSidebarProps {
   collapsed: boolean;
@@ -14,6 +15,12 @@ export default function WorkspaceSidebar({
   onToggleCollapse,
   activeRoute,
 }: WorkspaceSidebarProps) {
+  const [theme, setTheme] = useState<Theme>('light');
+
+  useEffect(() => {
+    setTheme(getCurrentTheme());
+    return subscribeToThemeChange(setTheme);
+  }, []);
   const menuItems = [
     { name: 'Calculator', path: '/calculator', icon: '🧮' },
     { name: 'Portfolio Planner', path: '/planner', icon: '📋' },
@@ -75,10 +82,11 @@ export default function WorkspaceSidebar({
           </div>
         )}
         <button
-          onClick={() => alert('Theme Toggle: Dark/Light Mode switched!')}
+          onClick={() => setTheme(toggleTheme())}
           className="flex items-center justify-center w-full py-1.5 text-xs border rounded hover:bg-accent text-accent-foreground font-medium"
+          title={theme === 'dark' ? 'Switch to Day' : 'Switch to Lamplight'}
         >
-          {collapsed ? '🌓' : '🌓 Toggle Theme'}
+          {theme === 'dark' ? (collapsed ? '☀️' : '☀️ Day Mode') : (collapsed ? '🌙' : '🌙 Lamplight')}
         </button>
       </div>
     </aside>

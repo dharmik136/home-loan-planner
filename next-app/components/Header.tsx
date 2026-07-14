@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getCurrentTheme, subscribeToThemeChange, toggleTheme, type Theme } from '../services/theme';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Mock user session state
+  const [theme, setTheme] = useState<Theme>('light');
+
+  useEffect(() => {
+    setTheme(getCurrentTheme());
+    return subscribeToThemeChange(setTheme);
+  }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
@@ -61,6 +68,15 @@ export default function Header() {
               </button>
             )}
           </div>
+
+          <button
+            onClick={() => setTheme(toggleTheme())}
+            className="inline-flex items-center justify-center rounded-md p-2 text-sm border border-border hover:bg-accent"
+            title={theme === 'dark' ? 'Switch to Day' : 'Switch to Lamplight'}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
 
           {/* Mobile Menu Button */}
           <button

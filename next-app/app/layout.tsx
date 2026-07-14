@@ -1,6 +1,7 @@
 import React from 'react';
 import { Prata, Lora, Kalam } from 'next/font/google';
 import Header from '../components/Header';
+import { ThemeInit } from '../components/ThemeInit';
 import '../app/globals.css'; // Mock importing global styles
 
 const prata = Prata({ subsets: ['latin'], weight: '400', variable: '--font-prata' });
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${prata.variable} ${lora.variable} ${kalam.variable}`}>
       <body className="h-full font-body antialiased bg-background text-foreground">
+        <ThemeInit />
         <div className="relative flex flex-col min-h-screen">
           {/* Header is included globally but page content can choose to hide/show details */}
           <Header />
