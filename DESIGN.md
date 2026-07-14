@@ -156,3 +156,12 @@ Corners are barely rounded — 2px (`{rounded.sm}`) to 4px (`{rounded.md}`) ever
 - **Don't** let Kalam appear anywhere but the milestone stamp.
 - **Don't** round corners past 4px.
 - **Don't** fill primary buttons at rest — outline only, fill on hover.
+
+## Responsive Behavior
+
+Not one of the eight canonical sections, but every reference system studied for the SaaS-polish pass documents this explicitly, so it's written down here rather than left only as implemented CSS.
+
+- **Breakpoints:** the three-column workspace grid (`370px / 1fr / 400px`) collapses to two columns at 1380px (the right column spans both, becoming its own 2-up grid), then to a single column at 940px, at which point the workflow-nav tabs become a horizontally-scrolling strip with `scroll-snap`. Marketing-page grids (pricing tiers, feature comparisons) collapse to one column at 1080px and 720px.
+- **Touch targets:** every interactive element — buttons, `.add-btn`, select/input controls, range sliders, theme/nav/modal-close buttons — has a global `min-width: 44px; min-height: 44px` floor set in `globals.css`. This is enforced via CSS `min-height`/`min-width`, which always constrains the final rendered size regardless of any smaller `height`/`width` an individual component sets inline — verified by computed-style inspection, not just assumed from the source.
+- **Collapse strategy:** the ledger's two-page spread (center gutter rule between input and result panels) becomes a single stacked column below 940px, with the gutter rule rotating from a vertical `border-right` to a horizontal `border-bottom`.
+- **Print:** a dedicated `@media print` layer forces the broadsheet back into a static two-column layout regardless of viewport, hides interactive chrome, and swaps the warm palette for plain black-on-white.
