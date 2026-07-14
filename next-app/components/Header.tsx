@@ -21,8 +21,23 @@ export default function Header() {
       <div className="container flex h-14 items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center space-x-2 font-bold text-xl">
+          <Link href="/" className="flex flex-col items-start font-bold text-xl leading-none">
             <span className="text-primary font-display">The Prepayment Ledger</span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 220 10"
+              className="w-full h-[7px] -mt-0.5"
+              style={{ color: "var(--cloth-red)" }}
+            >
+              <path
+                d="M2 5.6 C 26 2.4, 48 8.2, 74 4.6 S 118 1.8, 150 6.4 S 198 2.6, 218 5.2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                opacity="0.55"
+              />
+            </svg>
           </Link>
         </div>
 

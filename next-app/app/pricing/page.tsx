@@ -71,8 +71,8 @@ export default function PricingPage() {
           {pricingTiers.map((tier) => (
             <div
               key={tier.name}
-              className={`border rounded-lg p-6 bg-card flex flex-col justify-between shadow-sm relative transition-all ${
-                tier.isPopular ? 'ring-2 ring-primary scale-105 md:scale-105' : ''
+              className={`border rounded-lg p-6 flex flex-col justify-between shadow-sm relative transition-all ${
+                tier.isPopular ? 'lamplight-tier ring-2 ring-primary scale-105 md:scale-105' : 'bg-card'
               }`}
             >
               {tier.isPopular && (

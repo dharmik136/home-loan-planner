@@ -1894,6 +1894,32 @@ body.dark .sched-table th {
   line-height: 1 !important;
 }
 
+/* The featured pricing tier always wears the Lamplight palette, regardless
+   of the page's own Day/Lamplight state — "the ledger someone's already
+   lit a lamp over, because it's the one worth choosing." Scoping the same
+   CSS custom properties body.dark overrides means every Tailwind utility
+   inside (bg-card, text-foreground, border-primary, etc.) resolves against
+   these values automatically, the same mechanism as the page-wide toggle. */
+.lamplight-tier {
+  --color-background: #241512;
+  --color-foreground: #F0E4D3;
+  --color-card: #2E1D17;
+  --color-card-foreground: #F0E4D3;
+  --color-muted: #33221B;
+  --color-muted-foreground: #A99783;
+  --color-border: #4A3830;
+  --color-border-strong: #5C4740;
+  --color-primary: #C8543F;
+  --color-primary-hover: #DE6A54;
+  --color-primary-foreground: #241512;
+  --color-success: #4E9370;
+  --color-warning: #D9A64E;
+  --color-error: #C97A45;
+  --color-ring: #C8543F;
+  background: var(--color-card);
+  color: var(--color-foreground);
+}
+
 /* Display-type tracking: nine of the ten SaaS references studied for the
    polish pass tighten headline tracking; serifs need less than the sans
    faces those systems use, so this stays gentle. An explicit Tailwind
