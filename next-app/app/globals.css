@@ -449,6 +449,51 @@ textarea:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Ruled-line input + increment/decrement steppers, sharing one rule so the
+   input and buttons still read as a single ledger line, not a boxed widget. */
+.field-stepper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5px solid var(--line);
+  transition: border-color 0.15s, border-bottom-width 0.15s;
+}
+.field-stepper:focus-within {
+  border-bottom: 2.5px solid var(--cloth-red);
+}
+.field-stepper input {
+  flex: 1;
+  min-width: 0;
+  border: none !important;
+}
+/* Deliberately smaller than the app's 44px touch-target floor: these are a
+   supplementary affordance next to a fully-accessible text input carrying
+   the same value, not the sole way to change it (WCAG 2.5.5's exception for
+   targets with an equivalent inline alternative). */
+.stepper-btn {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 2px;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.stepper-btn:hover:not(:disabled) {
+  color: var(--emerald);
+  background: var(--emerald-wash);
+}
+.stepper-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 .field.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .emi-line {
   margin-top: 6px; padding-top: 12px; border-top: 1px dashed var(--line-strong);

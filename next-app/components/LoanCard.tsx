@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Loan, LoanResult, LenderRuleset } from "../engine/planning";
 import { formatINR } from "../engine/format";
 import { Callout } from "./Callout";
+import { Minus, Plus } from "lucide-react";
 
 interface Props {
   loan: Loan;
@@ -132,6 +133,8 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
             label="Outstanding principal"
             value={loan.outstanding}
             onChange={(val) => onChange({ outstanding: val })}
+            step={50000}
+            min={0}
           />
 
       <div className="field row2">
@@ -140,11 +143,17 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           value={loan.ratePct}
           onChange={(val) => onChange({ ratePct: val })}
           isDecimal={true}
+          step={0.05}
+          min={0}
+          max={100}
         />
         <NumericInput
           label="Tenure (months)"
           value={loan.tenureMonths}
           onChange={(val) => onChange({ tenureMonths: val })}
+          step={1}
+          min={1}
+          max={600}
         />
       </div>
 
@@ -153,6 +162,8 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           label="Pre-EMI Interest (Rs)"
           value={loan.preEmiInterest || 0}
           onChange={(val) => onChange({ preEmiInterest: Math.max(0, val) })}
+          step={1000}
+          min={0}
         />
         <div className="field" style={{ marginBottom: 0 }}>
           <label>Lender Rules</label>
@@ -187,6 +198,8 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           label="Custom Min Prepayment (Rs)"
           value={loan.customMinPrepay || 0}
           onChange={(val) => onChange({ customMinPrepay: val })}
+          step={5000}
+          min={0}
         />
       )}
 
@@ -521,11 +534,17 @@ function NumericInput({
   value,
   onChange,
   isDecimal = false,
+  step = 1,
+  min,
+  max,
 }: {
   label: string;
   value: number;
   onChange: (val: number) => void;
   isDecimal?: boolean;
+  step?: number;
+  min?: number;
+  max?: number;
 }) {
   const [editingValue, setEditingValue] = useState<string | null>(null);
 
@@ -541,9 +560,9 @@ function NumericInput({
     }
     const cleanRegex = isDecimal ? /[^0-9.]/g : /[^0-9]/g;
     const cleaned = raw.replace(cleanRegex, "");
-    
+
     setEditingValue(cleaned);
-    
+
     const parsed = Number(cleaned);
     if (!isNaN(parsed) && cleaned !== "") {
       onChange(parsed);
@@ -557,16 +576,34 @@ function NumericInput({
     }
   };
 
+  const round = (v: number) => (isDecimal ? Math.round(v * 100) / 100 : Math.round(v));
+  const atMin = min !== undefined && value <= min;
+  const atMax = max !== undefined && value >= max;
+  const step_ = (delta: number) => {
+    let next = round(value + delta);
+    if (min !== undefined) next = Math.max(min, next);
+    if (max !== undefined) next = Math.min(max, next);
+    onChange(next);
+  };
+
   return (
     <div className="field" style={{ marginBottom: "13px" }}>
       <label>{label}</label>
-      <input
-        aria-label={label}
-        value={displayValue}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        inputMode={isDecimal ? "decimal" : "numeric"}
-      />
+      <div className="field-stepper">
+        <input
+          aria-label={label}
+          value={displayValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          inputMode={isDecimal ? "decimal" : "numeric"}
+        />
+        <button type="button" className="stepper-btn" onClick={() => step_(-step)} disabled={atMin} aria-label={`Decrease ${label}`}>
+          <Minus size={12} />
+        </button>
+        <button type="button" className="stepper-btn" onClick={() => step_(step)} disabled={atMax} aria-label={`Increase ${label}`}>
+          <Plus size={12} />
+        </button>
+      </div>
     </div>
   );
 }
