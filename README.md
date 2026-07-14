@@ -36,7 +36,11 @@ A premium, interactive web application and live Excel workbook to simulate, opti
     *   `web/src/components/` — Broadsheet-theme React components (Moratorium, Tax panel, Windfall, Charts).
     *   `web/e2e-trust-flows.e2e.ts` — Playwright browser E2E test suite.
     *   `web/src/engine/math_trust.test.ts` — Vitest unit tests verifying mathematical correctness.
+*   `src/` / `tests/` — The Python amortization engine and workbook generator/verifier behind the Excel file, plus its unit test.
 *   `docs/` — Architecture design specs and implementation plans.
+*   `improvements_log.csv` — Running changelog of feature work on the original web app; contributors add an entry per the PR template.
+*   `SECURITY.md` — Vulnerability reporting instructions.
+*   `.github/` — CI (`ci.yml`), the GitHub Pages deploy workflow (`deploy.yml`), Dependabot config, and the PR template.
 
 ---
 
