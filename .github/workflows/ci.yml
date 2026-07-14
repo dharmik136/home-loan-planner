@@ -35,3 +35,27 @@ jobs:
       run: |
         cd web
         npm run build
+
+  build-next-app:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+        cache-dependency-path: next-app/package-lock.json
+
+    - name: Install Next.js App Dependencies
+      run: |
+        cd next-app
+        npm ci
+
+    - name: Build
+      run: |
+        cd next-app
+        npm run build
