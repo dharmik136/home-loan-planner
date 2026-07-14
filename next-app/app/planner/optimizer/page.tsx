@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { buildSchedule, monthlyEmi } from '../../../engine/amortization';
 import { Loan, PrepayEntry } from '../../../engine/planning';
 import { formatINR, formatCompactINR } from '../../../engine/format';
-import { ArrowRight, Lightbulb, Zap } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
+import { Callout } from '../../../components/Callout';
 
 const STORAGE_KEY = "prepayment-ledger-v1";
 
@@ -242,22 +243,14 @@ export default function WindfallOptimizerPage() {
       </header>
 
       {isUsingCustomLoans && (
-        <div style={{
-          background: "var(--gold-wash)",
-          border: "1px solid var(--gold)",
-          color: "var(--ink)",
-          padding: "10px 14px",
-          borderRadius: "4px",
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          marginBottom: "15px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Lightbulb size={15} style={{ color: "var(--gold)" }} /> Currently using a Demo Portfolio. Setup your own loans in the main planner.</span>
-          <button className="btn" onClick={handleRestoreDefaultPortfolio} style={{ minHeight: "28px", minWidth: "80px", fontSize: "0.7rem", padding: "2px 8px" }}>Reset Demo</button>
-        </div>
+        <Callout
+          variant="info"
+          action={
+            <button className="btn" onClick={handleRestoreDefaultPortfolio} style={{ minHeight: "28px", minWidth: "80px", fontSize: "0.7rem", padding: "2px 8px" }}>Reset Demo</button>
+          }
+        >
+          <span style={{ fontWeight: 600 }}>Currently using a Demo Portfolio. Setup your own loans in the main planner.</span>
+        </Callout>
       )}
 
       <div className="grid">

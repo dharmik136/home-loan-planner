@@ -5,7 +5,8 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { formatINR, formatCompactINR } from '../../engine/format';
-import { Download, TriangleAlert } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { Callout } from '../../components/Callout';
 
 // Types definition
 interface LoanData {
@@ -214,22 +215,9 @@ export default function CalculatorPage() {
 
       {/* Warning Banner */}
       {emiAndSchedules.warningMsg && (
-        <div style={{
-          background: "var(--gold-wash)",
-          border: "1px solid var(--gold)",
-          color: "var(--ink)",
-          padding: "12px 16px",
-          borderRadius: "4px",
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "flex-start",
-          gap: "8px"
-        }}>
-          <TriangleAlert size={16} className="shrink-0" style={{ color: "var(--gold)" }} />
-          {emiAndSchedules.warningMsg}
-        </div>
+        <Callout variant="warning">
+          <span style={{ fontWeight: 600 }}>{emiAndSchedules.warningMsg}</span>
+        </Callout>
       )}
 
       <div className="grid">

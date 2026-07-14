@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { Callout } from '../../components/Callout';
 
 export default function AboutPage() {
   // ContactFeedbackForm state
@@ -71,10 +71,9 @@ export default function AboutPage() {
           <h3 className="font-bold text-xl border-b pb-2">GET IN TOUCH / REPORT AN ISSUE</h3>
           
           {success ? (
-            <div className="flex items-center justify-center gap-2 p-4 rounded text-xs text-center font-medium" style={{ background: 'var(--emerald-wash)', border: '1px solid var(--emerald)', color: 'var(--emerald)' }}>
-              <CheckCircle2 size={16} className="shrink-0" />
+            <Callout variant="success">
               Thank you! Your feedback message has been logged successfully.
-            </div>
+            </Callout>
           ) : (
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <div>

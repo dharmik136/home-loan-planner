@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { LoanResult } from "../engine/planning";
 import { formatCompactINR, formatINR } from "../engine/format";
+import { Callout } from "./Callout";
 
 interface Props {
   results: LoanResult[];
@@ -92,24 +93,17 @@ export function InvestmentVsPrepay({ results }: Props) {
         </div>
       </div>
 
-      <div style={{
-        background: prepayWins ? "var(--emerald-wash)" : "var(--gold-wash)",
-        border: `1px solid ${prepayWins ? "var(--emerald)" : "var(--gold)"}`,
-        borderRadius: "3px",
-        padding: "10px 12px",
-        fontSize: "0.8rem",
-        color: "var(--ink)"
-      }}>
+      <Callout variant={prepayWins ? "success" : "info"}>
         {prepayWins ? (
-          <div>
+          <span>
             <b>Prepayment is ahead in this model.</b> It saves <b>{formatINR(Math.round(-difference))}</b> more than investing at {cagr}% CAGR.
-          </div>
+          </span>
         ) : (
-          <div>
+          <span>
             <b>Investing is ahead in this model.</b> Investing at {cagr}% CAGR earns <b>{formatINR(Math.round(difference))}</b> more than prepaying.
-          </div>
+          </span>
         )}
-      </div>
+      </Callout>
     </div>
   );
 }
