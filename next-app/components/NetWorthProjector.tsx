@@ -100,7 +100,7 @@ export function NetWorthProjector({ results }: Props) {
         </div>
         <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: "3px", padding: "10px", textAlign: "center" }}>
           <div style={{ fontSize: "0.66rem", color: "var(--ink-soft)", marginBottom: "3px" }}>PORTFOLIO at Yr {displayYears}</div>
-          <div style={{ fontWeight: "800", fontSize: "0.95rem", color: "#6366f1" }}>{formatINR(finalNetWorth?.portfolioValue ?? 0)}</div>
+          <div style={{ fontWeight: "800", fontSize: "0.95rem", color: "var(--gold)" }}>{formatINR(finalNetWorth?.portfolioValue ?? 0)}</div>
         </div>
         <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: "3px", padding: "10px", textAlign: "center" }}>
           <div style={{ fontSize: "0.66rem", color: "var(--ink-soft)", marginBottom: "3px" }}>FINAL NET WORTH</div>

@@ -15,12 +15,12 @@ interface BudgetCategory {
 const DEFAULT_CATEGORIES: BudgetCategory[] = [
   { label: "EMI / Debt", pct: 0, color: "var(--clay)" },
   { label: "Savings / SIP", pct: 20, color: "var(--emerald)" },
-  { label: "Groceries", pct: 15, color: "#f59e0b" },
-  { label: "Rent / Utilities", pct: 10, color: "#6366f1" },
-  { label: "Transport", pct: 8, color: "#06b6d4" },
-  { label: "Healthcare", pct: 5, color: "#ec4899" },
-  { label: "Entertainment", pct: 5, color: "#8b5cf6" },
-  { label: "Miscellaneous", pct: 0, color: "#94a3b8" },
+  { label: "Groceries", pct: 15, color: "var(--gold)" },
+  { label: "Rent / Utilities", pct: 10, color: "#A8603D" },
+  { label: "Transport", pct: 8, color: "#C99A3D" },
+  { label: "Healthcare", pct: 5, color: "#B0716A" },
+  { label: "Entertainment", pct: 5, color: "#8B5A5A" },
+  { label: "Miscellaneous", pct: 0, color: "var(--ink-faint)" },
 ];
 
 export function MonthlyBudgetPlanner({ results }: Props) {
@@ -48,7 +48,7 @@ export function MonthlyBudgetPlanner({ results }: Props) {
 
   const emiPct = displayCategories[0].pct;
   const healthStatus = emiPct <= 30 ? "Healthy" : emiPct <= 50 ? "Stretched" : "Over-leveraged";
-  const healthColor = emiPct <= 30 ? "var(--emerald)" : emiPct <= 50 ? "#d97706" : "var(--clay)";
+  const healthColor = emiPct <= 30 ? "var(--emerald)" : emiPct <= 50 ? "var(--warn)" : "var(--clay)";
 
   return (
     <div className="panel" style={{ marginTop: "16px" }}>

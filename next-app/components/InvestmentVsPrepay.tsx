@@ -83,7 +83,7 @@ export function InvestmentVsPrepay({ results }: Props) {
           <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: "4px" }}>
             Option B: Invest
           </div>
-          <div style={{ fontSize: "1.05rem", fontWeight: "700", color: "#4a6984" }}>
+          <div style={{ fontSize: "1.05rem", fontWeight: "700", color: "var(--gold)" }}>
             {formatCompactINR(netInvestmentGain)}
           </div>
           <div style={{ fontSize: "0.66rem", color: "var(--ink-faint)", marginTop: "2px" }}>
@@ -93,8 +93,8 @@ export function InvestmentVsPrepay({ results }: Props) {
       </div>
 
       <div style={{
-        background: prepayWins ? "var(--emerald-wash)" : "rgba(74, 105, 132, 0.06)",
-        border: `1px solid ${prepayWins ? "#b2cbb9" : "#9fb4c7"}`,
+        background: prepayWins ? "var(--emerald-wash)" : "var(--gold-wash)",
+        border: `1px solid ${prepayWins ? "var(--emerald)" : "var(--gold)"}`,
         borderRadius: "3px",
         padding: "10px 12px",
         fontSize: "0.8rem",

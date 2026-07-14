@@ -117,7 +117,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           </div>
           <div style={{ height: "6px", width: "100%", background: "var(--line)", borderRadius: "3px", overflow: "hidden", display: "flex" }}>
             <div style={{ width: `${((result.plan.monthsToPayoff / result.baseline.monthsToPayoff) * 100)}%`, background: "var(--emerald)", height: "100%" }} />
-            <div style={{ flexGrow: 1, background: "rgba(16, 185, 129, 0.15)", height: "100%" }} />
+            <div style={{ flexGrow: 1, background: "transparent", height: "100%" }} />
           </div>
         </div>
       )}
@@ -493,7 +493,7 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         <div className="callout-warning-pulse" style={{ backgroundColor: "var(--clay-wash)", borderLeft: "3px solid var(--clay)", padding: "8px 12px", borderRadius: "2px", margin: "12px 0", fontSize: "0.78rem", color: "var(--clay)", display: "flex", flexDirection: "column", gap: "4px" }}>
           {outstandingError && <span className="error-principal">- {outstandingError}</span>}
           {rateError && <span className="error-rate">- {rateError}</span>}
-          {rateWarning && <span className="warning-rate" style={{ color: "#b45309" }}>- {rateWarning}</span>}
+          {rateWarning && <span className="warning-rate" style={{ color: "var(--warn)" }}>- {rateWarning}</span>}
           {tenureError && <span className="error-tenure">- {tenureError}</span>}
           {emiError && <span className="error-emi">- {emiError}</span>}
         </div>

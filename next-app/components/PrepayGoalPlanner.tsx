@@ -97,7 +97,7 @@ export function PrepayGoalPlanner({ results }: Props) {
             {goals.map((g) => (
               <tr key={g.targetMonth} style={{ borderBottom: "1px solid var(--line)" }}>
                 <td style={{ padding: "7px 8px", fontWeight: "600" }}>{g.targetMonth / 12} yrs</td>
-                <td style={{ padding: "7px 8px", textAlign: "right", color: "#d97706", fontWeight: "700" }}>
+                <td style={{ padding: "7px 8px", textAlign: "right", color: "var(--gold)", fontWeight: "700" }}>
                   {g.requiredPrepay > 0 ? `+${formatINR(g.requiredPrepay)}` : "No extra needed"}
                 </td>
                 <td style={{ padding: "7px 8px", textAlign: "right" }}>{g.monthsEarlier} months</td>

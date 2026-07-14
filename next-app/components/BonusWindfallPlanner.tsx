@@ -86,7 +86,7 @@ export function BonusWindfallPlanner({ results }: Props) {
         </div>
       )}
 
-      <div style={{ background: "var(--emerald-wash)", border: "1px solid #c4dac9", borderRadius: "3px", padding: "11px 13px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      <div style={{ background: "var(--emerald-wash)", border: "1px solid var(--emerald)", borderRadius: "3px", padding: "11px 13px", display: "flex", flexDirection: "column", gap: "6px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem" }}>
           <span>Balance before prepayment (Month {applyAtMonth}):</span>
           <span><b>{formatINR(Math.round(balanceBeforePrepay))}</b></span>

@@ -104,7 +104,7 @@ export function BankEMIComparator() {
                   key={row.banks}
                   style={{
                     borderBottom: "1px solid var(--line)",
-                    background: isBest ? "var(--emerald-wash)" : isCustom ? "rgba(99,102,241,0.06)" : "transparent",
+                    background: isBest ? "var(--emerald-wash)" : isCustom ? "rgba(185,138,46,0.08)" : "transparent",
                   }}
                 >
                   <td style={{ padding: "7px 8px", fontWeight: isBest || isCustom ? "700" : "400" }}>
@@ -118,7 +118,7 @@ export function BankEMIComparator() {
                   <td style={{ padding: "7px 8px", textAlign: "right", color: "var(--clay)" }}>
                     {formatINR(Math.round(row.totalInterest))}
                   </td>
-                  <td style={{ padding: "7px 8px", textAlign: "right", color: row.emi === bestEmi ? "var(--emerald)" : "#d97706" }}>
+                  <td style={{ padding: "7px 8px", textAlign: "right", color: row.emi === bestEmi ? "var(--emerald)" : "var(--warn)" }}>
                     {row.emi === bestEmi ? "—" : `+${formatINR(row.emi - bestEmi)}/mo`}
                   </td>
                 </tr>

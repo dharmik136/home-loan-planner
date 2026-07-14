@@ -111,6 +111,7 @@ textarea:focus {
   --clay-wash: #EAE1D6;
   --gold: #B98A2E;
   --gold-wash: #F6EDD9;
+  --warn: #A8531F;          /* real form/validation warnings — kept apart from clay and cloth-red */
 
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 32px -16px rgba(110, 70, 40, 0.28), 0 2px 6px rgba(110, 70, 40, 0.1);
   --display: var(--font-prata), serif;
@@ -135,6 +136,7 @@ body.dark {
   --clay-wash: #33241C;
   --gold: #D9A64E;
   --gold-wash: #3A2C15;
+  --warn: #C97A45;
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -450,7 +452,7 @@ body {
 .stat .sub { font-size: 0.74rem; color: var(--ink-faint); margin-top: 3px; }
 .recommend {
   margin-top: 18px; padding: 13px 16px; border-radius: 3px;
-  background: var(--emerald-wash); border: 1px solid #c4dac9;
+  background: var(--emerald-wash); border: 1px solid var(--emerald);
   display: flex; align-items: center; gap: 12px; font-size: 0.92rem;
 }
 .recommend .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--emerald); flex: none; box-shadow: 0 0 0 4px rgba(43,160,116,0.18); }

@@ -107,7 +107,7 @@ export function RentVsBuyCalculator() {
 
       <div style={{
         background: buyWinsAt ? "var(--emerald-wash)" : "var(--clay-wash)",
-        border: `1px solid ${buyWinsAt ? "#c4dac9" : "var(--clay)"}`,
+        border: `1px solid ${buyWinsAt ? "var(--emerald)" : "var(--clay)"}`,
         borderRadius: "3px", padding: "10px 12px", fontSize: "0.8rem", fontWeight: "600", textAlign: "center"
       }}>
         {buyWinsAt

@@ -117,7 +117,7 @@ export function AchievementBadges({ results }: Props) {
               className="badge-unlocked"
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                background: "var(--emerald-wash)", border: "1px solid #c4dac9",
+                background: "var(--emerald-wash)", border: "1px solid var(--emerald)",
                 borderRadius: "8px", padding: "10px 12px", minWidth: "72px", textAlign: "center",
                 transition: "transform 0.15s",
                 cursor: "default",

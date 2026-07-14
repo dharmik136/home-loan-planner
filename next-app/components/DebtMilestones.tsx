@@ -69,7 +69,7 @@ export function DebtMilestones({ results }: Props) {
                 </div>
 
                 {/* Milestone 3: Savings */}
-                <div className="milestone-badge" style={{ background: "var(--emerald-wash)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", border: "1px solid #c4dac9" }}>
+                <div className="milestone-badge" style={{ background: "var(--emerald-wash)", padding: "8px 10px", borderRadius: "2px", textAlign: "center", border: "1px solid var(--emerald)" }}>
                   <div style={{ fontSize: "0.58rem", textTransform: "uppercase", color: "var(--emerald)", fontWeight: "700" }}>Payoff Boost</div>
                   <div style={{ fontSize: "0.86rem", fontWeight: "700", marginTop: "4px", color: "var(--emerald)" }}>
                     {comparison.monthsSaved > 0 ? `${formatDuration(comparison.monthsSaved)} saved` : "No boost yet"}

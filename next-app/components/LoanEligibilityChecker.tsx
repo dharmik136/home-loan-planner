@@ -110,7 +110,7 @@ export function LoanEligibilityChecker() {
           onChange={(e) => setRatePct(Number(e.target.value))} style={{ width: "100%" }} />
       </div>
 
-      <div style={{ background: maxLoan > 0 ? "var(--emerald-wash)" : "var(--clay-wash)", border: `1px solid ${maxLoan > 0 ? "#c4dac9" : "var(--clay)"}`, borderRadius: "3px", padding: "12px 14px" }}>
+      <div style={{ background: maxLoan > 0 ? "var(--emerald-wash)" : "var(--clay-wash)", border: `1px solid ${maxLoan > 0 ? "var(--emerald)" : "var(--clay)"}`, borderRadius: "3px", padding: "12px 14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
           <span style={{ fontSize: "0.8rem" }}>Max Eligible Loan Amount:</span>
           <span style={{ fontWeight: "800", fontSize: "1.05rem", color: maxLoan > 0 ? "var(--emerald)" : "var(--clay)" }}>{maxLoan > 0 ? formatINR(maxLoan) : "Not Eligible"}</span>
@@ -124,7 +124,7 @@ export function LoanEligibilityChecker() {
         <div style={{ marginTop: "8px", display: "flex", gap: "10px", fontSize: "0.72rem" }}>
           <span style={{ color: dtiOk ? "var(--emerald)" : "var(--clay)" }}>{dtiOk ? "FOIR OK" : "FOIR exceeded"}</span>
           {(loanType === "home" || loanType === "car" || loanType === "lap") && (
-            <span style={{ color: ltvOk ? "var(--emerald)" : "#d97706" }}>{ltvOk ? `LTV OK (${(config.ltv * 100).toFixed(0)}%)` : `LTV cap applied`}</span>
+            <span style={{ color: ltvOk ? "var(--emerald)" : "var(--warn)" }}>{ltvOk ? `LTV OK (${(config.ltv * 100).toFixed(0)}%)` : `LTV cap applied`}</span>
           )}
         </div>
       </div>

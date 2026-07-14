@@ -70,7 +70,7 @@ export function PartPaymentPlanner() {
         <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "var(--ink)", marginBottom: "6px" }}>
           🎯 Optimum Window:
         </div>
-        <div style={{ fontSize: "0.86rem", color: "#d97706", fontWeight: "700", marginBottom: "8px" }}>
+        <div style={{ fontSize: "0.86rem", color: "var(--gold)", fontWeight: "700", marginBottom: "8px" }}>
           {guide.timing}
         </div>
         <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", lineHeight: "1.4" }}>

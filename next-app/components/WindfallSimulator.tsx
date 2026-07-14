@@ -217,7 +217,7 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
           <div style={{ fontSize: "0.74rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: "700", marginBottom: "8px" }}>
             Recommended windfall allocation
           </div>
-          <div style={{ background: "var(--emerald-wash)", border: "1px solid #c4dac9", borderRadius: "3px", padding: "12px 14px" }}>
+          <div style={{ background: "var(--emerald-wash)", border: "1px solid var(--emerald)", borderRadius: "3px", padding: "12px 14px" }}>
             <p style={{ fontSize: "0.86rem", marginBottom: "8px", lineHeight: "1.4", color: "var(--ink)" }}>
               To reduce interest the most, split your <b>{formatINR(amount)}</b> payment like this:
             </p>
@@ -234,7 +234,7 @@ export function WindfallSimulator({ loans, onApplySplit }: Props) {
                 );
               })}
             </div>
-            <div style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700", borderTop: "1px dashed #c4dac9", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
+            <div style={{ fontSize: "0.74rem", color: "var(--emerald)", fontWeight: "700", borderTop: "1px dashed var(--emerald)", paddingTop: "8px", display: "flex", justifyContent: "space-between" }}>
               <span>Projected interest saved:</span>
               <span>{formatINR(optimalSplit.interestSaved)}</span>
             </div>
