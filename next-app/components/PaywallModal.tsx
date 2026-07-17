@@ -10,7 +10,7 @@ interface Props {
 
 export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
   const [email, setEmail] = useState("");
-  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [saveResult, setSaveResult] = useState<SavePlanResult | null>(null);
   const [error, setError] = useState("");
@@ -141,15 +141,15 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
       {!submitted ? (
         <form onSubmit={handleSubmit}>
           <h3 id="save-plan-title" style={{ fontFamily: "var(--display)", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "8px", color: "var(--ink)" }}>
-            Save Plan & Download PDF (100% Free)
+            Save planner snapshot
           </h3>
           <p style={{ fontSize: "0.82rem", color: "var(--ink-soft)", marginBottom: "20px", lineHeight: "1.4" }}>
-            Enter your email to save the current loan setup, prepayment entries, and calculated savings.
+            Enter your email to create a restorable snapshot of this plan.
           </p>
 
           <div className="save-flow-list">
             <div><b>Planner snapshot:</b> Stores the current loan cards and prepayment entries.</div>
-            <div><b>Optional sync:</b> Saves remotely when Supabase URL and anon key are configured.</div>
+            <div><b>Cloud sharing:</b> When Supabase is configured, your email and full planner snapshot are sent to the project database.</div>
             <div><b>Plan context:</b> Captures calculated savings with the saved record.</div>
           </div>
 
@@ -205,7 +205,7 @@ export function PaywallModal({ isOpen, onClose, onCapture }: Props) {
           </button>
 
           <span style={{ display: "block", fontSize: "0.68rem", color: "var(--ink-faint)", textAlign: "center", marginTop: "12px" }}>
-            No bank login required. No account sync. You control the planner data.
+            No bank login is required. Newsletter consent is optional and off by default.
           </span>
         </form>
       ) : (

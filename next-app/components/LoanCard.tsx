@@ -157,6 +157,9 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
         />
       </div>
 
+      <details className="loan-advanced">
+        <summary>Loan rules and advanced settings</summary>
+        <div className="loan-advanced-content">
       <div className="field row2">
         <NumericInput
           label="Pre-EMI Interest (Rs)"
@@ -504,6 +507,8 @@ export function LoanCard({ loan, emi, delay, onChange, onDelete, result }: Props
           }}
         />
       </div>
+        </div>
+      </details>
       </>)}
 
       {hardErrors.length > 0 && (

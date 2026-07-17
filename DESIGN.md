@@ -1,167 +1,86 @@
----
-version: alpha
-name: Fresh Khata
-description: The Prepayment Ledger's visual identity — a modern Bahi-khata, the red-cloth Indian merchant ledger opened fresh each Diwali as a promise of honest bookkeeping.
-colors:
-  paper: "#F6EFE1"
-  paper-raised: "#FBF3E5"
-  ink: "#241C14"
-  ink-soft: "#6B5B4A"
-  rule: "#CBB99A"
-  cloth-red: "#9E2B25"
-  saved: "#2F6B4A"
-  cost: "#6E5A4D"
-  warn: "#A8531F"
-  seal-gold: "#B98A2E"
-  paper-dark: "#241512"
-  paper-raised-dark: "#2E1D17"
-  ink-dark: "#F0E4D3"
-  ink-soft-dark: "#A99783"
-  rule-dark: "#4A3830"
-  cloth-red-dark: "#C8543F"
-  saved-dark: "#4E9370"
-  cost-dark: "#A08D7C"
-  warn-dark: "#C97A45"
-  seal-gold-dark: "#D9A64E"
-typography:
-  headline-lg:
-    fontFamily: Prata
-    fontSize: 2.75rem
-    fontWeight: "400"
-    lineHeight: 1.1
-  headline-md:
-    fontFamily: Prata
-    fontSize: 1.75rem
-    fontWeight: "400"
-    lineHeight: 1.15
-  headline-sm:
-    fontFamily: Prata
-    fontSize: 1.25rem
-    fontWeight: "400"
-    lineHeight: 1.2
-  body-md:
-    fontFamily: Lora
-    fontSize: 1rem
-    fontWeight: "400"
-    lineHeight: 1.5
-  label:
-    fontFamily: Lora
-    fontSize: 0.75rem
-    fontWeight: "600"
-    lineHeight: 1.3
-    letterSpacing: 0.08em
-  numeral:
-    fontFamily: Lora
-    fontSize: 1rem
-    fontWeight: "700"
-    lineHeight: 1.3
-  stamp:
-    fontFamily: Kalam
-    fontSize: 1rem
-    fontWeight: "700"
-rounded:
-  sm: 2px
-  md: 4px
-spacing:
-  unit: 8px
-  sheet-padding: 24px
-  gutter: 32px
-components:
-  masthead:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-  sheet-card:
-    backgroundColor: "{colors.paper-raised}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.sheet-padding}"
-  button-outline:
-    backgroundColor: transparent
-    textColor: "{colors.cloth-red}"
-    rounded: "{rounded.md}"
-    padding: 12px 20px
-  button-outline-hover:
-    backgroundColor: "{colors.cloth-red}"
-    textColor: "{colors.paper}"
-  input-ruled:
-    backgroundColor: transparent
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-  input-ruled-focus:
-    textColor: "{colors.cloth-red}"
-  stat-saved:
-    textColor: "{colors.saved}"
-    typography: "{typography.numeral}"
-  stat-cost:
-    textColor: "{colors.cost}"
-    typography: "{typography.numeral}"
-  milestone-stamp:
-    backgroundColor: transparent
-    textColor: "{colors.cloth-red}"
-    typography: "{typography.stamp}"
-    rounded: 9999px
----
+# The Prepayment Ledger Design System
 
-## Overview
+This document describes the current product interface in `next-app`. Historical
+design explorations remain under `docs/superpowers/`; they are not the source of
+truth for production styling.
 
-The Bahi-khata — the red-cloth-bound merchant ledger opened fresh every Diwali (Chopda Pujan) as a promise of honest bookkeeping. Every page is ruled, every entry accounted for, every number written by a hand that stands behind it. The interface is a page in that ledger: cream paper, iron-warm ink, ruled columns doing the work that boxes and cards do elsewhere. Ornament is rare and therefore meaningful — reserved for the moments that have earned it: the masthead, the primary action, the day the debt is finally closed.
+## Product Character
 
-## Colors
+The interface should feel like a serious financial planning desk: precise,
+calm, information-dense, and easy to audit. The public site introduces the
+product with editorial typography, while the planner uses a compact operational
+layout for repeated analysis.
 
-The palette is warm throughout — paper and ink, never a pure black or a screen-cool grey.
+The product name is **The Prepayment Ledger** on public pages. Inside the app,
+the shorter **Loan Planner** label keeps the workspace navigation compact.
 
-- **Paper ({colors.paper}):** fresh, unwritten ledger stock. The page background.
-- **Ink ({colors.ink}):** iron-gall ink, never pure black. Primary text.
-- **Ink-soft ({colors.ink-soft}):** faded ink — captions, metadata, secondary text.
-- **Rule ({colors.rule}):** the printed ruling on ledger paper. Hairline dividers.
-- **Cloth-red ({colors.cloth-red}):** the ledger's cloth binding. Reserved for the masthead rule, outline buttons, and links — never for "bad news."
-- **Saved ({colors.saved}):** money saved — keeps the universal green convention, tuned to read as a second ink color rather than a SaaS emerald.
-- **Cost ({colors.cost}):** interest paid — a muted iron-brown. Explicitly not red.
-- **Warn ({colors.warn}):** real form/validation errors — a burnt rust, kept apart from both `cost` and `cloth-red` so red stays sacred for ceremony.
-- **Seal-gold ({colors.seal-gold}):** turmeric-gold — section-header rules, the milestone stamp accent.
+## Foundations
 
-At night ("Lamplight"), the page becomes `{colors.paper-dark}` — doing the books by lamp, not a cold dashboard — and `cloth-red` brightens to `{colors.cloth-red-dark}` so it reads as glowing ember rather than a dimmed daytime color.
+- **Primary action:** emerald (`#07835e` light, `#52d6a7` dark).
+- **Secondary accent:** indigo for baseline comparisons and neutral actions.
+- **Surfaces:** cool white and soft grey in light mode; charcoal and deep green
+  black in dark mode.
+- **Typography:** Manrope for controls and data, Source Serif 4 for editorial
+  headings. Financial values use tabular numerals.
+- **Shape:** 6-8px radii for panels and controls. Pills are reserved for compact
+  status or metadata labels.
+- **Motion:** short state transitions only. Honor `prefers-reduced-motion`.
 
-## Typography
+Production tokens and overrides live in `next-app/app/experience.css`. The
+legacy variables in `globals.css` are compatibility aliases for existing
+planner components, not a separate visual system.
 
-Headlines and the masthead use **Prata** — a free stand-in for PF Marlet Display (Adobe Fonts entitlement was unavailable in this environment; see the design spec's Open Items to revisit real licensing) — for its tapered, quietly elegant capitals. Body text and every number use **Lora**, with tabular figures throughout so ledger columns stay aligned. **Kalam**, a hand-written face, is reserved for exactly one element: the milestone ink-stamp lettering. It never appears anywhere else.
+## Public Experience
 
-## Layout
+The home page opens on the real planning experience, not a marketing splash.
+Its first viewport must include:
 
-The app keeps its wide, multi-panel workspace — this is a tool whose value is comparing several numbers side by side, and narrowing it to a single reading column would be a real regression. Instead the width is expressed as a two-page ledger spread: a visible center gutter rule separates input panels from results panels, echoing the fold of an open ledger rather than a generic dashboard grid.
+1. The literal product category: "Home loan payoff planner".
+2. A direct route to the portfolio planner and single-loan calculator.
+3. The beginning of an interactive payoff model with real amortization output.
 
-## Elevation & Depth
+Public navigation is minimal and responsive. Claims must match implemented
+behavior; do not advertise authentication, checkout, PDF generation, or paid
+features until those systems exist.
 
-Two levels only: the page, and a sheet laid on top of it. Sheets get a soft, warm-brown-tinted shadow — like real paper catching light on a desk — never a cool-grey SaaS shadow, never glass, blur, or glow.
+## Workspace
 
-## Shapes
+- Desktop uses a fixed navigation rail and a three-column planner where space
+  permits.
+- Tablet collapses tools beneath the primary analysis.
+- Mobile uses a fixed horizontal icon bar and a single content column.
+- Workflow tabs may scroll horizontally, but the document itself must never
+  have horizontal overflow.
+- Core loan inputs stay visible. Lender rules and advanced settings begin
+  collapsed in a disclosure.
+- Results lead with interest saved, time saved, remaining interest, and payoff
+  date before charts or secondary tools.
 
-Corners are barely rounded — 2px (`{rounded.sm}`) to 4px (`{rounded.md}`) everywhere, evoking a trimmed paper edge rather than an app bubble. Nothing in this system uses Tailwind's default 8px+ radii.
+## Interaction Rules
 
-## Components
+- Use Lucide icons for familiar actions and provide labels or tooltips.
+- Every input needs an accessible name and visible label.
+- Controls have a minimum 44px touch target on compact viewports.
+- Focus rings use the primary emerald and remain visible in both themes.
+- Do not use alerts as placeholders for unfinished actions. Hide the action or
+  state the current limitation plainly.
+- Calculations start in the browser. Any Supabase write requires an explicit
+  user action and clear disclosure of the data being sent.
 
-- **Masthead:** cream background, a red double-rule bottom border (echoing a ledger page's ruled header band) on every page.
-- **Sheet card:** `{colors.paper-raised}` background, `{rounded.md}` corners, the warm elevation shadow.
-- **Buttons:** outline-only at rest — `cloth-red` border and text on transparent/paper background, no fill — filling solid `cloth-red` with paper-colored text only on hover. Quieter than a solid CTA, closer to a "sign here" box.
-- **Inputs:** no box, no border — a bottom rule only (writing directly on a ledger line), label in small caps above, focus state thickens the rule to `cloth-red`.
-- **Milestone stamp:** a circular, slightly rotated red ink stamp in Kalam, replacing badge/confetti-style celebration UI at the one moment it's earned: a loan reaching payoff.
+## Responsive And Print QA
 
-## Do's and Don'ts
+Before release, verify at 390x844, 768x1024, 1280x800, and 1440x900. Check both
+themes, menu and sidebar behavior, live input updates, charts, tables, and zero
+page-level horizontal overflow. Print styles hide interactive chrome and render
+the report in a legible black-on-white layout.
 
-- **Do** let ruled lines separate content instead of boxing everything in cards.
-- **Do** use tabular numerals wherever money is displayed.
-- **Do** keep dark mode warm (Lamplight) — never cold blue-grey.
-- **Don't** use red for interest cost, form errors, or any "bad news" — that's `cost` or `warn`.
-- **Don't** add glass, blur, glow, or neon anywhere.
-- **Don't** let Kalam appear anywhere but the milestone stamp.
-- **Don't** round corners past 4px.
-- **Don't** fill primary buttons at rest — outline only, fill on hover.
+## Accessibility
 
-## Responsive Behavior
-
-Not one of the eight canonical sections, but every reference system studied for the SaaS-polish pass documents this explicitly, so it's written down here rather than left only as implemented CSS.
-
-- **Breakpoints:** the three-column workspace grid (`370px / 1fr / 400px`) collapses to two columns at 1380px (the right column spans both, becoming its own 2-up grid), then to a single column at 940px, at which point the workflow-nav tabs become a horizontally-scrolling strip with `scroll-snap`. Marketing-page grids (pricing tiers, feature comparisons) collapse to one column at 1080px and 720px.
-- **Touch targets:** every interactive element — buttons, `.add-btn`, select/input controls, range sliders, theme/nav/modal-close buttons — has a global `min-width: 44px; min-height: 44px` floor set in `globals.css`. This is enforced via CSS `min-height`/`min-width`, which always constrains the final rendered size regardless of any smaller `height`/`width` an individual component sets inline — verified by computed-style inspection, not just assumed from the source.
-- **Collapse strategy:** the ledger's two-page spread (center gutter rule between input and result panels) becomes a single stacked column below 940px, with the gutter rule rotating from a vertical `border-right` to a horizontal `border-bottom`.
-- **Print:** a dedicated `@media print` layer forces the broadsheet back into a static two-column layout regardless of viewport, hides interactive chrome, and swaps the warm palette for plain black-on-white.
+- Maintain one clear `h1` per route and logical heading order.
+- Preserve semantic landmarks for the public header, workspace navigation,
+  main content, complementary tools, and footer.
+- Do not rely on color alone for baseline-versus-plan comparisons.
+- Keep body and control text readable; compact labels should not drop below
+  12px.
+- Keyboard and reduced-motion behavior are release requirements, not optional
+  polish.

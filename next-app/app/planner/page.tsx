@@ -335,6 +335,14 @@ export default function PlannerPage() {
 
   return (
     <div className="wrap planner-page-container">
+      <header className="workspace-page-header">
+        <div>
+          <span className="workspace-page-label">Portfolio workspace</span>
+          <h1>Build your debt-free plan</h1>
+          <p>Shape the loans on the left, then review the outcome before opening advanced tools.</p>
+        </div>
+      </header>
+
       {sharedPlanLoading && (
         <div className="loading-banner">
           Loading shared prepayment plan from cloud...
@@ -410,7 +418,7 @@ export default function PlannerPage() {
           </button>
         </aside>
 
-        <main className="col-mid">
+        <div className="col-mid">
           <section id="results" className="workflow-section">
             <SummaryCards results={results} />
           </section>
@@ -497,7 +505,7 @@ export default function PlannerPage() {
               trackEvent("save_plan_cta_clicked", { savings: totalSavings });
               setIsPaywallOpen(true);
               setPlanActionTaken(true);
-            }}>Save Plan & Get PDF (Free)</button>
+            }}>Save snapshot</button>
             <button className="btn ghost" onClick={() => { downloadScheduleCSV(results); setPlanActionTaken(true); }}>Download CSV</button>
             <button className="btn ghost" onClick={() => { exportWorkspaceJSON(); setPlanActionTaken(true); }}>Export JSON</button>
             <button className="btn ghost" onClick={() => document.getElementById("import-json-file")?.click()}>Import JSON</button>
@@ -510,7 +518,7 @@ export default function PlannerPage() {
               <SharePlanButton results={results} />
             </div>
           )}
-        </main>
+        </div>
 
         <aside className="col-right" id="tools">
           {loans.length >= 1 && (

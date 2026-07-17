@@ -10,10 +10,11 @@ export function getStoredTheme(): Theme | null {
 }
 
 export function getCurrentTheme(): Theme {
-  return document.body.classList.contains("dark") ? "dark" : "light";
+  return document.documentElement.dataset.theme === "dark" || document.body.classList.contains("dark") ? "dark" : "light";
 }
 
 export function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
   document.body.classList.toggle("dark", theme === "dark");
   window.localStorage.setItem(STORAGE_KEY, theme);
   window.dispatchEvent(new CustomEvent<Theme>(CHANGE_EVENT, { detail: theme }));

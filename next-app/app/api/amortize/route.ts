@@ -17,7 +17,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { buildSchedule, compare, monthlyEmi } from "../engine/amortization";
+import { buildSchedule, compare, monthlyEmi } from "../../../engine/amortization";
 
 const MAX_TENURE_MONTHS = 600;
 const MAX_PRINCIPAL = 1_000_000_000;

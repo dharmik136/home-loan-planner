@@ -235,6 +235,7 @@ export default function CalculatorPage() {
                   Loan Amount (Principal)
                 </label>
                 <input
+                  aria-label="Loan amount principal"
                   type="number"
                   value={loan.principal}
                   onChange={(e) => setLoan({ ...loan, principal: Number(e.target.value) })}
@@ -248,6 +249,7 @@ export default function CalculatorPage() {
                     Interest Rate (%)
                   </label>
                   <input
+                    aria-label="Interest rate percentage"
                     type="number"
                     step="0.01"
                     value={loan.rate}
@@ -260,6 +262,7 @@ export default function CalculatorPage() {
                     Tenure (Years)
                   </label>
                   <input
+                    aria-label="Tenure in years"
                     type="number"
                     value={loan.tenureYears}
                     onChange={(e) => setLoan({ ...loan, tenureYears: Number(e.target.value) })}
@@ -282,6 +285,7 @@ export default function CalculatorPage() {
                   Lender Ruleset
                 </label>
                 <select
+                  aria-label="Lender ruleset"
                   value={loan.ruleset}
                   onChange={(e) => setLoan({ ...loan, ruleset: e.target.value as LoanData['ruleset'] })}
                   style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", background: "var(--paper-raised)" }}
@@ -304,6 +308,7 @@ export default function CalculatorPage() {
                 </div>
                 <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                   <input
+                    aria-label="Monthly prepayment"
                     type="range"
                     min="0"
                     max="50000"
@@ -321,6 +326,7 @@ export default function CalculatorPage() {
                     Lump Sum Prepay
                   </label>
                   <input
+                    aria-label="Lump sum prepayment"
                     type="number"
                     value={loan.lumpSum}
                     onChange={(e) => setLoan({ ...loan, lumpSum: Number(e.target.value) })}
@@ -332,6 +338,7 @@ export default function CalculatorPage() {
                     Target Month
                   </label>
                   <input
+                    aria-label="Lump sum target month"
                     type="number"
                     value={loan.lumpSumMonth}
                     onChange={(e) => setLoan({ ...loan, lumpSumMonth: Number(e.target.value) })}
@@ -344,7 +351,7 @@ export default function CalculatorPage() {
         </aside>
 
         {/* Right Column: Visuals & Metrics */}
-        <main className="col-main">
+        <div className="col-main">
           {/* Summary Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "15px", marginBottom: "20px" }}>
             <div className="panel s2" style={{ textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", padding: "15px" }}>
@@ -444,7 +451,7 @@ export default function CalculatorPage() {
               </table>
             </div>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

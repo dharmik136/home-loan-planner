@@ -163,16 +163,16 @@ export default function SampleReportPage() {
             </ul>
             <div className="pt-4 border-t space-y-3">
               <button
-                onClick={() => alert('PDF report generating stream initialized. Check downloads.')}
+                onClick={() => window.print()}
                 className="w-full inline-flex items-center justify-center gap-1.5 rounded-md font-bold text-sm border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-9 px-4"
               >
-                Download Sample PDF Document <Download size={14} />
+                Print or save as PDF <Download size={14} />
               </button>
               <Link
-                href="/pricing"
+                href="/planner"
                 className="w-full inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent text-accent-foreground font-semibold text-xs h-9 px-4"
               >
-                Sign up for White-Label Plan
+                Build a planner report
               </Link>
             </div>
           </div>

@@ -4,14 +4,22 @@
   "description": "Multi-loan prepayment planner with smart windfall optimization",
   "private": true,
   "scripts": {
-    "web:install": "npm --prefix web install",
+    "install:apps": "npm run web:install && npm run next:install",
+    "web:install": "npm --prefix web ci",
     "web:dev": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
     "web:test": "npm --prefix web run test",
     "web:e2e": "npm --prefix web run e2e",
-    "next:install": "npm --prefix next-app install",
+    "web:e2e:ci": "npm --prefix web run e2e:ci",
+    "web:check": "npm run web:test && npm run web:build",
+    "next:install": "npm --prefix next-app ci",
     "next:dev": "npm --prefix next-app run dev",
-    "next:build": "npm --prefix next-app run build"
+    "next:build": "npm --prefix next-app run build",
+    "next:test": "npm --prefix next-app run test",
+    "next:typecheck": "npm --prefix next-app run typecheck",
+    "next:check": "npm run next:test && npm run next:typecheck && npm run next:build",
+    "python:test": "python -m pytest",
+    "check": "npm run web:check && npm run next:check && npm run python:test"
   },
   "keywords": [
     "amortization",

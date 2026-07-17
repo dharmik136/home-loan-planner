@@ -1,61 +1,98 @@
-name: CI Build & Test Check
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  web:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v7
-      with:
-        node-version: 22
-        cache: 'npm'
-        cache-dependency-path: web/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
-    - name: Install Web Dependencies
-      run: |
-        cd web
-        npm ci
+      - name: Install web dependencies
+        run: npm run web:install
 
-    - name: Run Vitest Suite
-      run: |
-        cd web
-        npm test
+      - name: Run web unit tests
+        run: npm run web:test
 
-    - name: Run Vite Production Build
-      run: |
-        cd web
-        npm run build
+      - name: Build web application
+        run: npm run web:build
 
-  build-next-app:
+      - name: Install Playwright browser
+        run: cd web && npx playwright install --with-deps chromium
+
+      - name: Run web browser tests
+        run: npm run web:e2e:ci
+
+  next-app:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v7
-      with:
-        node-version: 22
-        cache: 'npm'
-        cache-dependency-path: next-app/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: next-app/package-lock.json
 
-    - name: Install Next.js App Dependencies
-      run: |
-        cd next-app
-        npm ci
+      - name: Install Next.js dependencies
+        run: npm run next:install
 
-    - name: Build
-      run: |
-        cd next-app
-        npm run build
+      - name: Run Next.js engine tests
+        run: npm run next:test
+
+      - name: Type-check Next.js application
+        run: npm run next:typecheck
+
+      - name: Build Next.js application
+        run: npm run next:build
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install Python development dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Run Python unit tests
+        run: python -m pytest

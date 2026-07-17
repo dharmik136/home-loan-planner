@@ -1,16 +1,40 @@
 import React from 'react';
-import { Prata, Lora, Kalam } from 'next/font/google';
+import { Manrope, Source_Serif_4 } from 'next/font/google';
 import Header from '../components/Header';
 import { ThemeInit } from '../components/ThemeInit';
-import '../app/globals.css'; // Mock importing global styles
+import '../app/globals.css';
+import '../app/experience.css';
 
-const prata = Prata({ subsets: ['latin'], weight: '400', variable: '--font-prata' });
-const lora = Lora({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-lora' });
-const kalam = Kalam({ subsets: ['latin'], weight: '700', variable: '--font-kalam' });
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
+const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-source-serif' });
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://home-loan-planner-neon.vercel.app';
+const themeScript = `
+  try {
+    const stored = localStorage.getItem('khata-theme');
+    const theme = stored === 'dark' || stored === 'light'
+      ? stored
+      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.dataset.theme = theme;
+  } catch (_) {}
+`;
 
 export const metadata = {
-  title: 'The Prepayment Ledger',
-  description: 'Track, optimize, and roll over your loans to become debt-free faster.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'The Prepayment Ledger',
+    template: '%s | The Prepayment Ledger',
+  },
+  description: 'Model Indian home-loan prepayments, compare payoff strategies, and build a debt-free plan.',
+  applicationName: 'The Prepayment Ledger',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    title: 'The Prepayment Ledger',
+    description: 'Model Indian home-loan prepayments and build a clear debt-free plan.',
+    siteName: 'The Prepayment Ledger',
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -19,13 +43,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`h-full ${prata.variable} ${lora.variable} ${kalam.variable}`}>
-      <body className="h-full font-body antialiased bg-background text-foreground">
+    <html lang="en" suppressHydrationWarning className={`h-full ${manrope.variable} ${sourceSerif.variable}`}>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <body className="h-full antialiased bg-background text-foreground">
         <ThemeInit />
         <div className="relative flex flex-col min-h-screen">
-          {/* Header is included globally but page content can choose to hide/show details */}
           <Header />
-          <main className="flex-grow flex flex-col">{children}</main>
+          <div className="flex-grow flex flex-col">{children}</div>
         </div>
       </body>
     </html>

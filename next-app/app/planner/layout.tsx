@@ -13,15 +13,13 @@ export default function PlannerLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar navigation */}
+    <div className="workspace-shell">
       <WorkspaceSidebar
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed(!collapsed)}
         activeRoute={pathname || '/planner'}
       />
-      {/* Page content */}
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto bg-background">
+      <main className="workspace-content">
         {children}
       </main>
     </div>

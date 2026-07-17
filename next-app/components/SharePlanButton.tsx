@@ -17,6 +17,7 @@ export function SharePlanButton({ results }: Props) {
   const loanCount = results.length;
 
   const buildShareText = () => {
+    const calculatorUrl = typeof window !== "undefined" ? window.location.origin : "";
     const lines = [
       `Home loan prepayment plan`,
       ``,
@@ -27,7 +28,7 @@ export function SharePlanButton({ results }: Props) {
       `  - ${formatINR(Math.round(totalInterestSaved))} in interest saved`,
       `  - ${totalMonthsSaved} months earlier payoff`,
       ``,
-      `Calculator: https://prepaymentledger.in`,
+      `Calculator: ${calculatorUrl}`,
     ];
     return lines.join("\n");
   };
@@ -59,8 +60,9 @@ export function SharePlanButton({ results }: Props) {
   };
 
   const handleTwitter = () => {
+    const calculatorUrl = window.location.origin;
     const tweet = encodeURIComponent(
-      `Projected home loan interest saved: ${formatINR(Math.round(totalInterestSaved))}.\n\nCalculator: https://prepaymentledger.in #HomeLoan #PersonalFinance`
+      `Projected home loan interest saved: ${formatINR(Math.round(totalInterestSaved))}.\n\nCalculator: ${calculatorUrl} #HomeLoan #PersonalFinance`
     );
     window.open(`https://twitter.com/intent/tweet?text=${tweet}`, "_blank", "noopener");
     trackEvent("plan_shared", { method: "twitter", loanCount });

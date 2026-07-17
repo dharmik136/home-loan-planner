@@ -1,9 +1,22 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {
+  BadgeIndianRupee,
+  Calculator,
+  FileText,
+  House,
+  Info,
+  Landmark,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Sparkles,
+  Sun,
+  WalletCards,
+} from 'lucide-react';
 import { getCurrentTheme, subscribeToThemeChange, toggleTheme, type Theme } from '../services/theme';
-import { Calculator, ClipboardList, Zap, IndianRupee, Info, ChevronRight, ChevronLeft, Sun, Moon } from 'lucide-react';
 
 interface WorkspaceSidebarProps {
   collapsed: boolean;
@@ -11,82 +24,73 @@ interface WorkspaceSidebarProps {
   activeRoute: string;
 }
 
-export default function WorkspaceSidebar({
-  collapsed,
-  onToggleCollapse,
-  activeRoute,
-}: WorkspaceSidebarProps) {
+const menuItems = [
+  { name: 'Portfolio', path: '/planner', icon: WalletCards },
+  { name: 'Quick calculator', path: '/calculator', icon: Calculator },
+  { name: 'Optimizer', path: '/planner/optimizer', icon: Sparkles },
+  { name: 'Report preview', path: '/sample-report', icon: FileText },
+  { name: 'Pricing', path: '/pricing', icon: BadgeIndianRupee },
+  { name: 'About', path: '/about', icon: Info },
+];
+
+export default function WorkspaceSidebar({ collapsed, onToggleCollapse, activeRoute }: WorkspaceSidebarProps) {
   const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
     setTheme(getCurrentTheme());
     return subscribeToThemeChange(setTheme);
   }, []);
-  const menuItems = [
-    { name: 'Calculator', path: '/calculator', icon: Calculator },
-    { name: 'Portfolio Planner', path: '/planner', icon: ClipboardList },
-    { name: 'Windfall Optimizer', path: '/planner/optimizer', icon: Zap },
-    { name: 'Pricing', path: '/pricing', icon: IndianRupee },
-    { name: 'About', path: '/about', icon: Info },
-  ];
 
   return (
-    <aside
-      className={`flex flex-col border-r bg-muted/30 transition-all duration-300 ${
-        collapsed ? 'w-16' : 'w-64'
-      } h-screen sticky top-0`}
-    >
-      {/* Sidebar Header */}
-      <div className="flex h-14 items-center justify-between px-4 border-b">
-        {!collapsed && (
-          <span className="font-bold text-sm tracking-tight text-foreground truncate">
-            Workspace
-          </span>
-        )}
+    <aside className={`workspace-sidebar${collapsed ? ' collapsed' : ''}`}>
+      <div className="workspace-brand-row">
+        <Link href="/" className="workspace-brand" aria-label="Back to home">
+          <span><Landmark size={18} /></span>
+          {!collapsed && <strong>Loan Planner</strong>}
+        </Link>
         <button
+          type="button"
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-md hover:bg-muted-foreground/15 text-muted-foreground hover:text-foreground ml-auto"
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          className="workspace-icon-button sidebar-collapse"
+          title={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+          aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
         </button>
       </div>
 
-      {/* Navigation Items */}
-      <nav className="flex-1 space-y-1 p-2">
+      <nav className="workspace-navigation" aria-label="Workspace navigation">
+        <span className="workspace-nav-label">Workspace</span>
         {menuItems.map((item) => {
-          const isActive = activeRoute === item.path || activeRoute.startsWith(item.path + '/');
+          const active = activeRoute === item.path || (item.path !== '/planner' && activeRoute.startsWith(`${item.path}/`));
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground'
-              }`}
+              className={active ? 'active' : undefined}
+              aria-current={active ? 'page' : undefined}
+              title={collapsed ? item.name : undefined}
             >
-              <item.icon size={17} className="shrink-0" aria-hidden="true" />
-              {!collapsed && <span className="truncate">{item.name}</span>}
+              <item.icon size={18} aria-hidden="true" />
+              {!collapsed && <span>{item.name}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* Sidebar Footer */}
-      <div className="p-3 border-t flex flex-col gap-2">
-        {!collapsed && (
-          <div className="text-xs text-muted-foreground text-center truncate">
-            The Prepayment Ledger v1.0
-          </div>
-        )}
+      <div className="workspace-sidebar-footer">
+        <Link href="/" className="workspace-home-link" title={collapsed ? 'Home' : undefined}>
+          <House size={17} />
+          {!collapsed && <span>Back to home</span>}
+        </Link>
         <button
+          type="button"
           onClick={() => setTheme(toggleTheme())}
-          className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs border rounded hover:bg-accent text-accent-foreground font-medium"
-          title={theme === 'dark' ? 'Switch to Day' : 'Switch to Lamplight'}
+          className="workspace-theme-button"
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
         >
-          {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-          {!collapsed && (theme === 'dark' ? 'Day Mode' : 'Lamplight')}
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          {!collapsed && <span>{theme === 'dark' ? 'Light theme' : 'Dark theme'}</span>}
         </button>
       </div>
     </aside>

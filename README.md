@@ -3,11 +3,11 @@
 [![CI Build & Test Check](https://github.com/dharmik136/home-loan-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/dharmik136/home-loan-planner/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A premium, interactive web application and live Excel workbook to simulate, optimize, and plan prepayments for floating-rate Indian home loans, backed by a rigorous math core verifying 57+ unit tests.
+An interactive web application and live Excel workbook for simulating and planning prepayments on floating-rate Indian home loans, backed by automated TypeScript, browser, and Python checks.
 
 ### 🌐 Live Applications
 
-*   **[home-loan-planner-neon.vercel.app](https://home-loan-planner-neon.vercel.app/)** — the current app: a Next.js + Supabase multi-loan planner with saved plans, "Fresh Khata" ledger-themed UI (Day and Lamplight modes), and the full workflow (setup → prepayments → schedule → tools → save).
+*   **[home-loan-planner-neon.vercel.app](https://home-loan-planner-neon.vercel.app/)** — the current app: a Next.js multi-loan workspace with local calculations, optional Supabase snapshots/share links, responsive payoff charts, schedules, and decision tools. The public beta is free and has no account or checkout flow.
 *   **[dharmik136.github.io/home-loan-planner](https://dharmik136.github.io/home-loan-planner/)** — the original single-file dashboard (no account needed, everything stays in your browser). Still maintained, functionally simpler.
 
 ---
@@ -27,7 +27,7 @@ A premium, interactive web application and live Excel workbook to simulate, opti
 
 ## 📂 Repository Layout
 
-*   `next-app/` — The current Next.js 16 application (deployed to Vercel), backed by Supabase for accounts and saved plans. Styled with the "Fresh Khata" design system (see [`DESIGN.md`](DESIGN.md)).
+*   `next-app/` — The current Next.js 16 application deployed to Vercel. Supabase is optional and currently supports anonymous planner snapshots/share links, not user accounts.
 *   `supabase/` — Supabase migrations (schema, RLS policies) for `next-app`'s backend.
 *   `index.html` — The compiled, self-contained single-file production build of the original React web app. Serves directly to GitHub Pages.
 *   `Home-Loan-Prepayment-Planner.xlsx` — The live Excel workbook counterpart with in-built formula calculations.
@@ -47,13 +47,18 @@ A premium, interactive web application and live Excel workbook to simulate, opti
 ## 🛠️ Local Development
 
 ### 1. Next.js App (current)
-Requires a Supabase project (see `supabase/migrations/` for schema) and its URL/publishable key in `next-app/.env.local`:
+Requires a Supabase project (see `supabase/migrations/` for schema) and its URL/publishable key in `next-app/.env.local`. Start from the safe placeholder template; never put a secret or `service_role` key in a `NEXT_PUBLIC_` variable:
 ```bash
+cp next-app/.env.example next-app/.env.local
 cd next-app
-npm install
+npm ci
 npm run dev      # http://localhost:3000
+npm run test     # production amortization engine regression tests
+npm run typecheck
 npm run build    # production build
 ```
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the complete Supabase migration, Vercel environment, and release checklist.
 
 ### 2. Excel Core & Python Workbook Generator
 Requires Python 3.10+ and standard dependencies:
@@ -67,12 +72,12 @@ python src/verify_workbook.py       # Recalculate workbook formulas and cross-ve
 To run, edit, or test the original web client:
 ```bash
 cd web
-npm install
+npm ci
 
 # Start local dev server (default: http://localhost:5173)
 npm run dev      
 
-# Run all 57 Vitest unit tests (engine, tax slabs, rollover strategies)
+# Run all 60 Vitest unit tests (engine, tax slabs, rollover strategies)
 npm test         
 
 # Run Playwright E2E browser tests (responsiveness, inputs, PDF modal)
@@ -90,9 +95,13 @@ npm run web:dev        # Start local development server
 npm run web:build      # Compile production single-file bundle
 npm run web:test       # Run Vitest test suite
 npm run web:e2e        # Run Playwright E2E browser tests
-npm run next:install   # Install Next.js template dependencies
+npm run next:install   # Install locked Next.js dependencies
 npm run next:dev       # Start Next.js development server
+npm run next:test      # Run production engine regression tests
+npm run next:typecheck # Generate route types and run TypeScript checks
 npm run next:build     # Build Next.js static pages
+npm run python:test    # Run Python amortization tests
+npm run check          # Run unit tests, type checks, and production builds
 ```
 
 ---

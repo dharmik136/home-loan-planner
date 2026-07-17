@@ -22,6 +22,10 @@ web/.env.local
 next-app/.env
 next-app/.env.local
 
+# Local deployment metadata
+.vercel/
+**/.vercel/
+
 # IDE & Editor settings
 .vscode/
 .idea/
@@ -48,6 +52,7 @@ pnpm-debug.log*
 # Next.js and Vite builds
 web/.vite/
 web/dist-ssr/
+web/dist/
 next-app/.next/
 next-app/next-env.d.ts
 *.tsbuildinfo
@@ -63,6 +68,9 @@ web/playwright-report/
 htmlreport/
 .playwright-mcp/
 next-app/.playwright-mcp/
+.coverage
+coverage.xml
+htmlcov/
 
 # Local agent/MCP tooling config — machine-specific, not project source
 .agents/

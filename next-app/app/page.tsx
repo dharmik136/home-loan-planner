@@ -1,230 +1,277 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Scale, RefreshCw, Zap, ArrowRight, ChevronDown } from 'lucide-react';
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarCheck2,
+  ChartNoAxesCombined,
+  Check,
+  IndianRupee,
+  LockKeyhole,
+  SlidersHorizontal,
+  Sparkles,
+  TrendingDown,
+} from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { buildSchedule, compare, monthlyEmi } from '../engine/amortization';
+import { formatCompactINR, formatDuration, formatINR } from '../engine/format';
+
+interface TooltipPayload {
+  dataKey?: string;
+  value?: number;
+  color?: string;
+}
+
+function PayoffTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayload[]; label?: number }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="home-chart-tooltip">
+      <strong>Year {label}</strong>
+      {payload.map((entry) => (
+        <span key={entry.dataKey}>
+          <i style={{ background: entry.color }} />
+          {entry.dataKey === 'baseline' ? 'Minimum EMI' : 'Your plan'}
+          <b>{formatCompactINR(Number(entry.value || 0))}</b>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function ModelField({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  prefix,
+  suffix,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step: number;
+  prefix?: string;
+  suffix?: string;
+}) {
+  return (
+    <label className="home-model-field">
+      <span>{label}</span>
+      <div className="home-number-control">
+        {prefix && <b>{prefix}</b>}
+        <input
+          type="number"
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          onChange={(event) => onChange(Math.min(max, Math.max(min, Number(event.target.value) || min)))}
+        />
+        {suffix && <b>{suffix}</b>}
+      </div>
+      <input
+        type="range"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        onChange={(event) => onChange(Number(event.target.value))}
+        aria-label={`${label} slider`}
+      />
+    </label>
+  );
+}
+
+const capabilityRows = [
+  ['Portfolio strategy', 'Compare avalanche and snowball rollovers across multiple loans.'],
+  ['Prepayment scenarios', 'Model recurring payments, lump sums, step-ups, and windfalls.'],
+  ['Indian lending rules', 'Check common floating-rate and lender-specific constraints.'],
+  ['Decision tools', 'Stress-test rates, tax savings, balance transfers, and rent vs buy.'],
+];
 
 export default function Homepage() {
-  // QuickTeaserCalculator state
-  const [principal, setPrincipal] = useState(5000000);
+  const [principal, setPrincipal] = useState(5_000_000);
   const [interestRate, setInterestRate] = useState(8.5);
   const [tenureYears, setTenureYears] = useState(20);
-  const [extraMonthly, setExtraMonthly] = useState(10000);
+  const [extraMonthly, setExtraMonthly] = useState(10_000);
 
-  // Simple interest calculation helper
-  const calculateSavings = () => {
-    const monthlyRate = interestRate / 12 / 100;
-    const totalMonths = tenureYears * 12;
-    
-    // Standard EMI formula
-    const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
-    
-    if (isNaN(emi) || emi <= 0) return { interestSaved: 0, yearsSaved: 0 };
-
-    // Simulating amortization schedule with and without extra prepayments
-    let balanceBase = principal;
-    let interestPaidBase = 0;
-    for (let m = 0; m < totalMonths; m++) {
-      const interest = balanceBase * monthlyRate;
-      const principalPaid = emi - interest;
-      interestPaidBase += interest;
-      balanceBase -= principalPaid;
-      if (balanceBase <= 0) break;
-    }
-
-    let balancePrepay = principal;
-    let interestPaidPrepay = 0;
-    let monthsPrepay = 0;
-    while (balancePrepay > 0 && monthsPrepay < totalMonths) {
-      const interest = balancePrepay * monthlyRate;
-      let principalPaid = emi - interest + extraMonthly;
-      if (principalPaid > balancePrepay) {
-        principalPaid = balancePrepay;
-      }
-      interestPaidPrepay += interest;
-      balancePrepay -= principalPaid;
-      monthsPrepay++;
-    }
-
-    const interestSaved = Math.max(0, interestPaidBase - interestPaidPrepay);
-    const yearsSaved = Math.max(0, (totalMonths - monthsPrepay) / 12);
+  const model = useMemo(() => {
+    const months = Math.max(12, tenureYears * 12);
+    const emi = monthlyEmi(principal, interestRate, months);
+    const baseline = buildSchedule(principal, interestRate, months, emi);
+    const plan = buildSchedule(principal, interestRate, months, emi + extraMonthly);
+    const comparison = compare(baseline, plan);
+    const chartData = baseline.rows
+      .filter((row) => row.month === 1 || row.month % 12 === 0 || row.month === baseline.rows.length)
+      .map((row) => ({
+        year: Math.max(1, Math.ceil(row.month / 12)),
+        baseline: row.closing,
+        plan: plan.rows[row.month - 1]?.closing ?? 0,
+      }));
+    const payoffDate = new Date();
+    payoffDate.setMonth(payoffDate.getMonth() + comparison.planMonths);
 
     return {
-      interestSaved: Math.round(interestSaved),
-      yearsSaved: Number(yearsSaved.toFixed(1)),
+      emi,
+      planPayment: emi + extraMonthly,
+      comparison,
+      chartData,
+      payoffDate: payoffDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }),
+      interestReductionPct: comparison.baselineInterest > 0
+        ? Math.round((comparison.interestSaved / comparison.baselineInterest) * 100)
+        : 0,
     };
-  };
-
-  const { interestSaved, yearsSaved } = calculateSavings();
+  }, [extraMonthly, interestRate, principal, tenureYears]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-b from-muted/50 to-background border-b">
-        <div className="container px-4 md:px-8 mx-auto grid md:grid-cols-12 gap-8 items-center">
-          <div className="md:col-span-7 space-y-6">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight font-display">
-              EVERY RUPEE OF YOUR LOAN, ACCOUNTED FOR.
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-xl">
-              No compounding left unexamined, no prepayment left unweighed. Open a ledger for your mortgage and see, in ink, exactly when it closes.
-            </p>
-            <div className="flex gap-4">
-              <Link
-                href="/planner"
-                className="inline-flex items-center justify-center gap-1.5 rounded-md text-sm font-medium border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground h-11 px-6"
-              >
-                Open the Ledger <ArrowRight size={16} strokeWidth={2} />
-              </Link>
-            </div>
-          </div>
-
-          {/* Quick Teaser Calculator Widget */}
-          <div className="md:col-span-5 bg-card text-card-foreground border rounded-lg shadow p-6 space-y-4">
-            <h3 className="font-bold text-lg border-b pb-2">Quick Prepayment Simulator</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  Loan Amount (₹)
-                </label>
-                <input
-                  type="number"
-                  value={principal}
-                  onChange={(e) => setPrincipal(Number(e.target.value))}
-                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                    Interest Rate (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.05"
-                    value={interestRate}
-                    onChange={(e) => setInterestRate(Number(e.target.value))}
-                    className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                    Remaining Tenure (Years)
-                  </label>
-                  <input
-                    type="number"
-                    value={tenureYears}
-                    onChange={(e) => setTenureYears(Number(e.target.value))}
-                    className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  Extra Monthly Payment (₹)
-                </label>
-                <input
-                  type="number"
-                  value={extraMonthly}
-                  onChange={(e) => setExtraMonthly(Number(e.target.value))}
-                  className="w-full border-0 border-b-[1.5px] border-border rounded-none px-0.5 py-1.5 text-sm bg-transparent focus:border-b-2 focus:border-primary focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="bg-muted border border-border rounded p-4 text-center">
-              <p className="text-xs text-muted-foreground font-medium uppercase">YOUR RESULTS</p>
-              <div className="mt-1 space-y-1">
-                <p className="text-lg font-bold" style={{ color: 'var(--emerald)' }}>
-                  Interest Saved: ₹{interestSaved.toLocaleString('en-IN')}
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  Debt-Free Sooner: {yearsSaved} Years Saved
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Grid */}
-      <section className="py-16 bg-background border-b">
-        <div className="container px-4 md:px-8 mx-auto space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold">Why Use The Prepayment Ledger?</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              We provide math-driven debt structures to save you money, completely independent of lender bias.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="border rounded-lg p-6 space-y-2">
-              <Scale size={28} strokeWidth={1.75} style={{ color: 'var(--clay)' }} />
-              <h3 className="font-bold text-lg">Asymmetry Exposed</h3>
-              <p className="text-sm text-muted-foreground">
-                Banks hide the impact of compounding early payments. We map out the exact interest savings line-by-line.
-              </p>
-            </div>
-            <div className="border rounded-lg p-6 space-y-2">
-              <RefreshCw size={28} strokeWidth={1.75} style={{ color: 'var(--emerald)' }} />
-              <h3 className="font-bold text-lg">Portfolio Rollover</h3>
-              <p className="text-sm text-muted-foreground">
-                Automatically roll over closed EMIs into your remaining loans to accelerate debt payoff without raising monthly budget.
-              </p>
-            </div>
-            <div className="border rounded-lg p-6 space-y-2">
-              <Zap size={28} strokeWidth={1.75} style={{ color: 'var(--gold)' }} />
-              <h3 className="font-bold text-lg">Windfall Optimizer</h3>
-              <p className="text-sm text-muted-foreground">
-                Allocate bonuses, stock sales, or inheritance across multiple loans mathematically to maximize your interest reduction.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Accordion */}
-      <section className="py-16 bg-muted/20 border-b">
-        <div className="container px-4 md:px-8 mx-auto max-w-3xl space-y-8">
-          <h2 className="text-3xl font-bold text-center">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            <details className="group border rounded-lg bg-background p-4" open>
-              <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
-                <span>Does prepaying home loans attract additional charges?</span>
-                <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
-              </summary>
-              <p className="text-sm text-muted-foreground mt-2">
-                Under RBI rules, individual borrowers with floating-rate home loans do not face prepayment charges. Non-individual borrowers or fixed-rate structures might attract penalties, which our platform flags automatically.
-              </p>
-            </details>
-            <details className="group border rounded-lg bg-background p-4">
-              <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
-                <span>What is the difference between Avalanche & Snowball strategies?</span>
-                <ChevronDown size={18} className="transition group-open:rotate-180 shrink-0" />
-              </summary>
-              <p className="text-sm text-muted-foreground mt-2">
-                The Avalanche method targets loans with the highest interest rates first, saving the most money. The Snowball method targets the smallest loan balances first, providing quick psychological wins as you clear accounts.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-muted py-8 mt-auto border-t">
-        <div className="container px-4 md:px-8 mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-sm">The Prepayment Ledger</span>
-          </div>
-          <div className="flex gap-4 text-xs text-muted-foreground">
-            <Link href="/about" className="hover:underline">About</Link>
-            <Link href="/pricing" className="hover:underline">Pricing</Link>
-            <Link href="/sample-report" className="hover:underline">Privacy Policy</Link>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            © 2026 The Prepayment Ledger. Built for financial sovereignty.
+    <main className="home-page">
+      <section className="home-intro" aria-labelledby="home-title">
+        <div className="home-intro-copy">
+          <span className="home-eyebrow"><BadgeCheck size={15} /> Built for Indian home loans</span>
+          <h1 id="home-title">Home loan payoff planner</h1>
+          <p>
+            See exactly how an extra payment changes your interest, payoff date, and monthly path.
+            Then build the complete plan across every loan you carry.
           </p>
+          <div className="home-intro-actions">
+            <Link href="/planner" className="primary-action">Build my full plan <ArrowRight size={17} /></Link>
+            <Link href="/calculator" className="secondary-action">Open single-loan calculator</Link>
+          </div>
         </div>
+        <div className="home-trust-line" aria-label="Product safeguards">
+          <span><LockKeyhole size={16} /> Browser-first calculations</span>
+          <span><ChartNoAxesCombined size={16} /> Reducing-balance model</span>
+          <span><BadgeCheck size={16} /> No bank login required</span>
+        </div>
+      </section>
+
+      <section className="home-model" aria-labelledby="quick-model-title">
+        <div className="home-model-sidebar">
+          <div className="home-section-heading">
+            <span><SlidersHorizontal size={17} /> Quick model</span>
+            <h2 id="quick-model-title">Adjust your loan</h2>
+            <p>Results update as you move each input.</p>
+          </div>
+          <div className="home-model-fields">
+            <ModelField label="Outstanding balance" value={principal} onChange={setPrincipal} min={500_000} max={30_000_000} step={100_000} prefix="₹" />
+            <ModelField label="Interest rate" value={interestRate} onChange={setInterestRate} min={5} max={16} step={0.05} suffix="%" />
+            <ModelField label="Remaining tenure" value={tenureYears} onChange={setTenureYears} min={3} max={30} step={1} suffix="years" />
+            <ModelField label="Extra each month" value={extraMonthly} onChange={setExtraMonthly} min={0} max={100_000} step={1_000} prefix="₹" />
+          </div>
+          <div className="home-payment-summary">
+            <span>Minimum EMI <b>{formatINR(model.emi)}</b></span>
+            <span>Planned monthly payment <b>{formatINR(model.planPayment)}</b></span>
+          </div>
+        </div>
+
+        <div className="home-model-results">
+          <div className="home-results-topline">
+            <div>
+              <span className="home-eyebrow"><Sparkles size={15} /> Your projected outcome</span>
+              <h2>{formatCompactINR(model.comparison.interestSaved)} less interest</h2>
+              <p>{model.interestReductionPct}% below the minimum-EMI path.</p>
+            </div>
+            <Link href="/planner" className="result-link">Use these insights <ArrowRight size={16} /></Link>
+          </div>
+
+          <div className="home-result-stats">
+            <div>
+              <TrendingDown size={18} />
+              <span>Debt-free sooner</span>
+              <strong>{formatDuration(model.comparison.monthsSaved)}</strong>
+            </div>
+            <div>
+              <CalendarCheck2 size={18} />
+              <span>New payoff date</span>
+              <strong>{model.payoffDate}</strong>
+            </div>
+            <div>
+              <IndianRupee size={18} />
+              <span>Interest still payable</span>
+              <strong>{formatCompactINR(model.comparison.planInterest)}</strong>
+            </div>
+          </div>
+
+          <div className="home-chart" aria-label="Outstanding loan balance over time">
+            <div className="home-chart-heading">
+              <div>
+                <strong>Outstanding balance</strong>
+                <span>Minimum EMI compared with your plan</span>
+              </div>
+              <div className="home-chart-legend">
+                <span><i className="baseline" /> Minimum EMI</span>
+                <span><i className="plan" /> Your plan</span>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={model.chartData} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="var(--experience-grid)" vertical={false} />
+                <XAxis dataKey="year" tickLine={false} axisLine={false} tickFormatter={(year) => `Y${year}`} minTickGap={24} />
+                <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => formatCompactINR(Number(value)).replace('₹', '')} width={54} />
+                <Tooltip content={<PayoffTooltip />} />
+                <Area type="monotone" dataKey="baseline" stroke="var(--experience-baseline)" fill="var(--experience-baseline)" fillOpacity={0.07} strokeWidth={2} />
+                <Area type="monotone" dataKey="plan" stroke="var(--experience-primary)" fill="var(--experience-primary)" fillOpacity={0.11} strokeWidth={3} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-capabilities" aria-labelledby="capabilities-title">
+        <div className="home-capability-intro">
+          <span className="home-eyebrow">Beyond a basic EMI calculator</span>
+          <h2 id="capabilities-title">One workspace for the decisions around your loan.</h2>
+          <p>Start with the payoff curve, then go deeper only when the decision requires it.</p>
+          <Link href="/planner" className="text-action">Explore the workspace <ArrowRight size={16} /></Link>
+        </div>
+        <div className="home-capability-list">
+          {capabilityRows.map(([title, detail], index) => (
+            <div key={title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{title}</strong>
+              <p>{detail}</p>
+              <Check size={18} aria-hidden="true" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="home-method" aria-label="Methodology and privacy">
+        <div>
+          <LockKeyhole size={20} />
+          <strong>Private by default</strong>
+          <p>Your calculations begin in the browser. Cloud sharing is optional when Supabase is configured.</p>
+        </div>
+        <div>
+          <ChartNoAxesCombined size={20} />
+          <strong>Auditable math</strong>
+          <p>Schedules use a month-by-month reducing-balance engine with downloadable rows.</p>
+        </div>
+        <div>
+          <BadgeCheck size={20} />
+          <strong>Built for decisions</strong>
+          <p>Every result compares your plan against the same minimum-EMI baseline.</p>
+        </div>
+      </section>
+
+      <footer className="home-footer">
+        <span>The Prepayment Ledger</span>
+        <p>Planning estimates, not financial advice. Confirm current terms with your lender.</p>
+        <div><Link href="/about">About</Link><Link href="/pricing">Pricing</Link><Link href="/privacy">Privacy</Link><Link href="/sample-report">Report preview</Link></div>
       </footer>
-    </div>
+    </main>
   );
 }
